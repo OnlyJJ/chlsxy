@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.lm.live.userinfo.domain.sqlmapping.UserInfo">
+	<resultMap type="com.lm.live.userbase.domain.UserInfo" id="vo">
+		<result property="id" column="id" />
+		<result property="userId" column="userId" />
+		<result property="userAccount" column="userAccount" />
+		<result property="pwd" column="pwd" />
+		<result property="bindMobile" column="bindMobile" />
+		<result property="bindEmail" column="bindEmail" />
+		<result property="addTime" column="addTime" />
+		<result property="actTime" column="actTime" />
+		<result property="lastTime" column="lastTime" />
+		<result property="lastIp" column="lastIp" />
+		<result property="lastArea" column="lastArea" />
+		<result property="nickName" column="nickName" />
+		<result property="sex" column="sex" />
+		<result property="icon" column="icon" />
+		<result property="isAnchor" column="isAnchor" />
+		<result property="userStatus" column="userStatus" />
+		<result property="address" column="address" />
+		<result property="remark" column="remark" />
+		<result property="brithday" column="brithday" />
+		<result property="sf" column="sf" />
+		<result property="cs" column="cs" />
+		<result property="qy" column="qy" />
+		<result property="channelId" column="channelId" />
+		<result property="appPackage" column="appPackage" />
+		<result property="goodCodeLevel" column="goodCodeLevel" />
+		<result property="loginType" column="loginType" />
+	</resultMap>
+
+	<!-- 用户详细信息 -->
+	<select id="getUserDetailInfo" resultType="com.lm.live.user.vo.UserInfo">
+		SELECT   					
+			a.userId AS userId, a.nickName AS nickname, a.remark remark, a.sex sex, a.brithday brithday,
+			a.address address, a.icon icon,
+			b.gold AS gold, b.anchorLevel AS anchorLevel, b.userLevel AS userLevel,
+			b.userPoint AS userPoint, b.anchorPoint AS anchorPoint ,  
+			nextUserLevel.point AS nextLevelUserPoint, nextAnchorLevel.point AS nextLevelAnchorPoint ,
+			CASE WHEN ISNULL(d.userId) THEN 0 ELSE 1 END isAnchor ,
+			IFNULL(d.roomId, NULL) AS roomId
+		FROM t_user_info  a   
+		INNER JOIN t_user_account b ON (a.userId = b.userId)    
+		LEFT JOIN t_user_anchor d ON (a.userId=d.userId)    
+		LEFT JOIN t_level nextUserLevel ON nextUserLevel.levelType = 1 AND nextUserLevel.point > b.userPoint     
+		LEFT JOIN t_level nextAnchorLevel ON nextAnchorLevel.levelType = 2 AND nextAnchorLevel.point > b.anchorPoint       
+		WHERE a.userId = #{userId} 
+		LIMIT 1
+	</select>
+	
+	<!-- 用户关注列表 -->
+	<select id="listAttention" resultType="com.lm.live.user.vo.HomepageVo">
+		SELECT DISTINCT  
+			a.userId,a.nickName,e.roomId,a.icon,a.remark,
+			CASE WHEN ISNULL(e.roomId) THEN 0 ELSE 1 END identity,
+			CASE WHEN ISNULL(d.roomId) THEN 0 ELSE 1 END STATUS
+		FROM t_user_info a  
+		INNER JOIN t_user_attention b ON (a.userId=b.toUserId)   
+		LEFT JOIN t_live_record_cdn d ON (a.userId=d.userId AND d.endTime IS NULL)
+		LEFT JOIN t_user_anchor e ON (a.userId = e.userId)  
+		WHERE b.userId= #{userId}
+		ORDER BY STATUS DESC, b.addTime DESC
+	</select>
+	
+	<!-- 用户粉丝列表 -->
+	<select id="listFans" resultType="com.lm.live.user.vo.UserBaseInfo">
+		SELECT b.userId,b.nickName,b.icon 
+		FROM t_user_attention a
+		INNER JOIN t_user_info b ON (b.userId = a.userId)
+		WHERE a.toUserId = #{toUserId}
+		ORDER BY a.addTime DESC
+	</select>
+	
+</mapper>

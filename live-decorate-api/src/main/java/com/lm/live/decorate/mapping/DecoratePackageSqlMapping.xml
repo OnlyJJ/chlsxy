@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.lm.live.decorate.domain.sqlmapping.DecoratePackage">
+
+	<resultMap type="com.lm.live.decorate.domain.DecoratePackage"
+		id="vo">
+		<result property="id" column="id" />
+		<result property="userId" column="userId" />
+		<result property="roomId" column="roomId" />
+		<result property="decorateId" column="decorateId" />
+		<result property="isPeriod" column="isPeriod" />
+		<result property="number" column="number" />
+		<result property="beginTime" column="beginTime" />
+		<result property="endTime" column="endTime" />
+		<result property="isAccumulation" column="isAccumulation" />
+		<result property="status" column="status" />
+	</resultMap>
+
+	<insert id="insert">
+    	<![CDATA[
+    		INSERT INTO t_decorate_package(
+    			userId,
+    			roomId,
+    			decorateId,
+    			isPeriod,
+    			number,
+    			beginTime,
+    			endTime,
+    			status,
+    			isAccumulation
+    		) VALUES(
+    			#{userId,jdbcType=VARCHAR},
+    			#{roomId,jdbcType=VARCHAR},
+    			#{decorateId,jdbcType=VARCHAR},
+    			#{isPeriod,jdbcType=VARCHAR},
+    			#{number,jdbcType=VARCHAR},
+    			#{beginTime,jdbcType=VARCHAR},
+    			#{endTime,jdbcType=VARCHAR},
+    			#{status,jdbcType=VARCHAR},
+    			#{isAccumulation,jdbcType=VARCHAR}
+    		)
+    	]]>
+	</insert>
+
+	<update id="update">
+		UPDATE t_decorate_package
+		<set>
+			<if test="roomId != null">
+					 <![CDATA[ roomId = #{roomId,jdbcType=VARCHAR},  ]]>
+			</if>
+			<if test="isPeriod != null"> 
+ 					 <![CDATA[ isPeriod = #{isPeriod,jdbcType=VARCHAR},  ]]>
+			</if>
+			<if test="number != null"> 
+					 <![CDATA[ number = #{number,jdbcType=VARCHAR},  ]]>
+			</if>
+			<if test="beginTime != null">
+					<![CDATA[beginTime = #{beginTime,jdbcType=VARCHAR},  ]]>
+			</if>
+			<if test="endTime != null">
+					 <![CDATA[ endTime = #{endTime,jdbcType=VARCHAR},  ]]>
+			</if>
+			<if test="isAdornUserDecorate != null">
+					 <![CDATA[ status = #{status,jdbcType=VARCHAR},  ]]>
+			</if>
+		</set>
+		<where>
+			 <![CDATA[ and id = #{id} ]]>
+		</where>
+	</update>
+
+
+	<delete id="removeById" parameterType="int">
+		delete from
+		t_decorate_package where id = #{id}
+	</delete>
+
+	<!-- 获取有效的勋章 -->
+	<select id="findValidDecorate" resultType="com.lm.live.decorate.vo.DecoratePackageVo">
+		SELECT d.id as decorateId, d.name as name, d.lightenImg as lightenImg,
+			d.grayImg as grayImg, dp.status as inUse,d.remark as remark
+		FROM t_decorate d, t_decorate_package dp
+		WHERE dp.decorateId = d.id
+		AND dp.userId=#{userId}
+		AND d.category=#{category}
+		<![CDATA[
+		AND (isPeriod=0 or (isPeriod=1 and now() >= beginTime and now() <= endTime) )
+		]]>
+		AND d.type=0
+		ORDER BY dp.isPeriod ASC ,dp.endTime DESC ,d.sortWeight DESC
+		
+	</select>
+
+	<update id="updateStatus">
+		UPDATE t_decorate_package
+		SET status = #{status}
+		WHERE userId = #{userId}
+		AND decorateId = #{decorateId}
+	</update>
+
+
+</mapper>
