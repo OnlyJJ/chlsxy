@@ -9,7 +9,7 @@
 	<artifactId>live-service</artifactId>
 	<packaging>war</packaging>
 	<version>${live.web.version}</version>
-	<name>live-service Maven Webapp</name>
+	<name>live-service</name>
 	<url>http://maven.apache.org</url>
 	<dependencies>
 		<dependency>
