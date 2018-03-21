@@ -3,8 +3,9 @@ package com.lm.live.tools.gift.service;
 import java.util.List;
 import java.util.Map;
 
-import com.jiujun.shows.common.service.ICommonService;
-import com.jiujun.shows.tools.gift.domain.Gift;
+import com.lm.live.common.service.ICommonService;
+import com.lm.live.tools.gift.domain.Gift;
+
 
 /**
  * 礼物服务

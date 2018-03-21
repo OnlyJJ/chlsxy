@@ -3,7 +3,8 @@ package com.lm.live.tools.tool.domain;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.jiujun.shows.common.vo.BaseVo;
+import com.lm.live.common.vo.BaseVo;
+
 /**
  * @entity
  * @table t_tool_his

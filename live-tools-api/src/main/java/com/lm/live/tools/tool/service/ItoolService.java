@@ -2,11 +2,11 @@ package com.lm.live.tools.tool.service;
 
 import java.util.List;
 
-import com.jiujun.shows.common.service.ICommonService;
-import com.jiujun.shows.common.vo.Page;
-import com.jiujun.shows.tools.tool.domain.Tool;
-import com.jiujun.shows.tools.vo.ToolVo;
+import com.lm.live.common.service.ICommonService;
+import com.lm.live.common.vo.Page;
 import com.lm.live.tools.enums.GiftTypeBusinessEnum;
+import com.lm.live.tools.tool.domain.Tool;
+import com.lm.live.tools.vo.ToolVo;
 /**
  * 工具服务
  * @author shao.xiang

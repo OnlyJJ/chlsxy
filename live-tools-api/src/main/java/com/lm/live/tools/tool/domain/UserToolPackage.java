@@ -1,6 +1,7 @@
 package com.lm.live.tools.tool.domain;
 
-import com.jiujun.shows.common.vo.BaseVo;
+import com.lm.live.common.vo.BaseVo;
+
 /**
  * @entity
  * @table t_tool_user_package
