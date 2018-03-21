@@ -103,7 +103,6 @@ public class GuardVo extends JsonParseInterface implements Serializable {
 	private String g_endTime = "q";
 	private String g_roomId="r";
 	private String g_sortIndex="s";
-	private String g_userLevel="t";
 	
 	@Override
 	public JSONObject buildJson() {
@@ -128,7 +127,6 @@ public class GuardVo extends JsonParseInterface implements Serializable {
 			setString(json,g_endTime,endTime);
 			setString(json,g_roomId,roomId);
 			setInt(json,g_sortIndex,sortIndex);
-			setString(json,g_userLevel,userLevel);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -154,7 +152,6 @@ public class GuardVo extends JsonParseInterface implements Serializable {
 			this.avatar = getString(json,g_avatar);
 			this.timerDown=getString(json,g_timerDown);
 			this.time=getLong(json,g_time);
-			this.userLevel = getString(json, g_userLevel);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -320,6 +317,4 @@ public class GuardVo extends JsonParseInterface implements Serializable {
 		this.userLevel = userLevel;
 	}
 
-	
-	
 }

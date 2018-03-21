@@ -1,14 +1,8 @@
 package com.lm.live.guard.service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-
 
 import com.alibaba.fastjson.JSONObject;
-import com.lm.live.common.service.ICommonService;
-import com.lm.live.guard.domain.GuardWork;
+import com.lm.live.common.vo.Page;
 
 /**
  * 守护服务
@@ -26,5 +20,5 @@ public interface IGuardService {
 	 *@author shao.xiang
 	 *@data 2018年3月20日
 	 */
-	JSONObject getGuardData(String userId) throws Exception;
+	JSONObject getGuardData(String userId, Page page) throws Exception;
 }
