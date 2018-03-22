@@ -2,7 +2,6 @@ package com.lm.live.login.service.impl;
 
 import java.util.Date;
 
-import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 

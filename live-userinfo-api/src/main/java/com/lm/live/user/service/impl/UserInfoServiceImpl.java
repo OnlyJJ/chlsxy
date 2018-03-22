@@ -13,6 +13,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.common.constant.MCTimeoutConstants;
 import com.lm.live.common.enums.IMBusinessEnum;
+import com.lm.live.common.utils.DateUntil;
 import com.lm.live.common.utils.IMutils;
 import com.lm.live.common.utils.LogUtil;
 import com.lm.live.common.utils.MemcachedUtil;
@@ -346,7 +347,6 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 		if (isModifyInfo == 1) { // 检测是否可以修改资料
 			throw new UserBizException(ErrorCode.ERROR_1001);
 		}
-		String oldNickname = dbUserInfo.getNickName();
 		String newNickName = user.getNickName();
 		newNickName = StrUtil.trimStr(newNickName);//昵称去掉空格
 		if(!StringUtils.isEmpty(newNickName)){
@@ -358,96 +358,49 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 				throw new UserBizException(ErrorCode.ERROR_1002);
 			}
 			
-			if(!newNickName.equals(dbUserInfo.getNickName())){ 
-				UserInfoDo userinfo = userBaseService.getUserByNickname(newNickName);
-				if(userinfo !=null && userinfo.getUserId() == userId){
-					throw new UserBizException(ErrorCode.ERROR_1003);
-				}
-			dbUserInfo.setNickName(newNickName);
-			}else{
-				dbUserInfo.setNickName(newNickName);
+			if(newNickName.equals(dbUserInfo.getNickName())) { 
+				return;
 			}
+			UserInfoDo userinfo = userBaseService.getUserByNickname(newNickName);
+			if(userinfo !=null && userinfo.getUserId() != userId){
+				throw new UserBizException(ErrorCode.ERROR_1003);
+			}
+			dbUserInfo.setNickName(newNickName);
 		}
 		
-//		
-//		String newRemark = updateAnchorInfo.getRemark();
-//		if(StringUtils.isNotEmpty(newRemark)){
-//			// 检测敏感词
-//			if(SensitiveWordUtil.isContaintSensitiveWord(newRemark)){
-//				Exception e = new SystemDefinitionException(ErrorCode.ERROR_2037);
-//				LogUtil.log.error(e.getMessage() ,e);
-//				throw e;
-//			}else{
-//				dbUserInfo.setRemark(newRemark);
-//			}
-//		}
-//		
-//		if(null != updateAnchorInfo.getSex() && updateAnchorInfo.getSex().length() > 0){
-//			dbUserInfo.setSex(updateAnchorInfo.getSex()) ;
-//		}
-//		
-//		if(null != updateAnchorInfo.getBrithday() && updateAnchorInfo.getBrithday().length() > 0){
-//			String dateStr = updateAnchorInfo.getBrithday();
-//			String dateFormate = "yyyy-MM-dd";
-//			Date date = DateUntil.parse(dateStr,dateFormate);
-//			dbUserInfo.setBrithday(date) ;
-//		}
-//		
-//		String newAddr = updateAnchorInfo.getAddress();
-//		if(StringUtils.isNotEmpty(newAddr)){
-//			// 检测敏感词
-//			if(SensitiveWordUtil.isContaintSensitiveWord(newAddr)){
-//				Exception e = new SystemDefinitionException(ErrorCode.ERROR_2037);
-//				LogUtil.log.error(e.getMessage() ,e);
-//				throw e;
-//			}else{
-//				dbUserInfo.setAddress(newAddr);
-//			}
-//		}
-//		
-//		String newSf = updateAnchorInfo.getSf();
-//		if(StringUtils.isNotEmpty(newSf)){
-//			// 检测敏感词
-//			if(SensitiveWordUtil.isContaintSensitiveWord(newSf)){
-//				Exception e = new SystemDefinitionException(ErrorCode.ERROR_2037);
-//				LogUtil.log.error(e.getMessage() ,e);
-//				throw e;
-//			}else{
-//				dbUserInfo.setSf(newSf);
-//			}
-//			
-//		}
-//		
-//		String newCs = updateAnchorInfo.getCs();
-//		if(StringUtils.isNotEmpty(newCs)){
-//			// 检测敏感词
-//			if(SensitiveWordUtil.isContaintSensitiveWord(newCs)){
-//				Exception e = new SystemDefinitionException(ErrorCode.ERROR_2037);
-//				LogUtil.log.error(e.getMessage() ,e);
-//				throw e;
-//			}else{
-//				dbUserInfo.setCs(newCs);
-//			}
-//			
-//		}
-//		
-//		String newQy = updateAnchorInfo.getQy();
-//		if(StringUtils.isNotEmpty(newQy)){
-//			// 检测敏感词
-//			if(SensitiveWordUtil.isContaintSensitiveWord(newQy)){
-//				Exception e = new SystemDefinitionException(ErrorCode.ERROR_2037);
-//				LogUtil.log.error(e.getMessage() ,e);
-//				throw e;
-//			}else{
-//				dbUserInfo.setQy(newQy);
-//			}
-//			
-//		}
-//		String newIcon = updateAnchorInfo.getIcon();
-//		if(StringUtils.isNotEmpty(newIcon) && newIcon.indexOf(ICON_PATH) == -1){
-//			dbUserInfo.setIcon(newIcon);
-//		}
-//		
-//		this.dao.update(dbUserInfo);
+		
+		String newRemark = user.getRemark();
+		if(!StringUtils.isEmpty(newRemark)){
+			// 检测敏感词
+			if(SensitiveWordUtil.isContaintSensitiveWord(newRemark)){
+				throw new UserBizException(ErrorCode.ERROR_1002);
+			}
+			dbUserInfo.setRemark(newRemark);
+		}
+		
+		if(null != user.getSex() && user.getSex().length() > 0){
+			dbUserInfo.setSex(user.getSex()) ;
+		}
+		
+		if(null != user.getBrithday() && user.getBrithday().length() > 0){
+			String dateStr = user.getBrithday();
+			Date date = DateUntil.parse(dateStr, Constants.DATEFORMAT_YMD);
+			dbUserInfo.setBrithday(date) ;
+		}
+		
+		String newAddr = user.getAddress();
+		if(!StringUtils.isEmpty(newAddr)){
+			// 检测敏感词
+			if(SensitiveWordUtil.isContaintSensitiveWord(newAddr)){
+				throw new UserBizException(ErrorCode.ERROR_1002);
+			}
+			dbUserInfo.setAddress(newAddr);
+		}
+		
+		String newIcon = user.getIcon();
+		if(!StringUtils.isEmpty(newIcon)) {
+			dbUserInfo.setIcon(newIcon);
+		}
+		userBaseService.update(dbUserInfo);
 	}
 }

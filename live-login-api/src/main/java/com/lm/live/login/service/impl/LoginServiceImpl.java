@@ -159,6 +159,7 @@ public class LoginServiceImpl implements ILoginService {
 			String encryptDbPwd = getPwd(nowDate, userId, imeiMd5Str);
 
 			// 根据ip获取省份
+			//my-todo 修改为目前MT获取用户省份的方法
 			String clientProvince = provinceService.getProviceBy(clientIp);
 			// 随机获取昵称
 			String[] strArr = Constants.DEFAULT_AUTOREGIST_NAME.split(Constants.SEPARATOR);

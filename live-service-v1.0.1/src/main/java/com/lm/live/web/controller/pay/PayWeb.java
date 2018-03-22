@@ -351,7 +351,7 @@ public class PayWeb extends BaseController {
 	 */
 	@RequestMapping("wechat/pay/notifyCallBack")
 	public void wechatPayNotifyCallBack(HttpServletRequest request,HttpServletResponse response){
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, String> map = new HashMap<String, String>();
 		map.put("return_code","FAIL" );
 		map.put("return_msg", "ERROR");
 		try {
@@ -371,7 +371,12 @@ public class PayWeb extends BaseController {
 		} catch (Exception e) {
 			LogUtil.log.error(e.getMessage() ,e);
 		}
-		String resStr = XMLConverUtil.maptoXml(map);
+		String resStr = "";
+		try {
+			resStr = XMLConverUtil.mapToXml(map);
+		} catch (Exception e) {
+			LogUtil.log.error(e.getMessage(), e);
+		}
 		LogUtil.log.info("#####wechat/pay/notifyCallBack response:"+resStr);
 		HttpServletResponseUtil.out(response, resStr, false);
 	}
@@ -383,7 +388,7 @@ public class PayWeb extends BaseController {
 	 */
 	@RequestMapping("wechat/pay/notifyCallBack/native")
 	public void wechatPayNotifyCallBackOfMp(HttpServletRequest request,HttpServletResponse response){
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, String> map = new HashMap<String, String>();
 		map.put("return_code","FAIL" );
 		map.put("return_msg", "ERROR");
 		try {
@@ -401,7 +406,12 @@ public class PayWeb extends BaseController {
 		} catch (Exception e) {
 			LogUtil.log.error(e.getMessage() ,e);
 		}
-		String resStr = XMLConverUtil.maptoXml(map);
+		String resStr = "";
+		try {
+			resStr = XMLConverUtil.mapToXml(map);
+		} catch (Exception e) {
+			LogUtil.log.error(e.getMessage(), e);
+		}
 		LogUtil.log.info("#####wechat/pay/notifyCallBack response:"+resStr);
 		HttpServletResponseUtil.out(response, resStr, false);
 	}
@@ -413,7 +423,7 @@ public class PayWeb extends BaseController {
 	 */
 	@RequestMapping("wechat/pay/jsapi/notifyCallBack")
 	public void wechatPayJsapiCallBack(HttpServletRequest request,HttpServletResponse response){
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, String> map = new HashMap<String, String>();
 		map.put("return_code","FAIL" );
 		map.put("return_msg", "ERROR");
 		try {
@@ -429,7 +439,12 @@ public class PayWeb extends BaseController {
 		} catch (Exception e) {
 			LogUtil.log.error(e.getMessage() ,e);
 		}
-		String resStr = XMLConverUtil.maptoXml(map);
+		String resStr = "";
+		try {
+			resStr = XMLConverUtil.mapToXml(map);
+		} catch (Exception e) {
+			LogUtil.log.error(e.getMessage(), e);
+		}
 		LogUtil.log.info("###wechatPayJsapiCallBack-response:"+resStr);
 		HttpServletResponseUtil.out(response, resStr, false);
 	}

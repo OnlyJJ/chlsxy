@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
     <wb-module deploy-name="shows-web-service">
-        <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
-        <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/test/java"/>
+        <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
+        <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
         <dependent-module archiveName="live-login-api-1.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/live-login-api/live-login-api">
             <dependency-type>uses</dependency-type>
         </dependent-module>
@@ -50,7 +49,10 @@
         <dependent-module archiveName="live-guard-api-1.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/live-guard-api/live-guard-api">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <property name="context-root" value="shows-web-service"/>
-        <property name="java-output-path" value="/shows-web-service/target/classes"/>
+        <dependent-module archiveName="live-home-api-1.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/live-home-api/live-home-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <property name="java-output-path" value="/live-service/target/classes"/>
+        <property name="context-root" value="live-service"/>
     </wb-module>
 </project-modules>

@@ -48,6 +48,11 @@
 			<version>${live.guard.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>com.lm.live</groupId>
+			<artifactId>live-home-api</artifactId>
+			<version>${live.home.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.11</version>

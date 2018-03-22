@@ -80,7 +80,6 @@ public class AliPayNotifyController extends HttpServlet {
 			e.printStackTrace();
 			returnMsg = FAIL;
 		}
-		LogUtil.log.info(String.format("##############鏀粯瀹濇敮浠樺鐞嗙粨鏋�retMsgJson:%s", returnMsg));
 		ResponseUtil.out(returnMsg, request, response);
 	}
 	
