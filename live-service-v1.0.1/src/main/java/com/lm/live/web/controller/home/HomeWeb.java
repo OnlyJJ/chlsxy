@@ -39,7 +39,136 @@ public class HomeWeb extends BaseController {
 	 * @data 2018年3月22日
 	 */
 	@RequestMapping(value = {"H1/{q}"} , method= {RequestMethod.POST})
-	public void modifyUserInfo(HttpServletRequest request,HttpServletResponse response, @PathVariable String q){
+	public void getAnchorData(HttpServletRequest request,HttpServletResponse response, @PathVariable String q){
+		long time1 = System.currentTimeMillis();
+		DataRequest data = (DataRequest) RequestUtil.getDataRequest(request, response);
+		Result result = new Result(ErrorCode.SUCCESS_0.getResultCode(),ErrorCode.SUCCESS_0.getResultDescr());  
+		JSONObject jsonRes = new JSONObject();
+		try {
+			if(data==null  
+					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())
+					|| !data.getData().containsKey(Kind.class.getSimpleName().toLowerCase())
+					|| !data.getData().containsKey(Page.class.getSimpleName().toLowerCase())) {
+				throw new UserBizException(ErrorCode.ERROR_101);
+			}
+			Page page = new Page();
+			page.parseJson(data.getData().getJSONObject(page.getShortName()));
+			Kind kind = new Kind();
+			kind.parseJson(data.getData().getJSONObject(kind.getShortName()));
+			
+		} catch(UserBizException e) {
+			LogUtil.log.error(e.getMessage(), e);
+			result.setResultCode(e.getErrorCode().getResultCode());
+			result.setResultDescr(e.getErrorCode().getResultDescr());
+		} catch (Exception e) {
+			LogUtil.log.error(e.getMessage(), e);
+			result.setResultCode(ErrorCode.ERROR_100.getResultCode());
+			result.setResultDescr(ErrorCode.ERROR_100.getResultDescr());
+		}
+		jsonRes.put(result.getShortName(),result.buildJson());
+		long time2 = System.currentTimeMillis();
+		long spendTimes = time2 - time1;
+		handleInfo(LogUtil.log, request, data.getRequestStr(), spendTimes, jsonRes.toString(), true);
+		out(jsonRes, request, response, q);
+	}
+	
+	/**
+	 * H2
+	 * 首頁banner
+	 * @param request
+	 * @param response
+	 * @param q
+	 * @author shao.xiang
+	 * @data 2018年3月22日
+	 */
+	@RequestMapping(value = {"H2/{q}"} , method= {RequestMethod.POST})
+	public void getBannerData(HttpServletRequest request,HttpServletResponse response, @PathVariable String q){
+		long time1 = System.currentTimeMillis();
+		DataRequest data = (DataRequest) RequestUtil.getDataRequest(request, response);
+		Result result = new Result(ErrorCode.SUCCESS_0.getResultCode(),ErrorCode.SUCCESS_0.getResultDescr());  
+		JSONObject jsonRes = new JSONObject();
+		try {
+			if(data==null  
+					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())
+					|| !data.getData().containsKey(Kind.class.getSimpleName().toLowerCase())
+					|| !data.getData().containsKey(Page.class.getSimpleName().toLowerCase())) {
+				throw new UserBizException(ErrorCode.ERROR_101);
+			}
+			Page page = new Page();
+			page.parseJson(data.getData().getJSONObject(page.getShortName()));
+			Kind kind = new Kind();
+			kind.parseJson(data.getData().getJSONObject(kind.getShortName()));
+			
+		} catch(UserBizException e) {
+			LogUtil.log.error(e.getMessage(), e);
+			result.setResultCode(e.getErrorCode().getResultCode());
+			result.setResultDescr(e.getErrorCode().getResultDescr());
+		} catch (Exception e) {
+			LogUtil.log.error(e.getMessage(), e);
+			result.setResultCode(ErrorCode.ERROR_100.getResultCode());
+			result.setResultDescr(ErrorCode.ERROR_100.getResultDescr());
+		}
+		jsonRes.put(result.getShortName(),result.buildJson());
+		long time2 = System.currentTimeMillis();
+		long spendTimes = time2 - time1;
+		handleInfo(LogUtil.log, request, data.getRequestStr(), spendTimes, jsonRes.toString(), true);
+		out(jsonRes, request, response, q);
+	}
+	
+	/**
+	 * H3
+	 * 首頁banner
+	 * @param request
+	 * @param response
+	 * @param q
+	 * @author shao.xiang
+	 * @data 2018年3月22日
+	 */
+	@RequestMapping(value = {"H3/{q}"} , method= {RequestMethod.POST})
+	public void getRankData(HttpServletRequest request,HttpServletResponse response, @PathVariable String q){
+		long time1 = System.currentTimeMillis();
+		DataRequest data = (DataRequest) RequestUtil.getDataRequest(request, response);
+		Result result = new Result(ErrorCode.SUCCESS_0.getResultCode(),ErrorCode.SUCCESS_0.getResultDescr());  
+		JSONObject jsonRes = new JSONObject();
+		try {
+			if(data==null  
+					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())
+					|| !data.getData().containsKey(Kind.class.getSimpleName().toLowerCase())
+					|| !data.getData().containsKey(Page.class.getSimpleName().toLowerCase())) {
+				throw new UserBizException(ErrorCode.ERROR_101);
+			}
+			Page page = new Page();
+			page.parseJson(data.getData().getJSONObject(page.getShortName()));
+			Kind kind = new Kind();
+			kind.parseJson(data.getData().getJSONObject(kind.getShortName()));
+			
+		} catch(UserBizException e) {
+			LogUtil.log.error(e.getMessage(), e);
+			result.setResultCode(e.getErrorCode().getResultCode());
+			result.setResultDescr(e.getErrorCode().getResultDescr());
+		} catch (Exception e) {
+			LogUtil.log.error(e.getMessage(), e);
+			result.setResultCode(ErrorCode.ERROR_100.getResultCode());
+			result.setResultDescr(ErrorCode.ERROR_100.getResultDescr());
+		}
+		jsonRes.put(result.getShortName(),result.buildJson());
+		long time2 = System.currentTimeMillis();
+		long spendTimes = time2 - time1;
+		handleInfo(LogUtil.log, request, data.getRequestStr(), spendTimes, jsonRes.toString(), true);
+		out(jsonRes, request, response, q);
+	}
+	
+	/**
+	 * H4
+	 * 搜索
+	 * @param request
+	 * @param response
+	 * @param q
+	 * @author shao.xiang
+	 * @data 2018年3月22日
+	 */
+	@RequestMapping(value = {"H4/{q}"} , method= {RequestMethod.POST})
+	public void serachData(HttpServletRequest request,HttpServletResponse response, @PathVariable String q){
 		long time1 = System.currentTimeMillis();
 		DataRequest data = (DataRequest) RequestUtil.getDataRequest(request, response);
 		Result result = new Result(ErrorCode.SUCCESS_0.getResultCode(),ErrorCode.SUCCESS_0.getResultDescr());  
