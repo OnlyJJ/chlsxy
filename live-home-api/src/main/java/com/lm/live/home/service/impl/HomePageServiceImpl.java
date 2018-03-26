@@ -63,7 +63,9 @@ public class HomePageServiceImpl implements IHomePageService {
 
 	@Override
 	public JSONObject getRankData(Page page, Rank rank) throws Exception {
-		// TODO Auto-generated method stub
+		if(page == null || rank == null) {
+			throw new HomeBizException(ErrorCode.ERROR_101);
+		}
 		return null;
 	}
 
