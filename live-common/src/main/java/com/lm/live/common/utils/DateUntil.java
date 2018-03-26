@@ -147,7 +147,7 @@ public class DateUntil {
 	}
 	
 	/**
-	 * 获取当上周日
+	 * 获取上周日
 	 * @param date
 	 * @param n
 	 * @return
