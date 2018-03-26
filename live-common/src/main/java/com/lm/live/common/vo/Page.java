@@ -8,28 +8,22 @@ import com.lm.live.common.utils.JsonParseInterface;
 import com.lm.live.common.utils.LogUtil;
 
 public class Page extends JsonParseInterface implements Serializable{
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 2229022950311287560L;
-	private String count;//	a	项目总数
-	private String pageNum;//	b	页码
-	private String pagelimit;//	c	单页容量
+	private int count;//	a	项目总数
+	private int pageNum;//	b	页码
+	private int pagelimit;//	c	单页容量
 	
-	private static final String u_count = "a";
-	private static final String u_pageNum = "b";
-	private static final String u_pagelimit = "c";
+	private static final String p_count = "a";
+	private static final String p_pageNum = "b";
+	private static final String p_pagelimit = "c";
 	
-	/* (non-Javadoc)
-	 * @see com.lm.live.common.utils.JsonParseInterface#buildJson()
-	 */
 	@Override
 	public JSONObject buildJson() {
 		JSONObject json = new JSONObject();
 		try {
-			setString(json, u_count, count);
-			setString(json, u_pageNum, pageNum);
-			setString(json, u_pagelimit, pagelimit);
+			setInt(json, p_count, count);
+			setInt(json, p_pageNum, pageNum);
+			setInt(json, p_pagelimit, pagelimit);
 			return json;
 		} catch (Exception e) {
 			LogUtil.log.error(e.getMessage(),e);
@@ -42,9 +36,9 @@ public class Page extends JsonParseInterface implements Serializable{
 		if (json == null) 
 			return ;
 		try {
-			count = getString(json, u_count);
-			pageNum = getString(json, u_pageNum);
-			pagelimit = getString(json, u_pagelimit);
+			count = getInt(json, p_count);
+			pageNum = getInt(json, p_pageNum);
+			pagelimit = getInt(json, p_pagelimit);
 		} catch (Exception e) {
 			LogUtil.log.error(e.getMessage(),e);
 		}
@@ -61,28 +55,29 @@ public class Page extends JsonParseInterface implements Serializable{
 				+ pagelimit +  "]";
 	}
 
-	public String getCount() {
+	public int getCount() {
 		return count;
 	}
 
-	public void setCount(String count) {
+	public void setCount(int count) {
 		this.count = count;
 	}
 
-	public String getPageNum() {
+	public int getPageNum() {
 		return pageNum;
 	}
 
-	public void setPageNum(String pageNum) {
+	public void setPageNum(int pageNum) {
 		this.pageNum = pageNum;
 	}
 
-	public String getPagelimit() {
+	public int getPagelimit() {
 		return pagelimit;
 	}
 
-	public void setPagelimit(String pagelimit) {
+	public void setPagelimit(int pagelimit) {
 		this.pagelimit = pagelimit;
 	}
+
 
 }

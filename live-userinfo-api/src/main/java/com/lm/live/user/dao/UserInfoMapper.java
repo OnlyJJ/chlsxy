@@ -4,8 +4,9 @@ package com.lm.live.user.dao;
 import java.util.List;
 
 
+
 import com.lm.live.common.vo.UserBaseInfo;
-import com.lm.live.user.vo.HomepageVo;
+import com.lm.live.user.vo.AnchorInfoVo;
 import com.lm.live.user.vo.UserInfo;
 
 /**
@@ -29,7 +30,7 @@ public interface UserInfoMapper {
 	 * @param userId
 	 * @return
 	 */
-	List<HomepageVo> listAttention(String userId);
+	List<AnchorInfoVo> listAttention(String userId);
 	
 	/**
 	 * 获取用户粉丝列表

@@ -35,12 +35,11 @@ import com.lm.live.user.dao.UserInfoMapper;
 import com.lm.live.user.enums.ErrorCode;
 import com.lm.live.user.exception.UserBizException;
 import com.lm.live.user.service.IUserInfoService;
-import com.lm.live.user.vo.HomepageVo;
+import com.lm.live.user.vo.AnchorInfoVo;
 import com.lm.live.user.vo.UserInfo;
 import com.lm.live.userbase.domain.UserAnchor;
 import com.lm.live.userbase.domain.UserAttentionDo;
 import com.lm.live.userbase.domain.UserInfoDo;
-import com.lm.live.userbase.exception.UserBaseBizException;
 import com.lm.live.userbase.service.IUserAnchorService;
 import com.lm.live.userbase.service.IUserAttentionService;
 import com.lm.live.userbase.service.IUserBaseService;
@@ -121,12 +120,12 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 			LogUtil.log.error("### listAttentions-获取用户关注列表，从缓存中获取数据。。。userId="+userId);
 		} else {
 			JSONArray array = new JSONArray();
-			List<HomepageVo> list = dao.listAttention(userId);
+			List<AnchorInfoVo> list = dao.listAttention(userId);
 			if(list != null && list.size() > 0) {
-				for(HomepageVo vo : list) {
+				for(AnchorInfoVo vo : list) {
 					array.add(vo.buildJson());
 				}
-				page.setCount(String.valueOf(list.size()));
+				page.setCount(list.size());
 				ret.put(page.getShortName(), page.buildJson());
 				ret.put(Constants.DATA_BODY, array.toString());
 			}
@@ -283,8 +282,8 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 		}
 		if(list != null) {
 			JSONArray array = new JSONArray();
-			int pageNum = Integer.parseInt(page.getPageNum()); // 页码
-			int pageSize = Integer.parseInt(page.getPagelimit()); // 单页容量
+			int pageNum = page.getPageNum(); // 页码
+			int pageSize = page.getPagelimit(); // 单页容量
 			if(list != null && list.size() > 0) {
 				int all = list.size();
 				// 从哪里开始
@@ -322,7 +321,7 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 					array.add(list.get(index).buildJson());
 					index++;
 				}
-				page.setCount(String.valueOf(list.size()));
+				page.setCount(list.size());
 				ret.put(page.getShortName(), page.buildJson());
 				ret.put(Constants.DATA_BODY, array.toString());
 			}

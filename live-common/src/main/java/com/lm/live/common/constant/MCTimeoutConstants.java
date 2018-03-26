@@ -10,6 +10,11 @@ package com.lm.live.common.constant;
 public class MCTimeoutConstants {
 	
 	/**
+	 * 默认缓存时间,3main
+	 */
+	public final static int DEFAULT_TIMEOUT_3M = 60 * 3;
+	
+	/**
 	 * 默认缓存时间,5main
 	 */
 	public final static int DEFAULT_TIMEOUT_5M = 60 * 5;

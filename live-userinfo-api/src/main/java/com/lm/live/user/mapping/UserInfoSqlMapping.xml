@@ -53,7 +53,7 @@
 	</select>
 	
 	<!-- 用户关注列表 -->
-	<select id="listAttention" resultType="com.lm.live.user.vo.HomepageVo">
+	<select id="listAttention" resultType="com.lm.live.user.vo.AnchorInfoVo">
 		SELECT DISTINCT  
 			a.userId,a.nickName,e.roomId,a.icon,a.remark,
 			CASE WHEN ISNULL(e.roomId) THEN 0 ELSE 1 END identity,

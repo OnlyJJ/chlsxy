@@ -28,8 +28,8 @@ public class RequestVo extends JsonParseInterface implements Serializable {
 	
 	// 字段key
 	private static final String u_userId = "a";
-	private static final String u_roomId = "b";
-	private static final String u_targetId = "c";
+	private static final String u_targetId = "b";
+	private static final String u_roomId = "c";
 	private static final String u_handleType = "d";
 
 	@Override

@@ -38,8 +38,8 @@ public class GuardServiceImpl implements IGuardService {
 			}
 		}
 		if(jsonArray.size()>0){
-			int pageNum = Integer.parseInt(page.getPageNum()); // 页码
-			int pageSize = Integer.parseInt(page.getPagelimit()); // 单页容量
+			int pageNum = page.getPageNum(); // 页码
+			int pageSize = page.getPagelimit(); // 单页容量
 			// 从哪里开始
 			int index = pageNum >1 ? (pageNum - 1) * pageSize : 0;
 			int currentNum = 0;
@@ -47,7 +47,7 @@ public class GuardServiceImpl implements IGuardService {
 			int pageLimit = pageSize;
 			// 判断请求的页码最大值
 			int count = jsonArray.size();
-			page.setCount(count+"");
+			page.setCount(count);
 			if(count%pageLimit == 0) {
 				maxPageNum = count/pageLimit;
 			}else{

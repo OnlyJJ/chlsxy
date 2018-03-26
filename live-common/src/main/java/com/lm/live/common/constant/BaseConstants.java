@@ -57,6 +57,9 @@ public class BaseConstants {
 	
 	public static final String REQ_ATTR_DATA = "request_attribute_data";
 	
+	/** 需要屏蔽掉的用户 */
+	public static final String HIDE_USER = "";
+	
 	
 	/** 默认字符编码，UTF-8 */
 	public static final String DEFAULT_UNICODE = "UTF-8";

@@ -1,5 +1,6 @@
 package com.lm.live.web.controller.home;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -14,11 +15,14 @@ import com.lm.live.common.utils.LogUtil;
 import com.lm.live.common.utils.RequestUtil;
 import com.lm.live.common.vo.DeviceProperties;
 import com.lm.live.common.vo.Page;
+import com.lm.live.common.vo.RequestVo;
 import com.lm.live.common.vo.Result;
+import com.lm.live.home.service.IHomePageService;
+import com.lm.live.home.vo.BannerVo;
 import com.lm.live.home.vo.Kind;
+import com.lm.live.home.vo.Rank;
 import com.lm.live.user.enums.ErrorCode;
 import com.lm.live.user.exception.UserBizException;
-import com.lm.live.user.vo.UserInfo;
 import com.lm.live.web.vo.DataRequest;
 
 /**
@@ -28,6 +32,9 @@ import com.lm.live.web.vo.DataRequest;
  */
 @Controller("HomeWeb")
 public class HomeWeb extends BaseController {
+	
+	@Resource
+	private IHomePageService homePageService;
 	
 	/**
 	 * H1
@@ -55,7 +62,7 @@ public class HomeWeb extends BaseController {
 			page.parseJson(data.getData().getJSONObject(page.getShortName()));
 			Kind kind = new Kind();
 			kind.parseJson(data.getData().getJSONObject(kind.getShortName()));
-			
+			jsonRes = homePageService.getHomePageData(page, kind);
 		} catch(UserBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
@@ -90,15 +97,12 @@ public class HomeWeb extends BaseController {
 		try {
 			if(data==null  
 					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())
-					|| !data.getData().containsKey(Kind.class.getSimpleName().toLowerCase())
-					|| !data.getData().containsKey(Page.class.getSimpleName().toLowerCase())) {
+					|| !data.getData().containsKey(BannerVo.class.getSimpleName().toLowerCase())) {
 				throw new UserBizException(ErrorCode.ERROR_101);
 			}
-			Page page = new Page();
-			page.parseJson(data.getData().getJSONObject(page.getShortName()));
-			Kind kind = new Kind();
-			kind.parseJson(data.getData().getJSONObject(kind.getShortName()));
-			
+			BannerVo vo = new BannerVo();
+			vo.parseJson(data.getData().getJSONObject(vo.getShortName()));
+			jsonRes = homePageService.getBannerData(vo);
 		} catch(UserBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
@@ -117,7 +121,7 @@ public class HomeWeb extends BaseController {
 	
 	/**
 	 * H3
-	 * 首頁banner
+	 * 榜单
 	 * @param request
 	 * @param response
 	 * @param q
@@ -133,15 +137,15 @@ public class HomeWeb extends BaseController {
 		try {
 			if(data==null  
 					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())
-					|| !data.getData().containsKey(Kind.class.getSimpleName().toLowerCase())
+					|| !data.getData().containsKey(Rank.class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(Page.class.getSimpleName().toLowerCase())) {
 				throw new UserBizException(ErrorCode.ERROR_101);
 			}
 			Page page = new Page();
 			page.parseJson(data.getData().getJSONObject(page.getShortName()));
-			Kind kind = new Kind();
-			kind.parseJson(data.getData().getJSONObject(kind.getShortName()));
-			
+			Rank rank = new Rank();
+			rank.parseJson(data.getData().getJSONObject(rank.getShortName()));
+			jsonRes = homePageService.getRankData(page, rank);
 		} catch(UserBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
@@ -176,15 +180,16 @@ public class HomeWeb extends BaseController {
 		try {
 			if(data==null  
 					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())
-					|| !data.getData().containsKey(Kind.class.getSimpleName().toLowerCase())
+					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(Page.class.getSimpleName().toLowerCase())) {
 				throw new UserBizException(ErrorCode.ERROR_101);
 			}
 			Page page = new Page();
 			page.parseJson(data.getData().getJSONObject(page.getShortName()));
-			Kind kind = new Kind();
-			kind.parseJson(data.getData().getJSONObject(kind.getShortName()));
-			
+			RequestVo vo = new RequestVo();
+			vo.parseJson(data.getData().getJSONObject(vo.getShortName()));
+			String condition = vo.getTargetId();
+			jsonRes = homePageService.serach(page, condition);
 		} catch(UserBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
