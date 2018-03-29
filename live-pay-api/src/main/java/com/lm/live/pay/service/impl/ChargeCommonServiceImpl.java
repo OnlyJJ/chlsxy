@@ -30,7 +30,7 @@ import com.lm.live.pay.exception.PayBizException;
 import com.lm.live.pay.service.IChargeCommonService;
 import com.lm.live.userbase.service.IUserBaseService;
 
-@Service
+@Service("chargeCommonService")
 public class ChargeCommonServiceImpl implements IChargeCommonService{
 
 	@Resource

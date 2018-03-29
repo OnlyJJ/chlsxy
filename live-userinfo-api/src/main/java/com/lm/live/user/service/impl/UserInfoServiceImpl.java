@@ -44,7 +44,7 @@ import com.lm.live.userbase.service.IUserAnchorService;
 import com.lm.live.userbase.service.IUserAttentionService;
 import com.lm.live.userbase.service.IUserBaseService;
 
-@Service
+@Service("userInfoService")
 public class UserInfoServiceImpl  implements IUserInfoService {
 
 	@Resource

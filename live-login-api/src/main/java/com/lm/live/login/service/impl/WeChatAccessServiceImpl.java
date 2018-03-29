@@ -16,7 +16,7 @@ import com.lm.live.common.utils.StrUtil;
 import com.lm.live.login.constant.Constants;
 import com.lm.live.login.enums.ErrorCode;
 import com.lm.live.login.exceptions.LoginBizException;
-import com.lm.live.login.service.WeChatAccessService;
+import com.lm.live.login.service.IWeChatAccessService;
 import com.lm.live.login.vo.AccessToken;
 import com.lm.live.login.vo.WechatUserInfo;
 
@@ -25,8 +25,8 @@ import com.lm.live.login.vo.WechatUserInfo;
  * 微信接入相关业务
  *
  */
-@Service
-public class WeChatAccessServiceImpl implements WeChatAccessService{
+@Service("weChatAccessService")
+public class WeChatAccessServiceImpl implements IWeChatAccessService{
 	
 	 
 	/** NATIVE(微信扫码)支付标示 */

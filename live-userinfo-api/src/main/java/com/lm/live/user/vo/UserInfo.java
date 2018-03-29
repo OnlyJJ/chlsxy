@@ -35,9 +35,9 @@ public class UserInfo extends UserBaseInfo implements Serializable {
 	private String address;
 	/** 个性签名 */
 	private String remark;
-	/** 用户等级 */
+	/** 用户经验 */
 	private long userPoint;
-	/** 主播等级 */
+	/** 主播经验 */
 	private long anchorPoint;
 	/** 下一用户等级所需经验 */
 	private long nextLevelUserPoint;
@@ -51,6 +51,12 @@ public class UserInfo extends UserBaseInfo implements Serializable {
 	private List<Decorate> decorate;
 	/** 贡献值，用于榜单显示数据，如财富值，主播水晶值 */
 	private long contribute;
+	/** 用户等级 */
+	private int userLevel;
+	/** 主播等级 */
+	private int anchorLevel;
+	/** 房间身份：0-普通用户，1-主播，2-房管 */
+	private int roomIdentity;
 
 	// 字段key
 	private static final String u_gold = "a";
@@ -68,7 +74,10 @@ public class UserInfo extends UserBaseInfo implements Serializable {
 	private static final String u_petVo = "m";
 	private static final String u_decorate = "n";
 	private static final String u_contribute = "o";
-
+	private static final String u_roomIdentity = "p";
+	private static final String u_userLevel = "q";
+	private static final String u_anchorLevel = "r";
+	
 	@Override
 	public JSONObject buildJson() {
 		JSONObject json = new JSONObject();
@@ -102,6 +111,9 @@ public class UserInfo extends UserBaseInfo implements Serializable {
 			}
 			setList(json, u_decorate, decorateListVo);
 			setLong(json,u_contribute, contribute);
+			setInt(json, u_roomIdentity, roomIdentity);
+			setInt(json, u_userLevel, userLevel);
+			setInt(json, u_anchorLevel, anchorLevel);
 			return json;
 		} catch (Exception e) {
 			LogUtil.log.error(e.getMessage(), e);
@@ -247,6 +259,30 @@ public class UserInfo extends UserBaseInfo implements Serializable {
 
 	public void setContribute(long contribute) {
 		this.contribute = contribute;
+	}
+
+	public int getUserLevel() {
+		return userLevel;
+	}
+
+	public void setUserLevel(int userLevel) {
+		this.userLevel = userLevel;
+	}
+
+	public int getAnchorLevel() {
+		return anchorLevel;
+	}
+
+	public void setAnchorLevel(int anchorLevel) {
+		this.anchorLevel = anchorLevel;
+	}
+
+	public int getRoomIdentity() {
+		return roomIdentity;
+	}
+
+	public void setRoomIdentity(int roomIdentity) {
+		this.roomIdentity = roomIdentity;
 	}
 
 }

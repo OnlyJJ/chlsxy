@@ -10,6 +10,7 @@ import javax.annotation.Resource;
 import jodd.util.StringUtil;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
@@ -54,9 +55,9 @@ import com.lm.live.login.enums.LockTarget;
 import com.lm.live.login.enums.LoginType;
 import com.lm.live.login.exceptions.LoginBizException;
 import com.lm.live.login.service.ILoginService;
-import com.lm.live.login.service.QQAccessService;
-import com.lm.live.login.service.WeChatAccessService;
-import com.lm.live.login.service.WeiboAccessService;
+import com.lm.live.login.service.IQQAccessService;
+import com.lm.live.login.service.IWeChatAccessService;
+import com.lm.live.login.service.IWeiboAccessService;
 import com.lm.live.login.vo.AccessToken;
 import com.lm.live.login.vo.QQConnectUserInfoVo;
 import com.lm.live.login.vo.WechatUserInfo;
@@ -72,6 +73,7 @@ import com.lm.live.userbase.service.IUserBaseService;
  * @date 2018年3月10日
  *
  */
+@Service("loginService")
 public class LoginServiceImpl implements ILoginService {
 
 	@Resource
@@ -105,13 +107,13 @@ public class LoginServiceImpl implements ILoginService {
 	private IThirdpartyConfService thirdpartyConfService;
 	
 	@Resource
-	private WeChatAccessService weChatAccessService;
+	private IWeChatAccessService weChatAccessService;
 	
 	@Resource
-	private QQAccessService qqAccessService;
+	private IQQAccessService qqAccessService;
 	
 	@Resource
-	private WeiboAccessService weiboAccessService;
+	private IWeiboAccessService weiboAccessService;
 
 	@Override
 	public UserInfo autoRegist(String clientType, String clientIp,

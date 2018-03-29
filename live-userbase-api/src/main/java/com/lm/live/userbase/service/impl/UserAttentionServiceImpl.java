@@ -13,7 +13,7 @@ import com.lm.live.userbase.domain.UserAttentionDo;
 import com.lm.live.userbase.service.IUserAnchorService;
 import com.lm.live.userbase.service.IUserAttentionService;
 
-@Service
+@Service("userAttentionService")
 public class UserAttentionServiceImpl extends CommonServiceImpl<AttentionMapper, UserAttentionDo> implements IUserAttentionService {
 
 	

@@ -52,8 +52,8 @@ public class LoginWeb extends BaseController {
 	@Resource
 	private IAppInstallChannelService appInstallChannelService;
 	
-	@Resource
-	private IUuidBlackListService uuidBlackListServiceImpl;
+	@Resource()
+	private IUuidBlackListService uuidBlackListService;
 	
 	@Resource
 	private ILoginService loginService;
@@ -87,7 +87,7 @@ public class LoginWeb extends BaseController {
 			// 通过设备信息IMEI校验黑名单
 			String uuid = deviceProperties.getUuid();
 			if(StringUtils.isNotEmpty(uuid)) {
-				uuidBlackListServiceImpl.checkBlackList(uuid);
+				uuidBlackListService.checkBlackList(uuid);
 			}
 			
 			// 检测是否正常的app请求(即判断有没被刷接口)
@@ -146,7 +146,7 @@ public class LoginWeb extends BaseController {
 			}
 			// 校验设备黑名单
 			if (StringUtils.isNotEmpty(uuid)) {
-				uuidBlackListServiceImpl.checkBlackList(uuid);
+				uuidBlackListService.checkBlackList(uuid);
 			}
 			Code code = new Code();
 			code.parseJson(data.getData().getJSONObject(code.getShortName()));
@@ -203,7 +203,7 @@ public class LoginWeb extends BaseController {
 			}
 			// 校验设备黑名单
 			if (StringUtils.isNotEmpty(uuid)) {
-				uuidBlackListServiceImpl.checkBlackList(uuid);
+				uuidBlackListService.checkBlackList(uuid);
 			}
 			QQConnectUserInfoVo qqvo = new QQConnectUserInfoVo();
 			qqvo.parseJson(data.getData().getJSONObject(qqvo.getShortName()));
@@ -267,7 +267,7 @@ public class LoginWeb extends BaseController {
 			}
 			// 校验设备黑名单
 			if (StringUtils.isNotEmpty(uuid)) {
-				uuidBlackListServiceImpl.checkBlackList(uuid);
+				uuidBlackListService.checkBlackList(uuid);
 			}
 			UserBaseInfo userbase = new UserBaseInfo();
 			userbase.parseJson(data.getData().getJSONObject(userbase.getShortName()));

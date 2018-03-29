@@ -14,7 +14,7 @@ import com.lm.live.login.dao.WeiboUserInfoDoMapper;
 import com.lm.live.login.domain.WeiboUserInfoDo;
 import com.lm.live.login.enums.ErrorCode;
 import com.lm.live.login.exceptions.LoginBizException;
-import com.lm.live.login.service.WeiboAccessService;
+import com.lm.live.login.service.IWeiboAccessService;
 import com.lm.live.login.vo.WeiboUserInfo;
 
 /**
@@ -22,9 +22,9 @@ import com.lm.live.login.vo.WeiboUserInfo;
  * 新浪微博接入相关业务
  *
  */
-@Service
+@Service("weiboAccessService")
 public class WeiboAccessServiceImpl extends CommonServiceImpl<WeiboUserInfoDoMapper, WeiboUserInfoDo>
-	implements WeiboAccessService{
+	implements IWeiboAccessService{
 
 	@Override
 	public WeiboUserInfo getInfo(String accessToken, String uid)throws Exception {

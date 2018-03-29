@@ -8,7 +8,7 @@ import com.lm.live.login.vo.WechatUserInfo;
  * 微信接入
  *
  */
-public interface WeChatAccessService {
+public interface IWeChatAccessService {
 	
 	/**
 	 * 通过code获取access_token

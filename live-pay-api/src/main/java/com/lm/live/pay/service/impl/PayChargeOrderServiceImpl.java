@@ -19,7 +19,7 @@ import com.lm.live.pay.service.IPayChargeOrderService;
  * @date 2015-12-01 16:32:40
  * @author charge
  */
-@Service
+@Service("payChargeOrderService")
 public class PayChargeOrderServiceImpl extends CommonServiceImpl<PayChargeOrderMapper,PayChargeOrder> implements IPayChargeOrderService {
 
 	@Override

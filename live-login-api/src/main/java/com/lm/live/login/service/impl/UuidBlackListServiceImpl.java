@@ -12,7 +12,7 @@ import com.lm.live.login.enums.ErrorCode;
 import com.lm.live.login.exceptions.LoginBizException;
 import com.lm.live.login.service.IUuidBlackListService;
 
-@Service("uuidBlackListServiceImpl")
+@Service("uuidBlackListService")
 public class UuidBlackListServiceImpl extends CommonServiceImpl<UuidBlackListMapper, UuidBlackList> implements IUuidBlackListService {
 
 	@Override

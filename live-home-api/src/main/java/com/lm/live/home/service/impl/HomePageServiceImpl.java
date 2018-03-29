@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.springframework.stereotype.Service;
+
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -32,6 +34,7 @@ import com.lm.live.home.vo.Rank;
  * @Company lm
  * @data 2018年3月26日
  */
+@Service("homePageService")
 public class HomePageServiceImpl implements IHomePageService {
 	
 	@Resource

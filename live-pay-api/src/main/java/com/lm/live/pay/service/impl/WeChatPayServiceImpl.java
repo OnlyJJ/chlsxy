@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.lm.live.account.domain.UserAccount;
@@ -46,6 +47,7 @@ import com.lm.live.pay.vo.WechatPayVo;
 import com.lm.live.userbase.domain.UserInfoDo;
 import com.lm.live.userbase.service.IUserBaseService;
 
+@Service("weChatPayService")
 public class WeChatPayServiceImpl implements IWeChatPayService {
 
 	@Resource

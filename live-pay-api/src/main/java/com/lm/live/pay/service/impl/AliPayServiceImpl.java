@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import jodd.util.StringUtil;
@@ -35,6 +36,7 @@ import com.lm.live.pay.vo.PayOrder;
 import com.lm.live.userbase.domain.UserInfoDo;
 import com.lm.live.userbase.service.IUserBaseService;
 
+@Service("aliPayService")
 public class AliPayServiceImpl extends CommonServiceImpl<PayChargeOrderMapper, PayChargeOrder> implements IAliPayService {
 	
 	@Resource

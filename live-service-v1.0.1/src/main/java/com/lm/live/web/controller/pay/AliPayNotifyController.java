@@ -22,7 +22,7 @@ import com.lm.live.common.vo.DeviceProperties;
 import com.lm.live.pay.service.IAliPayService;
 import com.lm.live.pay.service.IPayChargeOrderService;
 
-@Controller("aliPayNotifyController")
+@Controller("AliPayNotifyController")
 public class AliPayNotifyController extends HttpServlet {
 
 	private static final long serialVersionUID = 4582513677508728286L;

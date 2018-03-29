@@ -7,13 +7,13 @@
 	http://www.springframework.org/schema/context 
 	http://www.springframework.org/schema/context/spring-context.xsd 
 	http://www.springframework.org/schema/mvc 
-	http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+	http://www.springframework.org/schema/mvc/spring-mvc.xsd" >
 	
 	<!-- 启用MVC注解 -->
 	<mvc:annotation-driven />
 
 	<!-- 自动扫描controller包下的所有类，使其认为spring mvc的控制器 -->
-	<context:component-scan base-package="com.lm.live.web.controller" />
+	<context:component-scan base-package="com.lm.live.web" />
 	
 	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"></bean>
 	
@@ -31,15 +31,18 @@
 	<mvc:resources location="/fileUpload/" mapping="/fileUpload/**"/>
 	<mvc:resources location="/"  mapping="/**" />
 
-    <!--  拦截器解析请求参数,放到request中(必须放在所有拦截器的最前面)  -->
+    <!--  拦截器解析请求参数,放到request中(必须放在所有拦截器的最前面)  
     <mvc:interceptors>
 	    <mvc:interceptor>
 	    	<mvc:mapping path="/L**/**"/>
 			<mvc:mapping path="/P**/**"/>
 			<mvc:mapping path="/U**/**"/>
-			<bean class="com.lm.live.web.listeners.AnalyzeReqParameterInterceptor"></bean>
+	    	<mvc:mapping path="/H**/**"/>
+			<mvc:mapping path="/R**/**"/>
+			<mvc:mapping path="/G**/**"/>
+			<mvc:mapping path="/E**/**"/>
+			<bean name="analyzeReqParameterInterceptor" class="com.lm.live.web.listeners.AnalyzeReqParameterInterceptor"></bean>
 		</mvc:interceptor>
-		<!-- 
 		<mvc:interceptor>
 			<mvc:mapping path="/**"/>
 			<bean class="com.jiujun.shows.common.springMVCInterceptor.LoginSessionInterceptor">
@@ -65,6 +68,6 @@
 				</property>
 			</bean>
 		</mvc:interceptor>
-		-->
 	</mvc:interceptors>
+		-->
 </beans>

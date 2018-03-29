@@ -31,12 +31,12 @@
 			slave-connection-minimum-idle-size="10" slave-connection-pool-size="64"
 			master-connection-minimum-idle-size="10" master-connection-pool-size="64"
 			read-mode="SLAVE" subscription-mode="SLAVE" scan-interval="1000">
-			<redisson:node-address value="redis://192.168.1.125:7111" />
-			<redisson:node-address value="redis://192.168.1.111:7112" />
-			<redisson:node-address value="redis://192.168.1.110:7113" />
-			<redisson:node-address value="redis://192.168.1.105:7114" />
-			<redisson:node-address value="redis://192.168.1.135:7115" />
-			<redisson:node-address value="redis://192.168.1.112:7116" />
+			<redisson:node-address value="redis://192.168.1.71:7111" />
+			<redisson:node-address value="redis://192.168.1.72:7112" />
+			<redisson:node-address value="redis://192.168.1.73:7113" />
+			<redisson:node-address value="redis://192.168.1.74:7114" />
+			<redisson:node-address value="redis://192.168.1.75:7115" />
+			<redisson:node-address value="redis://192.168.1.76:7116" />
 		</redisson:cluster-servers>
 	</redisson:client>
 	<!-- redis集群配置 

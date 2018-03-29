@@ -2,6 +2,8 @@ package com.lm.live.guard.service.impl;
 
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.common.constant.MCTimeoutConstants;
@@ -13,6 +15,7 @@ import com.lm.live.guard.constant.MCPrefix;
 import com.lm.live.guard.service.IGuardService;
 import com.lm.live.guard.vo.GuardVo;
 
+@Service("guardService")
 public class GuardServiceImpl implements IGuardService {
 
 	@SuppressWarnings("unchecked")

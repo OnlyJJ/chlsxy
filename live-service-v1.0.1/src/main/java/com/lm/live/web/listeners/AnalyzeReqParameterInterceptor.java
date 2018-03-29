@@ -17,12 +17,6 @@ import com.lm.live.common.utils.ResponseUtil;
 import com.lm.live.common.vo.Result;
 import com.lm.live.web.vo.DataRequest;
 
-/**
- * 瑙ｆ瀽璇锋眰鍙傛暟(杩欎釜鎷︽埅鍣ㄥ簲璇ユ斁鍦ㄦ墍鏈夋嫤鎴櫒鍒楄〃鐨勯)
- * @author shao.xiang
- * @date 2017锟�锟�7锟�
- *
- */
 public class AnalyzeReqParameterInterceptor extends HandlerInterceptorAdapter {
 
 	@Override
@@ -40,7 +34,6 @@ public class AnalyzeReqParameterInterceptor extends HandlerInterceptorAdapter {
 					+ fromIp + "]";
 			DataRequest data = new DataRequest(request, response, iscompression);
 			data.reciveRequest(sessionId,uri);
-			//浠庢祦涓В鏋愬嚭璇锋眰鏁版嵁鏀惧埌request浣滅敤鍩熶腑
 			LogUtil.log.info("DataRequest-data.bef=" + data.getRequestStr());
 			RequestUtil.setDataRequest(request, response, data);
 			LogUtil.log.info("DataRequest-data.aft=" + data.getRequestStr());
@@ -62,18 +55,12 @@ public class AnalyzeReqParameterInterceptor extends HandlerInterceptorAdapter {
 		}
 	}
 
-	/**
-	 * 瑙嗗浘宸插鐞嗗畬鍚庢墽琛岀殑鏂规硶锛岋拷?甯哥敤浜庨噴鏀捐祫婧愶紱
-	 */
 	@Override
 	public void afterCompletion(HttpServletRequest request,
 			HttpServletResponse response, Object handler, Exception ex)
 			throws Exception {
 	}
 
-	/**
-	 * 鎺у埗鍣ㄧ殑鏂规硶宸茬粡鎵ц瀹屾瘯锛岃浆鎹㈡垚瑙嗗浘涔嬪墠鐨勫鐞嗭紱
-	 */
 	@Override
 	public void postHandle(HttpServletRequest request,
 			HttpServletResponse response, Object handler,

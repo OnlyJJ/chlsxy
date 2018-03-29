@@ -14,7 +14,7 @@ import com.lm.live.login.dao.QQConnectUserInfoDoMapper;
 import com.lm.live.login.domain.QQConnectUserInfoDo;
 import com.lm.live.login.enums.ErrorCode;
 import com.lm.live.login.exceptions.LoginBizException;
-import com.lm.live.login.service.QQAccessService;
+import com.lm.live.login.service.IQQAccessService;
 import com.lm.live.login.vo.QQConnectUserInfo;
 
 /**
@@ -22,9 +22,9 @@ import com.lm.live.login.vo.QQConnectUserInfo;
  * ＱＱ接入相关业务
  *
  */
-@Service
+@Service("qqAccessService")
 public class QQAccessServiceImpl extends CommonServiceImpl<QQConnectUserInfoDoMapper, QQConnectUserInfoDo>
-	implements QQAccessService{
+	implements IQQAccessService{
 
 	@Override
 	public QQConnectUserInfo getUserinfo(String accessToken, String openid) throws Exception {

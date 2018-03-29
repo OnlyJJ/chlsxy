@@ -11,7 +11,7 @@ import com.lm.live.login.vo.QQConnectUserInfo;
  * @date 2018年3月11日
  *
  */
-public interface QQAccessService extends ICommonService<QQConnectUserInfoDo> {
+public interface IQQAccessService extends ICommonService<QQConnectUserInfoDo> {
 	
 	/**
 	 * 拉取用户QQ个人信息

@@ -2,6 +2,7 @@ package com.lm.live.decorate.service.impl;
 
 import java.util.List;
 
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson.JSONArray;
@@ -26,6 +27,7 @@ import com.lm.live.decorate.vo.DecoratePackageVo;
  *
  * 2018年3月20日
  */
+@Service("decoratePackageService")
 public class DecoratePackageServiceImpl extends CommonServiceImpl<DecoratePackageMapper, DecoratePackage>
 		implements IDecoratePackageService {
 	

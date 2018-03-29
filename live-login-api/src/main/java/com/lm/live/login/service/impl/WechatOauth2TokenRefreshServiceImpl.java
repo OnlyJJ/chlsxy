@@ -21,7 +21,7 @@ import com.lm.live.login.exceptions.LoginBizException;
 import com.lm.live.login.service.IWechatOauth2TokenRefreshService;
 import com.lm.live.login.vo.AccessToken;
 
-@Service
+@Service("wechatOauth2TokenRefreshService")
 public class WechatOauth2TokenRefreshServiceImpl extends CommonServiceImpl<WechatOauth2TokenRefreshMapper,WechatOauth2TokenRefresh> implements IWechatOauth2TokenRefreshService {
 
 	@Override

@@ -8,7 +8,7 @@ import com.lm.live.login.vo.WeiboUserInfo;
  * 新浪微博接入
  *
  */
-public interface WeiboAccessService extends ICommonService<WeiboUserInfoDo>{
+public interface IWeiboAccessService extends ICommonService<WeiboUserInfoDo>{
 	
 	/**
 	 * 获取新浪微博用户信息

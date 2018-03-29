@@ -14,7 +14,7 @@ import com.lm.live.userbase.enums.ErrorCode;
 import com.lm.live.userbase.exception.UserBaseBizException;
 import com.lm.live.userbase.service.IUserBaseService;
 
-@Service
+@Service("userBaseService")
 public class UserBaseServiceImpl extends CommonServiceImpl<UserBaseMapper, UserInfoDo> implements IUserBaseService {
 
 	
