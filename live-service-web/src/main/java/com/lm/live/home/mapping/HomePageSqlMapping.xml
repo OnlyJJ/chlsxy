@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.lm.live.userinfo.domain.sqlmapping.UserInfo">
+	<resultMap type="com.lm.live.userbase.domain.UserInfo" id="vo">
+		<result property="id" column="id" />
+		<result property="userId" column="userId" />
+		<result property="userAccount" column="userAccount" />
+		<result property="pwd" column="pwd" />
+		<result property="bindMobile" column="bindMobile" />
+		<result property="bindEmail" column="bindEmail" />
+		<result property="addTime" column="addTime" />
+		<result property="actTime" column="actTime" />
+		<result property="lastTime" column="lastTime" />
+		<result property="lastIp" column="lastIp" />
+		<result property="lastArea" column="lastArea" />
+		<result property="nickName" column="nickName" />
+		<result property="sex" column="sex" />
+		<result property="icon" column="icon" />
+		<result property="isAnchor" column="isAnchor" />
+		<result property="userStatus" column="userStatus" />
+		<result property="address" column="address" />
+		<result property="remark" column="remark" />
+		<result property="brithday" column="brithday" />
+		<result property="sf" column="sf" />
+		<result property="cs" column="cs" />
+		<result property="qy" column="qy" />
+		<result property="channelId" column="channelId" />
+		<result property="appPackage" column="appPackage" />
+		<result property="goodCodeLevel" column="goodCodeLevel" />
+		<result property="loginType" column="loginType" />
+	</resultMap>
+
+	<!-- 热门位主播 -->
+	<select id="listHotAnchor" resultType="com.lm.live.user.vo.HomepageVo">
+		SELECT a.userId,a.roomId,a.showImg,a.sex, d.nickName,d.remark,d.icon, 1 AS STATUS,IFNULL(s.gold,0) AS gold
+			FROM t_user_anchor a
+			INNER JOIN t_user_info d ON (d.userId = a.userId) 
+			INNER JOIN  (
+				SELECT m.gold AS gold,r.userId FROM t_live_record_cdn r
+				INNER JOIN t_stat_crystal m ON r.userId=m.userId AND r.endTime IS NULL 
+				WHERE m.timeframe= #{timeframe}	
+				<if test="userIdList != null and userIdList != ''">
+	 				AND r.userId not in ${userIdList}
+				 </if> 	
+				AND  r.userId NOT IN(SELECT p.anchorId FROM t_anchor_punisment p WHERE p.status=1 AND NOW() BETWEEN beginTime AND endTime)				
+				GROUP BY r.userId
+				ORDER BY gold DESC
+				LIMIT #{size}) s
+			ON a.userId = s.userId
+		WHERE a.anchorStatus = 1 
+		AND a.isForbidden = 0
+		ORDER BY gold DESC
+		LIMIT #{size}
+	</select>
+	
+	<!-- 新秀位主播 -->
+	<select id="listNewAnchor" resultType="com.lm.live.user.vo.HomepageVo">
+		SELECT a.userId,a.roomId,a.showImg,a.sex, d.nickName,d.remark,d.icon, 1 AS STATUS,IFNULL(s.gold,0) AS gold
+			FROM t_user_anchor a
+			INNER JOIN t_user_info d ON (d.userId = a.userId) 
+			INNER JOIN  (
+				SELECT m.gold AS gold,r.userId FROM t_live_record_cdn r
+				INNER JOIN t_stat_crystal m ON r.userId=m.userId AND r.endTime IS NULL 
+				<![CDATA[
+				INNER JOIN t_user_anchor a2 ON a2.userId=r.userId AND a2.actTime > DATE_SUB(NOW(),INTERVAL 1 MONTH)
+				]]>
+				WHERE m.timeframe= #{timeframe}	
+				<if test="userIdList != null and userIdList != ''">
+	 				AND r.userId not in ${userIdList}
+				 </if> 	
+				AND  r.userId NOT IN(SELECT p.anchorId FROM t_anchor_punisment p WHERE p.status=1 AND NOW() BETWEEN beginTime AND endTime)				
+				GROUP BY r.userId
+				ORDER BY gold DESC
+				LIMIT #{size}) s
+			ON a.userId = s.userId
+		WHERE a.anchorStatus = 1 
+		AND a.isForbidden = 0
+		ORDER BY gold DESC
+		LIMIT #{size}
+	</select>
+	
+	<!-- 推荐位主播 -->
+	<select id="listNewAnchor" resultType="com.lm.live.user.vo.HomepageVo">
+		SELECT a.userId,a.roomId,a.showImg,a.sex, d.nickName,d.remark,d.icon, 1 AS STATUS,IFNULL(s.gold,0) AS gold
+			FROM t_user_anchor a
+			INNER JOIN t_user_info d ON (d.userId = a.userId) 
+			LEFT JOIN  (
+				SELECT m.gold AS gold,r.userId FROM t_live_record_cdn r
+				INNER JOIN t_stat_crystal m ON r.userId=m.userId AND r.endTime IS NULL 
+				INNER JOIN t_recommend_anchor c ON c.userId=r.userId AND NOW() BETWEEN c.startTime  AND c.endTime
+				WHERE m.timeframe= #{timeframe}	
+				<if test="userIdList != null and userIdList != ''">
+	 				AND r.userId not in ${userIdList}
+				 </if> 	
+				AND  r.userId NOT IN(SELECT p.anchorId FROM t_anchor_punisment p WHERE p.status=1 AND NOW() BETWEEN beginTime AND endTime)				
+				GROUP BY r.userId
+				ORDER BY gold DESC
+			) s
+			ON a.userId = s.userId
+		WHERE a.anchorStatus = 1 
+		AND a.isForbidden = 0
+		ORDER BY gold DESC
+	</select>
+	
+	<!-- 其他普通主播 -->
+	<select id="listCommonAnchor" resultType="com.lm.live.user.vo.HomepageVo">
+		SELECT a.userId,a.roomId,a.showImg,a.sex, d.nickName,d.remark,d.icon, 
+			CASE WHEN ISNULL(c.roomId) THEN 2 ELSE 1 END STATUS,
+			CASE WHEN ISNULL(v.url) THEN 1 ELSE 2 END isVideo,
+			CASE WHEN ISNULL(p.anchorId) THEN 2 ELSE 1 END punishment,
+			IFNULL(cry.gold,0) AS crystal,
+			IFNULL(c1.sort1,0) AS weekML,
+			IFNULL(c2.sort2,0) AS mounthML,
+			FROM t_user_anchor a
+			INNER JOIN t_user_info d ON d.userId = a.userId 
+			LEFT JOIN t_room_default_vedio v ON v.roomId=a.roomId AND v.status=1
+			LEFT JOIN t_live_record_cdn c ON c.userId = a.userId AND c.endTime IS NULL 
+			LEFT JOIN t_stat_crystal cry ON a.userId=cry.userId AND cry.timeframe= #{timeframe}
+			<![CDATA[
+			LEFT JOIN (SELECT userId,SUM(gold) AS sort1 FROM t_stat_crystal c WHERE c.timeframe >=#{startWeekTime} AND c.timeframe <=#{timeframe} GROUP BY c.userId) AS c1 ON c1.userId = a.userId
+			LEFT JOIN (SELECT userId,SUM(gold) AS sort2 FROM t_stat_crystal c WHERE c.timeframe >= #{startMounthTime} AND c.timeframe <=#{timeframe} GROUP BY userId) AS c2 ON c2.userId = a.userId
+			]]>
+			LEFT JOIN t_anchor_punisment p ON p.anchorId=a.userId AND p.status=1 AND NOW() BETWEEN p.beginTime AND p.endTime
+		WHERE a.anchorStatus = 1 
+		<if test="userIdList != null and userIdList != ''">
+	 		AND r.userId not in ${userIdList}
+		</if> 	
+		AND a.isForbidden = 0
+		
+		ORDER BY STATUS ASC,punishment DESC,crystal DESC,weekML DESC,mounthML DESC ,isVideo DESC
+		LIMIT #{size}
+	</select>
+	
+	
+	<!-- 用户粉丝列表 -->
+	<select id="listFans" resultType="com.lm.live.user.vo.UserBaseInfo">
+		SELECT b.userId,b.nickName,b.icon 
+		FROM t_user_attention a
+		INNER JOIN t_user_info b ON (b.userId = a.userId)
+		WHERE a.toUserId = #{toUserId}
+		ORDER BY a.addTime DESC
+	</select>
+	
+</mapper>
