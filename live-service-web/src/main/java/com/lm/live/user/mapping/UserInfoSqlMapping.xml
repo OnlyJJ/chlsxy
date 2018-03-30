@@ -3,8 +3,8 @@
     PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
     "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
 
-<mapper namespace="com.lm.live.userinfo.domain.sqlmapping.UserInfo">
-	<resultMap type="com.lm.live.userbase.domain.UserInfo" id="vo">
+<mapper namespace="com.lm.live.userinfo.domain.sqlmapping.UserInfoDo">
+	<resultMap type="com.lm.live.userbase.domain.UserInfoDo" id="vo">
 		<result property="id" column="id" />
 		<result property="userId" column="userId" />
 		<result property="userAccount" column="userAccount" />
@@ -67,7 +67,7 @@
 	</select>
 	
 	<!-- 用户粉丝列表 -->
-	<select id="listFans" resultType="com.lm.live.user.vo.UserBaseInfo">
+	<select id="listFans" resultType="com.lm.live.common.vo.UserBaseInfo">
 		SELECT b.userId,b.nickName,b.icon 
 		FROM t_user_attention a
 		INNER JOIN t_user_info b ON (b.userId = a.userId)

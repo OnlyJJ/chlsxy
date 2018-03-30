@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE muserer PUBLIC "-//mybatis.org//DTD Muserer 3.0//EN" 
-"http://mybatis.org/dtd/mybatis-3-muserer.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!-- namespace必须指向Dao接口 -->
-<muserer namespace="com.jiujun.shows.user.domain.sqlmusering.PetLevel">
-	<resultMap type="com.jiujun.shows.user.domain.PetLevel"  id="vo">
+<mapper namespace="com.lm.live.pet.domain.sqlmusering.PetLevel">
+	<resultMap type="com.lm.live.pet.domain.PetLevel"  id="vo">
 		<id property="id" column="id" />
 		<result property="petId" column="petId" />
 		<result property="level" column="level" />
@@ -34,7 +34,7 @@
 				,point
 				,image
 				)
-		VALUES	(#{id,jdbcType=INT UNSIGNED}
+		VALUES	(#{id}
 				,#{petId}
 				,#{level}
 				,#{point}
@@ -71,4 +71,4 @@
 	</delete>
 	
 	
-</muserer> 
+</mapper> 

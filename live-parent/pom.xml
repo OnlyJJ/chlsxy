@@ -70,7 +70,7 @@
 		<!-- 其他 -->
 		<live.others.version>1.0.0-SNAPSHOT</live.others.version>
 		<!-- web接口入口控制器 -->
-		<live.web.version>1.0.0-SNAPSHOT</live.web.version>
+		<live.web.version>1.0.2-SNAPSHOT</live.web.version>
 		<!-- 服务化模块，end! -->
 
 
@@ -102,7 +102,7 @@
 		<zookeeper.version>3.4.9</zookeeper.version>
 		<zkclient.version>0.6</zkclient.version>
 		<!-- redisson 依赖io-netty -->
-		<redisson.version>2.11.1</redisson.version>
+		<redisson.version>2.10.5</redisson.version>
 	</properties>
 
 

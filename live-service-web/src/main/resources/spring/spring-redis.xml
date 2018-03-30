@@ -59,7 +59,7 @@
 	</bean>
 
 	<bean id="redisUtils" class="com.lm.live.common.redis.RedisUtil"
-		scope="singleton" init-method="init">
+		scope="singleton">
 		<!-- 通过setter将jedisCluster注入 -->
 		<property name="jedisCluster" ref="jedisCluster" />
 	</bean>

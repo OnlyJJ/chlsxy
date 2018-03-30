@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE muserer PUBLIC "-//mybatis.org//DTD Muserer 3.0//EN" 
-"http://mybatis.org/dtd/mybatis-3-muserer.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!-- namespace必须指向Dao接口 -->
-<muserer namespace="com.jiujun.shows.user.domain.sqlmusering.PetNature">
-	<resultMap type="com.jiujun.shows.user.domain.PetNature"  id="vo">
+<mapper namespace="com.lm.live.pet.domain.sqlmusering.PetNature">
+	<resultMap type="com.lm.live.pet.domain.PetNature"  id="vo">
 		<id property="id" column="id" />
 		<result property="name" column="name" />
 		<result property="remark" column="remark" />
@@ -34,7 +34,7 @@
 				,natureType
 				,natureVal
 				)
-		VALUES	(#{id,jdbcType=INT UNSIGNED}
+		VALUES	(#{id}
 				,#{name}
 				,#{remark}
 				,#{natureType}
@@ -71,4 +71,4 @@
 	</delete>
 	
 	
-</muserer> 
+</mapper> 

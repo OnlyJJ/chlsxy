@@ -4,7 +4,7 @@
     "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
 
 <mapper namespace="com.lm.live.userinfo.domain.sqlmapping.UserInfo">
-	<resultMap type="com.lm.live.userbase.domain.UserInfo" id="vo">
+	<resultMap type="com.lm.live.userbase.domain.UserInfoDo" id="vo">
 		<result property="id" column="id" />
 		<result property="userId" column="userId" />
 		<result property="userAccount" column="userAccount" />
@@ -34,7 +34,7 @@
 	</resultMap>
 
 	<!-- 热门位主播 -->
-	<select id="listHotAnchor" resultType="com.lm.live.user.vo.HomepageVo">
+	<select id="listHotAnchor" resultType="com.lm.live.home.vo.HomePageVo">
 		SELECT a.userId,a.roomId,a.showImg,a.sex, d.nickName,d.remark,d.icon, 1 AS STATUS,IFNULL(s.gold,0) AS gold
 			FROM t_user_anchor a
 			INNER JOIN t_user_info d ON (d.userId = a.userId) 
@@ -57,7 +57,7 @@
 	</select>
 	
 	<!-- 新秀位主播 -->
-	<select id="listNewAnchor" resultType="com.lm.live.user.vo.HomepageVo">
+	<select id="listNewAnchor" resultType="com.lm.live.home.vo.HomePageVo">
 		SELECT a.userId,a.roomId,a.showImg,a.sex, d.nickName,d.remark,d.icon, 1 AS STATUS,IFNULL(s.gold,0) AS gold
 			FROM t_user_anchor a
 			INNER JOIN t_user_info d ON (d.userId = a.userId) 
@@ -83,7 +83,7 @@
 	</select>
 	
 	<!-- 推荐位主播 -->
-	<select id="listNewAnchor" resultType="com.lm.live.user.vo.HomepageVo">
+	<select id="listRecommendAnchor" resultType="com.lm.live.home.vo.HomePageVo">
 		SELECT a.userId,a.roomId,a.showImg,a.sex, d.nickName,d.remark,d.icon, 1 AS STATUS,IFNULL(s.gold,0) AS gold
 			FROM t_user_anchor a
 			INNER JOIN t_user_info d ON (d.userId = a.userId) 
@@ -106,7 +106,7 @@
 	</select>
 	
 	<!-- 其他普通主播 -->
-	<select id="listCommonAnchor" resultType="com.lm.live.user.vo.HomepageVo">
+	<select id="listCommonAnchor" resultType="com.lm.live.home.vo.HomePageVo">
 		SELECT a.userId,a.roomId,a.showImg,a.sex, d.nickName,d.remark,d.icon, 
 			CASE WHEN ISNULL(c.roomId) THEN 2 ELSE 1 END STATUS,
 			CASE WHEN ISNULL(v.url) THEN 1 ELSE 2 END isVideo,
@@ -136,7 +136,7 @@
 	
 	
 	<!-- 用户粉丝列表 -->
-	<select id="listFans" resultType="com.lm.live.user.vo.UserBaseInfo">
+	<select id="listFans" resultType="com.lm.live.common.vo.UserBaseInfo">
 		SELECT b.userId,b.nickName,b.icon 
 		FROM t_user_attention a
 		INNER JOIN t_user_info b ON (b.userId = a.userId)

@@ -3,17 +3,12 @@ package com.lm.live.common.redis;
 
 import java.util.concurrent.TimeUnit;
 
-import org.redisson.Redisson;
-import org.redisson.RedissonMultiLock;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.redisson.config.Config;
-import org.redisson.config.SingleServerConfig;
 
 import com.lm.live.common.enums.ErrorCode;
 import com.lm.live.common.exception.SystemDefinitionException;
 import com.lm.live.common.utils.LogUtil;
-import com.lm.live.common.utils.SpringContextListener;
 
 /**
  * 分布式锁
