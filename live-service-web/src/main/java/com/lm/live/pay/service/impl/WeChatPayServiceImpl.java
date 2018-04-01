@@ -88,7 +88,7 @@ public class WeChatPayServiceImpl implements IWeChatPayService {
 		}
 		
 		if(!StringUtils.isEmpty(agentUserId)){
-			UserAccount userAccount = userAccountService.getObjectByUserId(receiverUserId);
+			UserAccount userAccount = userAccountService.getByUserId(receiverUserId);
 			// 为空说明被充账户不存在
 			if(userAccount == null){
 				throw new PayBizException(ErrorCode.ERROR_5020);
@@ -276,7 +276,7 @@ public class WeChatPayServiceImpl implements IWeChatPayService {
 		ServiceResult<WechatJSAPIVo> ret = new ServiceResult<WechatJSAPIVo>();
 		ret.setSucceed(false);
 		// 校验充值账户是否存在
-		UserAccount userAccount = userAccountService.getObjectByUserId(receiverUserId);
+		UserAccount userAccount = userAccountService.getByUserId(receiverUserId);
 		if(userAccount == null){
 			throw new PayBizException(ErrorCode.ERROR_5020);
 		}

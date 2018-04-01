@@ -125,7 +125,7 @@ public class AliPayServiceImpl extends CommonServiceImpl<PayChargeOrderMapper, P
 		pco.setGenerateOrderAddr(generateOrderAddr);
 		
 		if(!StringUtils.isEmpty(agentUserId)) {
-			UserAccount userAccount = userAccountService.getObjectByUserId(receiverUserId);
+			UserAccount userAccount = userAccountService.getByUserId(receiverUserId);
 			if(userAccount == null){
 				throw new PayBizException(ErrorCode.ERROR_5020);
 			}

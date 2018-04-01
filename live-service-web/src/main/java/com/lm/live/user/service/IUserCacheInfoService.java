@@ -36,5 +36,4 @@ public interface IUserCacheInfoService {
 	 */
 	public String getAndSetPesudoUserName(String userId,String ip) throws Exception;
 
-	public UserCacheInfo getOrUpdateUserInfoFromCache(String uid) throws Exception;
 }

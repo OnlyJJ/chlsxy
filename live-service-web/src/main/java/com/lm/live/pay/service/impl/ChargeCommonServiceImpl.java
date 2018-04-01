@@ -93,7 +93,7 @@ public class ChargeCommonServiceImpl implements IChargeCommonService{
 		}
 		
 		String userId = dbPayChargeOrder.getUserId();
-		UserAccount userAccount = userAccountService.getObjectByUserId(userId);
+		UserAccount userAccount = userAccountService.getByUserId(userId);
 		if(userAccount==null){
 			LogUtil.log.error("###账户不存在,userId:"+userId);
 			throw new PayBizException(ErrorCode.ERROR_5020);
@@ -139,7 +139,7 @@ public class ChargeCommonServiceImpl implements IChargeCommonService{
 		
 		userAccountService.addGolds(userId, golds,userAccountBook);
 		//重新查一次db
-		userAccount = userAccountService.getObjectByUserId(userId);
+		userAccount = userAccountService.getByUserId(userId);
 		
 		//每次成功,都记录历史
 		Date nowDate = new Date();

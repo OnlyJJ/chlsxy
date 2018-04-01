@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+   
+<mapper namespace="com.lm.live.account.domain.sqlmapping.UserAccountBook">
+	<resultMap type="com.lm.live.account.domain.UserAccountBook" id="vo">
+	    <result property="id" column="id" />
+	    <result property="userId" column="userId" />
+	    <result property="giftId" column="giftId" />
+	    <result property="sendGiftNum" column="sendGiftNum" />
+	    <result property="giftPackagePreRemainNum" column="giftPackagePreRemainNum" />
+	    <result property="changeGiftNum" column="changeGiftNum" />
+	    <result property="giftPackageSufRemainNum" column="giftPackageSufRemainNum" />
+	    <result property="preRemainGolds" column="preRemainGolds" />
+	    <result property="changeGolds" column="changeGolds" />
+	    <result property="sufRemainGolds" column="sufRemainGolds" />
+	    <result property="sourceId" column="sourceId" />
+	    <result property="sourceDesc" column="sourceDesc" />
+	    <result property="recordTime" column="recordTime" />
+	    <result property="content" column="content" />
+	</resultMap>
+	
+	 <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+	  <![CDATA[
+	  INSERT INTO t_user_account_book(
+			userId,
+			giftId,
+			sendGiftNum,
+			giftPackagePreRemainNum,
+			changeGiftNum,
+			giftPackageSufRemainNum,
+			preRemainGolds,
+			changeGolds,
+			sufRemainGolds,
+			sourceId,
+			sourceDesc,
+			recordTime,
+			content
+			) VALUES (
+			#{userId,jdbcType=VARCHAR},
+			#{giftId,jdbcType=VARCHAR},
+			#{sendGiftNum,jdbcType=VARCHAR},
+			#{giftPackagePreRemainNum,jdbcType=VARCHAR},
+			#{changeGiftNum,jdbcType=VARCHAR},
+			#{giftPackageSufRemainNum,jdbcType=VARCHAR},
+			#{preRemainGolds,jdbcType=VARCHAR},
+			#{changeGolds,jdbcType=VARCHAR},
+			#{sufRemainGolds,jdbcType=VARCHAR},
+			#{sourceId,jdbcType=VARCHAR},
+			#{sourceDesc,jdbcType=VARCHAR},
+			#{recordTime,jdbcType=VARCHAR},
+			#{content,jdbcType=VARCHAR}
+		)	
+		]]>
+	  </insert>
+	  
+</mapper>

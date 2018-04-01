@@ -9,30 +9,26 @@ package com.lm.live.account.domain;
 public class UserAccount {
 
 	/** 主键自增ID */
-	private Integer id;
+	private int id;
 	/** 用户ID */
 	private String userId;
-	/** 人民币帐户(元) */
-	private Float rmb;
 	/** 金币数量 */
 	private Long gold;
 	/** (蓝钻)钻石数量 */
-	private Long diamond;
+	private Long crystal;
 	/** 主播获得经验（点） */
 	private Long anchorPoint;
 	/** 主播：子等级:S1。普通用户: V1，关联t_level.level & type=2 */
-	private String anchorLevel;
+	private int anchorLevel;
 	/** '用户获得经验（点） */
 	private Long userPoint;
 	/** 普通用户子等级: V1，，关联t_level.level & type=1 */
-	private String userLevel;
-	private Long renqPoint; // 普通用户人气等级经验
-	private String renqLevel; // 普通用户人气等级，R0~R46，关联level等级
+	private int userLevel;
 	
-	public Integer getId() {
+	public int getId() {
 		return id;
 	}
-	public void setId(Integer id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 	public String getUserId() {
@@ -41,12 +37,6 @@ public class UserAccount {
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
-	public Float getRmb() {
-		return rmb;
-	}
-	public void setRmb(Float rmb) {
-		this.rmb = rmb;
-	}
 
 	public Long getGold() {
 		return gold;
@@ -54,23 +44,11 @@ public class UserAccount {
 	public void setGold(Long gold) {
 		this.gold = gold;
 	}
-	public Long getDiamond() {
-		return diamond;
-	}
-	public void setDiamond(Long diamond) {
-		this.diamond = diamond;
-	}
 	public Long getAnchorPoint() {
 		return anchorPoint;
 	}
 	public void setAnchorPoint(Long anchorPoint) {
 		this.anchorPoint = anchorPoint;
-	}
-	public String getAnchorLevel() {
-		return anchorLevel;
-	}
-	public void setAnchorLevel(String anchorLevel) {
-		this.anchorLevel = anchorLevel;
 	}
 	public Long getUserPoint() {
 		return userPoint;
@@ -78,23 +56,23 @@ public class UserAccount {
 	public void setUserPoint(Long userPoint) {
 		this.userPoint = userPoint;
 	}
-	public String getUserLevel() {
+	public Long getCrystal() {
+		return crystal;
+	}
+	public void setCrystal(Long crystal) {
+		this.crystal = crystal;
+	}
+	public int getAnchorLevel() {
+		return anchorLevel;
+	}
+	public void setAnchorLevel(int anchorLevel) {
+		this.anchorLevel = anchorLevel;
+	}
+	public int getUserLevel() {
 		return userLevel;
 	}
-	public void setUserLevel(String userLevel) {
+	public void setUserLevel(int userLevel) {
 		this.userLevel = userLevel;
-	}
-	public Long getRenqPoint() {
-		return renqPoint;
-	}
-	public void setRenqPoint(Long renqPoint) {
-		this.renqPoint = renqPoint;
-	}
-	public String getRenqLevel() {
-		return renqLevel;
-	}
-	public void setRenqLevel(String renqLevel) {
-		this.renqLevel = renqLevel;
 	}
 	
 	

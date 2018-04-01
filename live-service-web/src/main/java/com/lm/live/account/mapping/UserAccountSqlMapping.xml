@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.lm.live.account.domain.sqlmapping.UserAccount">
+	<resultMap type="com.lm.live.account.domain.UserAccount" id="vo">
+		<result property="id" column="id" />
+		<result property="userId" column="userId" />
+		<result property="gold" column="gold" />
+		<result property="crystal" column="crystal" />
+		<result property="anchorPoint" column="anchorPoint" />
+		<result property="anchorLevel" column="anchorLevel" />
+		<result property="userPoint" column="userPoint" />
+		<result property="userLevel" column="userLevel" />
+	</resultMap>
+
+	<select id="getObjectById" parameterType="java.lang.Integer"
+		resultMap="vo">
+		select * from t_user_account where id=#{id}
+	</select>
+	<select id="getByUserId" parameterType="java.lang.String"
+		resultMap="vo">
+		select * from t_user_account where userId=#{userId}
+	</select>
+
+
+	<!-- 用户送礼时，1.扣金币，2，加用户经验 -->
+	<update id="updateUserId">
+		UPDATE t_user_account
+		<set>
+			<if test="gold != null">
+					 <![CDATA[ gold = #{gold,jdbcType=VARCHAR},  ]]>
+			</if>
+			<if test="crystal != null"> 
+ 					 <![CDATA[ crystal = #{crystal,jdbcType=VARCHAR},  ]]>
+			</if>
+			<if test="anchorPoint != null"> 
+					 <![CDATA[ anchorPoint = #{anchorPoint,jdbcType=VARCHAR},  ]]>
+			</if>
+			<if test="anchorLevel != null">
+					<![CDATA[anchorLevel = #{anchorLevel,jdbcType=VARCHAR},  ]]>
+			</if>
+			<if test="userPoint != null">
+					 <![CDATA[ userPoint = #{userPoint,jdbcType=VARCHAR},  ]]>
+			</if>
+			<if test="userLevel != null">
+					<![CDATA[userLevel = #{userLevel,jdbcType=VARCHAR}  ]]>
+			</if>
+		</set>
+		<where>
+			 <![CDATA[ and userId = #{userId,jdbcType=VARCHAR} ]]>
+		</where>
+	</update>
+	<!-- 加金币 -->
+	<update id="addGold">
+		UPDATE t_user_account SET gold = gold + #{gold} 
+		WHERE userId=#{userId}
+	</update>
+	<!-- 减金币，由调用方处理并发 -->
+	<update id="subtractGold">
+		UPDATE t_user_account SET gold = gold - #{gold} 
+		WHERE userId=#{userId}
+	</update>
+	<!-- 更新主播等级 -->
+	<update id="updateAnchorLevel">
+		UPDATE t_user_account SET anchorLevel = #{anchorLevel} 
+		WHERE userId=#{userId}
+	</update>
+	<!-- 更新用户等级 -->
+	<update id="updateUserLevel">
+		UPDATE t_user_account SET userLevel = #{userLevel}
+		WHERE userId=#{userId}
+	</update>
+	<!-- 加用户经验 -->
+	<update id="addUserPoint">
+		UPDATE t_user_account SET userPoint = userPoint + #{userPoint} 
+		WHERE userId=#{userId}
+	</update>
+	<!-- 加主播经验 -->
+	<update id="addAnchorPoint">
+		UPDATE t_user_account SET anchorPoint = anchorPoint + #{anchorPoint} 
+		WHERE userId=#{userId}
+	</update>
+	<!-- 加主播水晶 -->
+	<update id="addCrystal">
+		UPDATE t_user_account SET crystal = crystal + #{crystal} 
+		WHERE userId=#{userId}
+	</update>
+	<!-- 主播收礼时，同时加主播经验和水晶-->
+	<update id="updateAnchor">
+		UPDATE t_user_account
+		<set>
+			<if test="crystal != null"> 
+ 					 <![CDATA[ crystal = crystal + #{crystal,jdbcType=VARCHAR},  ]]>
+			</if>
+			<if test="anchorPoint != null"> 
+					 <![CDATA[ anchorPoint = anchorPoint + #{anchorPoint,jdbcType=VARCHAR},  ]]>
+			</if>
+		</set>
+		<where>
+			 <![CDATA[ and userId = #{userId,jdbcType=VARCHAR} ]]>
+		</where>
+	</update>
+</mapper>
