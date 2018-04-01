@@ -1,5 +1,7 @@
 package com.lm.live.tools.domain;
 
+import java.util.Date;
+
 import com.lm.live.common.vo.BaseVo;
 
 /**
@@ -11,128 +13,78 @@ import com.lm.live.common.vo.BaseVo;
 public class UserPackage extends BaseVo {
 	private static final long serialVersionUID = 1L;
 	/** 主键自增ID */
-	private Integer id;
+	private int id;
 	/** 用户ID */
 	private String userId;
-	/** 礼物ID */
-	private Integer giftId;
-	/** 礼物数量 */
-	private Integer number;
+	/** 道具ID，type为1（礼物）时，对应gift表id，为2时，对应tool表id */
+	private int toolId;
+	/** 类型，1-礼物，2-工具 */
+	private int type;
+	/** 数量 */
+	private int number;
 	/** 是否具备有效期：0-长期有效，1-有效期内有效 */
-	private Integer isPeriod;
+	private int isPeriod;
 	/** 有效期结束时间 */
-	private String endTime;
+	private Date endTime;
 	/** 添加进背包中的时间 */
-	private String addTime;
+	private Date addTime;
 	/** 是否有效：0-无效，1-有效 */
-	private Integer isValid;
-
-	
-	/** 关联 t_gift 表 */
-	/** 礼物名称 */
-	private String name;
-	
-	/** 关联 t_user_info 表 */
-	/** 用户账号 */
-	private String userAccount;
-	private String bindEmail;
-	private String bindMobile;
-	
-	public String getBindEmail() {
-		return bindEmail;
+	private int isValid;
+	public int getId() {
+		return id;
 	}
-
-	public void setBindEmail(String bindEmail) {
-		this.bindEmail = bindEmail;
+	public void setId(int id) {
+		this.id = id;
 	}
-
-	public String getBindMobile() {
-		return bindMobile;
+	public String getUserId() {
+		return userId;
 	}
-
-	public void setBindMobile(String bindMobile) {
-		this.bindMobile = bindMobile;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
-	
-	public String getUserAccount() {
-		return userAccount;
+	public int getToolId() {
+		return toolId;
 	}
-
-	public void setUserAccount(String userAccount) {
-		this.userAccount = userAccount;
+	public void setToolId(int toolId) {
+		this.toolId = toolId;
 	}
-
-	public String getName() {
-		return name;
+	public int getType() {
+		return type;
 	}
-
-	public void setName(String name) {
-		this.name = name;
+	public void setType(int type) {
+		this.type = type;
 	}
-
-	public Integer getIsValid() {
+	public int getNumber() {
+		return number;
+	}
+	public void setNumber(int number) {
+		this.number = number;
+	}
+	public int getIsPeriod() {
+		return isPeriod;
+	}
+	public void setIsPeriod(int isPeriod) {
+		this.isPeriod = isPeriod;
+	}
+	public Date getEndTime() {
+		return endTime;
+	}
+	public void setEndTime(Date endTime) {
+		this.endTime = endTime;
+	}
+	public Date getAddTime() {
+		return addTime;
+	}
+	public void setAddTime(Date addTime) {
+		this.addTime = addTime;
+	}
+	public int getIsValid() {
 		return isValid;
 	}
-
-	public void setIsValid(Integer isValid) {
+	public void setIsValid(int isValid) {
 		this.isValid = isValid;
 	}
 
-	public void setId(Integer id){
-		this.id = id;
-	}
-	
-	public Integer getId() {
-		return this.id;
-	}
-	
-	public void setUserId(String userId){
-		this.userId = userId;
-	}
-	
-	public String getUserId() {
-		return this.userId;
-	}
-	
-	public void setGiftId(Integer giftId){
-		this.giftId = giftId;
-	}
-	
-	public Integer getGiftId() {
-		return this.giftId;
-	}
-	
-	public void setNumber(Integer number){
-		this.number = number;
-	}
-	
-	public Integer getNumber() {
-		return this.number;
-	}
-	
-	public void setIsPeriod(Integer isPeriod){
-		this.isPeriod = isPeriod;
-	}
-	
-	public Integer getIsPeriod() {
-		return this.isPeriod;
-	}
-	
-	public void setEndTime(String endTime){
-		this.endTime = endTime;
-	}
-	
-	public String getEndTime() {
-		return this.endTime;
-	}
-	
-	public void setAddTime(String addTime){
-		this.addTime = addTime;
-	}
-	
-	public String getAddTime() {
-		return this.addTime;
-	}
 	
 
 }

@@ -30,6 +30,60 @@ public class PayGiftOut extends BaseVo {
 	private Date resultTime;
 	/**来源类型,默认0:礼物,1:守护 */
 	private int sourceType;
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getOrderId() {
+		return orderId;
+	}
+	public void setOrderId(String orderId) {
+		this.orderId = orderId;
+	}
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	public String getToUserId() {
+		return toUserId;
+	}
+	public void setToUserId(String toUserId) {
+		this.toUserId = toUserId;
+	}
+	public int getGiftId() {
+		return giftId;
+	}
+	public void setGiftId(int giftId) {
+		this.giftId = giftId;
+	}
+	public int getNumber() {
+		return number;
+	}
+	public void setNumber(int number) {
+		this.number = number;
+	}
+	public int getSrystal() {
+		return srystal;
+	}
+	public void setSrystal(int srystal) {
+		this.srystal = srystal;
+	}
+	public Date getResultTime() {
+		return resultTime;
+	}
+	public void setResultTime(Date resultTime) {
+		this.resultTime = resultTime;
+	}
+	public int getSourceType() {
+		return sourceType;
+	}
+	public void setSourceType(int sourceType) {
+		this.sourceType = sourceType;
+	}
 
 
 }

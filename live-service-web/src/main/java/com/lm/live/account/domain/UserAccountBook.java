@@ -34,18 +34,6 @@ public class UserAccountBook extends BaseVo {
 	 */
 	private int sendGiftNum;
 	/**
-	 * 送礼之前相应礼物包裹剩余量(可为Null,加减礼物时使用)
-	 */
-	private int giftPackagePreRemainNum;
-	/**
-	 * 改变用户包裹,增加为+,减少为-
-	 */
-	private int changeGiftNum;
-	/**
-	 * 送礼之后相应礼物包裹剩余量(可为Null,加减礼物时使用)
-	 */
-	private int giftPackageSufRemainNum;
-	/**
 	 * 改变前账户剩余金币数
 	 */
 	private long preRemainGolds;
@@ -91,24 +79,6 @@ public class UserAccountBook extends BaseVo {
 	}
 	public void setGiftId(int giftId) {
 		this.giftId = giftId;
-	}
-	public int getGiftPackagePreRemainNum() {
-		return giftPackagePreRemainNum;
-	}
-	public void setGiftPackagePreRemainNum(int giftPackagePreRemainNum) {
-		this.giftPackagePreRemainNum = giftPackagePreRemainNum;
-	}
-	public int getChangeGiftNum() {
-		return changeGiftNum;
-	}
-	public void setChangeGiftNum(int changeGiftNum) {
-		this.changeGiftNum = changeGiftNum;
-	}
-	public int getGiftPackageSufRemainNum() {
-		return giftPackageSufRemainNum;
-	}
-	public void setGiftPackageSufRemainNum(int giftPackageSufRemainNum) {
-		this.giftPackageSufRemainNum = giftPackageSufRemainNum;
 	}
 	public long getPreRemainGolds() {
 		return preRemainGolds;

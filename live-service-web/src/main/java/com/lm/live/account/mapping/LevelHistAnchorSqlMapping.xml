@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+   
+<mapper namespace="com.jiujun.shows.level.his.domain.sqlmapping.LevelHistAnchor">
+	<resultMap type="com.jiujun.shows.level.his.domain.LevelHistAnchor" id="vo">
+	    <result property="id" column="id" />
+	    <result property="userId" column="userId" />
+	    <result property="anchorLevel" column="anchorLevel" />
+	    <result property="resultTime" column="resultTime" />
+	    <result property="remark" column="remark" />
+	    <result property="anchorLevelStr" column="anchorLevelStr" />
+	    <result property="reachOrder" column="reachOrder" />
+	</resultMap>
+
+	<select id="getObjectById" parameterType="int" resultMap="vo">
+		select * from t_level_his_anchor where id=#{id}
+	</select>
+	
+	<delete id="removeById" parameterType="int">
+		delete from t_level_his_anchor where id = #{id}
+	</delete>
+	
+	<delete id="removeByIds" >
+		delete from t_level_his_anchor where id in 
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>	
+	
+	<delete id="removeEntityBatch" parameterType="java.util.List">
+		delete from t_level_his_anchor where id in 
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item.id}
+		</foreach>
+	</delete>	
+
+	<select id="getListByPage"  resultMap="vo">
+		select * from t_level_his_anchor 
+	<where>
+	 	<if test="userId != null and userId != ''">
+			AND userId like '%${userId}%'
+		</if> 	
+		<if test="anchorLevel != null">
+			AND anchorLevel = #{anchorLevel}
+		</if>	
+		<if test="ltResultTime != null and ltResultTime != ''">
+			<![CDATA[AND resultTime >= #{ltResultTime} ]]>
+		</if> 
+		<if test="gtResultTime != null and gtResultTime != ''">
+			<![CDATA[AND resultTime <= #{gtResultTime} ]]>
+		</if> 
+	 	<if test="remark != null and remark != ''">
+			AND remark like '%${remark}%'
+		</if> 	
+		<if test="appendWhere != null and appendWhere != ''">
+			${appendWhere}
+		</if>           
+      </where>
+        ORDER BY 
+		<choose>
+			<when test="orderBy != null and orderBy != ''">
+				${orderBy}
+			</when>
+			<otherwise>
+				id
+			</otherwise>
+		</choose>
+		<choose>
+			<when test="descOrAsc != null and descOrAsc != ''">
+				${descOrAsc}
+			</when>
+			<otherwise>
+				asc 
+			</otherwise>
+		</choose>
+	</select>
+	  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+	  <!--
+	  <selectKey resultType="int" keyProperty="baseId" order="BEFORE">select nextval('seq_xxx')</selectKey>
+	  -->
+	  <![CDATA[
+	  INSERT INTO t_level_his_anchor(
+			id,
+			userId,
+			anchorLevel,
+			resultTime,
+			anchorLevelStr,
+			reachOrder,
+			remark
+			) VALUES (
+			#{id,jdbcType=VARCHAR},
+			#{userId,jdbcType=VARCHAR},
+			#{anchorLevel,jdbcType=VARCHAR},
+			#{resultTime,jdbcType=VARCHAR},
+			#{anchorLevelStr,jdbcType=VARCHAR},
+			#{reachOrder,jdbcType=VARCHAR},
+			#{remark,jdbcType=VARCHAR}
+		)	
+		]]>
+	  </insert>
+	  
+	  <insert id="insertBatch" parameterType="java.util.List">
+	  <![CDATA[
+	  		INSERT INTO t_level_his_anchor(
+			id,
+			userId,
+			anchorLevel,
+			resultTime,
+			remark
+			) VALUES 
+		]]>
+		<foreach collection="list" item="item" separator=",">
+		<![CDATA[
+			 (#{item.id,jdbcType=VARCHAR},#{item.userId,jdbcType=VARCHAR},#{item.anchorLevel,jdbcType=VARCHAR},#{item.resultTime,jdbcType=VARCHAR},#{item.remark,jdbcType=VARCHAR})
+		]]>
+		</foreach>
+	  </insert>
+	  
+	  <update id="update">
+		UPDATE t_level_his_anchor
+			<set>
+			 	<if test="userId != null">
+					<![CDATA[userId = #{userId,jdbcType=VARCHAR},  ]]>
+				</if> 	
+				<if test="anchorLevel != null">
+					 <![CDATA[ anchorLevel = #{anchorLevel,jdbcType=VARCHAR},  ]]>
+				</if>	
+				<if test="resultTime != null">
+					<![CDATA[resultTime = #{resultTime,jdbcType=VARCHAR},  ]]>
+				</if> 
+			 	<if test="remark != null">
+					<![CDATA[remark = #{remark,jdbcType=VARCHAR}  ]]>
+				</if> 	
+			</set>
+			<where>
+			 <![CDATA[ and id = #{id,jdbcType=VARCHAR} ]]>  			  	
+			</where>  
+	  </update>	
+</mapper>

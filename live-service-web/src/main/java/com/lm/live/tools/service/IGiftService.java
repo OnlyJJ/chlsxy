@@ -21,7 +21,7 @@ public interface IGiftService extends ICommonService<Gift> {
 	 * @return
 	 */
 	public Gift getGiftInfoFromCache(int giftId);
-
+	
 	/**
 	 * 查询房间内显示的礼物
 	 * @param roomId

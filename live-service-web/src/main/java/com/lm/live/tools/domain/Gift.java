@@ -11,9 +11,10 @@ import com.lm.live.common.vo.BaseVo;
  * @date 2017-06-29
  */
 public class Gift extends BaseVo {
+	// my-todo 因为茄子成长未确定，暂时先不修改这里，这里还需要再次优化
 	private static final long serialVersionUID = 1L;
 	/** 主键自增ID */
-	private Integer id;
+	private int id;
 	/** 礼物名称：法拉利 */
 	private String name;
 	/** 礼物说明：假一送十 */
@@ -21,31 +22,27 @@ public class Gift extends BaseVo {
 	/** 礼物图片 */
 	private String image;
 	/** 单价，单位：金币 */
-	private Integer price;
+	private int price;
 	/** 主播分成比例:0.55 */
 	private Double rate;
 	/** 蓝钻价值=price*rate，对应主播收入，单位：钻石 */
-	private Integer diamond;
-	/** 蓝钻对应RMB价值，单位：分 */
+	private int crystal;
+	/** 对应RMB价值，单位：分 */
 	private Double priceRMB;
 	/** 主播获得经验(点) */
-	private Integer anchorPoint;
+	private int anchorPoint;
 	/** 用户获得经验(点) */
-	private Integer userPoint;
+	private int userPoint;
 	/** 是否启用该礼物/商品，0-停用，1-启用 */
-	private Integer isUse;
+	private int isUse;
 	/** 启用之后开始生效时间，为空表示即时生效 */
 	private Date startTime;
 	/** 停用时间，为空表示长期有效 */
 	private Date endTime;
 	/** 添加时间 */
 	private Date addTime;
-	/**判断添加时间，大于或等于 */
-	private Date	gtAddTime;
-	/**判断添加时间，小于或等于 */
-	private Date	ltAddTime;
 	/**flash显示效果ID*/
-	private Integer showType;
+	private int showType;
 	/**flash显示效果名称*/
 	private String showName;
 	
@@ -53,10 +50,10 @@ public class Gift extends BaseVo {
 	private int meili;
 	
 	/** 桃子成长人气值  */
-	private Integer renqi;
+	private int renqi;
 	
 	/** 桃子成长女神值 */
-	private Integer nvshen;
+	private int nvshen;
 
 	/** 是否可以购买 ,0-可以，1-不可以*/
 	private int buyable;
@@ -68,11 +65,11 @@ public class Gift extends BaseVo {
 	/**特殊标记，默认0(无),1:指定为送出后滚屏礼物 */
 	private int specialFlag;
 	
-	public void setId(Integer id){
+	public void setId(int id){
 		this.id = id;
 	}
 	
-	public Integer getId() {
+	public int getId() {
 		return this.id;
 	}
 	
@@ -100,11 +97,11 @@ public class Gift extends BaseVo {
 		return this.image;
 	}
 	
-	public void setPrice(Integer price){
+	public void setPrice(int price){
 		this.price = price;
 	}
 	
-	public Integer getPrice() {
+	public int getPrice() {
 		return this.price;
 	}
 	
@@ -116,13 +113,6 @@ public class Gift extends BaseVo {
 		return this.rate;
 	}
 	
-	public void setDiamond(Integer diamond){
-		this.diamond = diamond;
-	}
-	
-	public Integer getDiamond() {
-		return this.diamond;
-	}
 	
 	public void setPriceRMB(Double priceRMB){
 		this.priceRMB = priceRMB;
@@ -132,27 +122,27 @@ public class Gift extends BaseVo {
 		return this.priceRMB;
 	}
 	
-	public void setAnchorPoint(Integer anchorPoint){
+	public void setAnchorPoint(int anchorPoint){
 		this.anchorPoint = anchorPoint;
 	}
 	
-	public Integer getAnchorPoint() {
+	public int getAnchorPoint() {
 		return this.anchorPoint;
 	}
 	
-	public void setUserPoint(Integer userPoint){
+	public void setUserPoint(int userPoint){
 		this.userPoint = userPoint;
 	}
 	
-	public Integer getUserPoint() {
+	public int getUserPoint() {
 		return this.userPoint;
 	}
 	
-	public void setIsUse(Integer isUse){
+	public void setIsUse(int isUse){
 		this.isUse = isUse;
 	}
 	
-	public Integer getIsUse() {
+	public int getIsUse() {
 		return this.isUse;
 	}
 	
@@ -180,28 +170,11 @@ public class Gift extends BaseVo {
 		return this.addTime;
 	}
 	
-	public void setGtAddTime(Date gtAddTime){
-		this.gtAddTime = gtAddTime;
-	}
-	
-	public Date getGtAddTime() {
-		return this.gtAddTime;
-	}
-	
-	public void setLtAddTime(Date ltAddTime){
-		this.ltAddTime = ltAddTime;
-	}
-	
-	public Date getLtAddTime() {
-		return this.ltAddTime;
-	}
-	
-	
-	public Integer getShowType() {
+	public int getShowType() {
 		return showType;
 	}
 
-	public void setShowType(Integer showType) {
+	public void setShowType(int showType) {
 		this.showType = showType;
 	}
 
@@ -213,19 +186,19 @@ public class Gift extends BaseVo {
 		this.showName = showName;
 	}
 
-	public Integer getRenqi() {
+	public int getRenqi() {
 		return renqi;
 	}
 
-	public void setRenqi(Integer renqi) {
+	public void setRenqi(int renqi) {
 		this.renqi = renqi;
 	}
 
-	public Integer getNvshen() {
+	public int getNvshen() {
 		return nvshen;
 	}
 
-	public void setNvshen(Integer nvshen) {
+	public void setNvshen(int nvshen) {
 		this.nvshen = nvshen;
 	}
 
@@ -267,6 +240,14 @@ public class Gift extends BaseVo {
 
 	public void setSpecialFlag(int specialFlag) {
 		this.specialFlag = specialFlag;
+	}
+
+	public int getCrystal() {
+		return crystal;
+	}
+
+	public void setCrystal(int crystal) {
+		this.crystal = crystal;
 	}
 	
 }
