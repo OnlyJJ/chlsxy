@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 查找最新的schemaLocation 访问 http://www.springframework.org/schema/ -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:aop="http://www.springframework.org/schema/aop" xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:amq="http://activemq.apache.org/schema/core"
+    xmlns:jms="http://www.springframework.org/schema/jms"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans   
+        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd   
+        http://www.springframework.org/schema/context   
+        http://www.springframework.org/schema/context/spring-context-3.2.xsd
+        http://www.springframework.org/schema/aop
+	   	http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+        http://www.springframework.org/schema/mvc   
+        http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+        http://www.springframework.org/schema/jms
+        http://www.springframework.org/schema/jms/spring-jms-3.2.4.xsd
+        http://activemq.apache.org/schema/core
+        http://activemq.apache.org/schema/core/activemq-core-5.9.0.xsd">
+        
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:activemq.properties</value>
+			</list>
+		</property>
+	</bean>   
+     
+    <amq:connectionFactory id="amqTcpConnectionFactory" userName="${activemq.name}" password="${activemq.password}" brokerURL="${activemq.tcp}" />
+
+	<!-- 开启aop注解 -->
+	<aop:aspectj-autoproxy />
+	
+	<!-- 启用MVC注解 -->
+    <mvc:annotation-driven />
+	
+	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+	
+	<context:component-scan base-package="com.yl" />
+
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"></bean>
+	
+	<!-- spring容器启动时，开启socket服务器 -->
+	<bean class="com.yl.listener.SocketServerListener"/>
+	
+	<bean id="activeMqService" class="com.yl.common.service.ActiveMqService" destroy-method="destory">
+		<constructor-arg name="tcpConnectionFactory" ref="amqTcpConnectionFactory" />
+	</bean>
+     
+     <import resource="classpath:spring/spring-redis.xml" />
+</beans>

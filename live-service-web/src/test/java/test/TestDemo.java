@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.common.utils.HttpUtils;
 
@@ -33,5 +34,15 @@ public class TestDemo {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static void main(String[] args) {
+		
+		String[] a = {"a"};
+		
+		String k = JSON.toJSONString(a);
+		String[] b = JSON.parseObject(k, String[].class);
+		
+		System.err.println(b[0]);
 	}
 }
