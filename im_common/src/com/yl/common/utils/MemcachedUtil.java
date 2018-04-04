@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
  * @author huangzp
  * @date 2015-4-7
  */
+@Component
 public class MemcachedUtil {
 
 	private static MemcachedClient mcClient = null;

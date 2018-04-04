@@ -3,7 +3,6 @@ package com.lm.live.common.redis;
 import java.util.List;
 import java.util.Map;
 
-
 import redis.clients.jedis.JedisCluster;
 
 import com.alibaba.fastjson.JSON;
@@ -244,6 +243,21 @@ public class RedisUtil {
 	 */
 	public static long hdel(String hkey, String key) {
 		return jedisCluster.hdel(hkey, key);
+	}
+	/**
+	 * Map
+	 *@param hkey 缓存map的key
+	 *@param key map中的key
+	 *@param obj map中的val（Object）
+	 *@param expire 过期时间
+	 *@author shao.xiang
+	 *@data 2018年4月2日
+	 */
+	public static void hset(String hkey, String key, Object obj, int expire) {
+		jedisCluster.hset(hkey, key, JSON.toJSONString(obj));
+		if(expire > 0) {
+			jedisCluster.expire(key, expire);
+		}
 	}
 
 }

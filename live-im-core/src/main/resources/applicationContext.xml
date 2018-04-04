@@ -47,5 +47,4 @@
 		<constructor-arg name="tcpConnectionFactory" ref="amqTcpConnectionFactory" />
 	</bean>
      
-     <import resource="classpath:spring/spring-redis.xml" />
 </beans>

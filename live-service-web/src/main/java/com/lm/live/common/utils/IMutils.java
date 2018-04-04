@@ -21,7 +21,7 @@ public class IMutils {
 	
 	
 	
-	private static final String imUrl = SpringContextListener.getContextProValue("httpURL_IM", ""); ;
+	private static final String imUrl = SpringContextListener.getContextProValue("httpURL_IM", "http://192.168.1.70:8162/M3/0/"); ;
 
 	/**
 	 * 根据im返回的字符串判断是否im发送信息成功

@@ -1,0 +1,16 @@
+<project name="im_common" default="build" basedir=".">
+  <property name="targetdir" value="target" />
+  <target name="build">
+  	<mkdir dir="temp"/>
+		<copy todir="temp">
+			<fileset dir="bin">
+				<exclude name="**/*.properties" />
+				<exclude name="**/*.xml" />
+			</fileset>
+			
+		</copy>
+	  	<jar jarfile="${targetdir}/im_common.jar" basedir="temp"/>
+	  	<copy file="${targetdir}/im_common.jar" todir="../im_core/WebRoot/WEB-INF/lib" />
+	  	<delete dir="temp"/>
+  </target>
+</project>
