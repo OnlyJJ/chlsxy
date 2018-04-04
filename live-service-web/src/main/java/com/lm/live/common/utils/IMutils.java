@@ -11,6 +11,7 @@ import com.lm.live.common.constant.MCPrefix;
 import com.lm.live.common.constant.MCTimeoutConstants;
 import com.lm.live.common.enums.ErrorCode;
 import com.lm.live.common.exception.SystemDefinitionException;
+import com.lm.live.common.redis.RedisUtil;
 
 /**
  * 跟im交互的工具类
@@ -156,7 +157,7 @@ public class IMutils {
 		String imToken = Md5CommonUtils.getMD5String(userId);
 		String cacheKey = MCPrefix.IM_MC_SESSION_+imToken;
 		int timeoutSecond = MCTimeoutConstants.DEFAULT_TIMEOUT_5M;
-		MemcachedUtil.set(cacheKey, userId, timeoutSecond);
+		RedisUtil.set(cacheKey, userId, timeoutSecond);
 		return imToken;
 	}
 

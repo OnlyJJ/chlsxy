@@ -76,7 +76,8 @@ public class SessionService {
 	public String getSessionUid(String token) throws ServiceException {
 		String uid = null;
 		if(!StrUtil.isNullOrEmpty(token)){
-			String val = RedisUtil.get(MCKeyUtil.getSocketKey(uid));
+			String val = RedisUtil.get(MCKeyUtil.getSessionKey(token));
+			LogUtil.log.info("### getSessionUid- uid = " + val);
 			if(StringUtils.isNotEmpty(val)){ //消息会话有效
 				uid = val;
 			}else{ 
