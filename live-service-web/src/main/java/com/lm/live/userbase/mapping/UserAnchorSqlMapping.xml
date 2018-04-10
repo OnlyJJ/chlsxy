@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+   
+<mapper namespace="com.lm.live.userbase.dao.UserAnchorMapper">
+	<resultMap type="com.lm.live.userbase.domain.UserAnchor" id="vo">
+	    <result property="id" column="id" />
+	    <result property="userId" column="userId" />
+	    <result property="roomId" column="roomId" />
+	    <result property="name" column="name" />
+	    <result property="sex" column="sex" />
+	    <result property="idCardNO" column="idCardNO" />
+	    <result property="idCardImg1" column="idCardImg1" />
+	    <result property="idCardImg2" column="idCardImg2" />
+	    <result property="idCardImg3" column="idCardImg3" />
+	    <result property="bank" column="bank" />
+	    <result property="bankAccount" column="bankAccount" />
+	    <result property="subBankAddr" column="subBankAddr" />
+	    <result property="bankNO" column="bankNO" />
+	    <result property="mobile" column="mobile" />
+	    <result property="qq" column="qq" />
+	    <result property="address" column="address" />
+	    <result property="showImg" column="showImg" />
+	    <result property="familyId" column="familyId" />
+	    <result property="addTime" column="addTime" />
+	    <result property="actTime" column="actTime" />
+	    <result property="anchorStatus" column="anchorStatus" />
+	    <result property="bankAddr" column="bankAddr" />
+	    <result property="remark" column="remark" />
+	    <result property="fansCount" column="fansCount" />
+	    <result property="isForbidden" column="isForbidden" />
+	    <result property="isLevelIcon" column="isLevelIcon" />
+	    <result property="anchorStyle" column="anchorStyle" />
+	    <result property="anchorType" column="anchorType" />
+	    <result property="showAddress" column="showAddress" />
+	    <result property="lastAddress" column="lastAddress" />
+	    
+	</resultMap>
+
+	<select id="getObjectById" parameterType="java.lang.Integer" resultMap="vo">
+		select * from t_user_anchor where id=#{id}
+	</select>
+	
+	<select id="getAnchorByRoomId"  resultMap="vo">
+		select * from t_user_anchor where roomId=#{roomId}  limit 1
+	</select>
+	
+	 <select id="getAnchorById"  resultMap="vo">
+		select * from t_user_anchor where userId=#{userId}  limit 1
+	</select>
+	
+	 <select id="getAnchorFansCount"  resultType="java.lang.Integer">
+		select fansCount 
+		FROM t_user_anchor 
+		where userId= #{userId}
+	</select>
+	
+	 <update id="modifyAnchorFansCount">
+		UPDATE t_user_anchor 
+		set fansCount = fansCount +  ${num} 
+		where userId= #{userId}
+	</update>	
+	
+	<update id="isForbidden" parameterType="java.util.List">
+	    UPDATE t_user_anchor SET anchorStatus = 1 WHERE userId IN
+	    <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+	        #{item}
+	    </foreach>
+	  </update> 
+	  
+	 <update id="modifyShowAdress" >
+	    UPDATE t_user_anchor 
+		SET showAddress = #{showAddress}
+		WHERE userId= #{userId}
+	  </update> 
+	
+	 <update id="modifyLastAddress" >
+	    UPDATE t_user_anchor 
+		SET lastAddress = #{lastAddress}
+		WHERE roomId= #{roomId}
+	  </update> 
+	
+	<!-- 获取热门推荐主播（日榜前2）（开播） -->
+	<select id="findRecommendAnchor" resultType="java.util.HashMap">
+		SELECT a.userId,a.roomId,a.showImg,a.sex, d.nickName,d.remark,d.icon,f.anchorLevel,f.userLevel,d.cs, a.fansCount AS attentionCount,
+			CASE WHEN ISNULL(s.hId) THEN 'n' ELSE 'y' END isDecorated,1 AS specialType,
+			1 AS status,
+			IFNULL(s.diamond,0) AS diamond,
+		    CASE WHEN ISNULL(s.nsId) THEN 'n' ELSE 'y' END isNvShenDecorated
+			FROM t_user_anchor a
+			INNER JOIN t_user_info d ON (d.userId = a.userId) 
+			INNER JOIN t_user_account f ON f.userId = a.userId
+			INNER JOIN  (SELECT m.gold AS diamond,h.id AS hId,nvShenDecoratedPac.id AS nsId,r.userId FROM t_live_record_cdn r
+				INNER JOIN t_stat_meili m ON r.userId=m.userId AND r.endTime IS NULL 
+				<![CDATA[
+				LEFT JOIN t_peach_decorated h ON h.roomId=r.roomId AND h.endTime >= NOW()
+				LEFT JOIN t_decorate_package nvShenDecoratedPac  ON nvShenDecoratedPac.userId = r.userId AND  nvShenDecoratedPac.endTime >= NOW() AND nvShenDecoratedPac.decorateId=9
+				]]>
+				WHERE m.timeframe= #{timeframe}
+				<if test="userIdList != null and userIdList != ''">
+	 				AND r.userId not in ${userIdList}
+				 </if> 	
+				AND  r.userId NOT IN(SELECT p.anchorId FROM t_anchor_punisment p WHERE p.status=1 AND NOW() BETWEEN beginTime AND endTime)				
+				GROUP BY r.userId
+				ORDER BY diamond DESC
+				LIMIT #{size}) s
+			ON a.userId = s.userId
+		WHERE(a.anchorStatus = 0 OR a.anchorStatus IS NULL) AND (a.isForbidden =0 OR  a.isForbidden IS NULL)
+		<!--anchorType＝0 娱乐主播-->
+		AND a.anchorType = 0
+		ORDER BY diamond DESC
+		LIMIT #{size}
+	</select>
+	
+	<!-- 新秀前2（开播） -->
+	<select id="findNewAnchor" resultType="java.util.HashMap">
+		SELECT a.userId,a.roomId,a.showImg,a.sex, d.nickName,d.remark,d.icon,f.anchorLevel,f.userLevel,d.cs, a.fansCount AS attentionCount,
+			CASE WHEN ISNULL(s.hId) THEN 'n' ELSE 'y' END isDecorated,2 AS specialType,
+			1 AS status,
+			IFNULL(s.diamond,0) AS diamond,
+			CASE WHEN ISNULL(s.nsId) THEN 'n' ELSE 'y' END isNvShenDecorated
+			FROM t_user_anchor a
+			INNER JOIN t_user_info d ON (d.userId = a.userId) 
+			INNER JOIN t_user_account f ON f.userId = a.userId
+			INNER JOIN  (SELECT m.gold AS diamond,h.id AS hId,nvShenDecoratedPac.id AS nsId,r.userId FROM t_live_record_cdn r
+				INNER JOIN t_stat_meili m ON r.userId=m.userId AND r.endTime IS NULL 
+				<![CDATA[
+				INNER JOIN t_user_anchor a2 ON a2.userId=r.userId AND a2.actTime > DATE_SUB(NOW(),INTERVAL 1 MONTH)
+				LEFT JOIN t_peach_decorated h ON h.roomId=r.roomId AND h.endTime >= NOW()
+				LEFT JOIN t_decorate_package nvShenDecoratedPac  ON nvShenDecoratedPac.userId = r.userId AND  nvShenDecoratedPac.endTime >= NOW() AND nvShenDecoratedPac.decorateId=9
+				]]>
+				WHERE m.timeframe= #{timeframe}
+				<if test="userIdList != null and userIdList != ''">
+	 				AND r.userId not in ${userIdList}
+				 </if> 	
+				AND  r.userId NOT IN(SELECT p.anchorId FROM t_anchor_punisment p WHERE p.status=1 AND NOW() BETWEEN beginTime AND endTime)				
+				GROUP BY r.userId
+				ORDER BY diamond DESC
+				LIMIT #{size}
+				) s
+			ON a.userId = s.userId
+		 WHERE(a.anchorStatus = 0 OR a.anchorStatus IS NULL) AND (a.isForbidden =0 OR  a.isForbidden IS NULL)
+		 <!--anchorType＝0 娱乐主播-->
+		 AND a.anchorType = 0
+		 ORDER BY diamond DESC
+		LIMIT #{size}
+	</select>
+	
+	 <update id="updateByUserid" parameterType="java.util.Map">
+	 	UPDATE t_user_anchor 
+		set isLevelIcon = #{isLevelIcon}
+		where userId= #{userId}
+	 </update>
+	 
+	 
+	 <select id="getUserAnchorByIsForbidden"  resultMap="vo">
+	 	select userId,isForbidden,isLevelIcon from t_user_anchor where anchorStatus = #{isForbidden}
+	 </select>
+	 
+	 <select id="isRecentlyRegist" parameterType="java.util.Map" resultType="java.lang.String">
+	 	select userId from t_user_anchor where userId = #{userId} AND TIMESTAMPDIFF(DAY,actTime,NOW()) > #{registDay} 
+	 </select>
+	
+	<!-- 获取全部新秀主播，排序规则见详细 -->
+	<select id="listAllNewstarAnchor" resultType="java.util.HashMap">
+		SELECT a.acttime,a.userId,a.roomId,a.showImg,a.sex, d.nickName,d.remark,d.icon,f.anchorLevel,f.userLevel,d.cs,
+			CASE WHEN ISNULL(c.roomId) THEN 2 ELSE 1 END status,
+			CASE WHEN ISNULL(h.id) THEN 'n' ELSE 'y' END isDecorated,
+		    CASE WHEN ISNULL(nvShenDecoratedPac.id) THEN 'n' ELSE 'y' END isNvShenDecorated ,
+		    a.fansCount AS attentionCount
+  		 FROM t_user_anchor a
+		 INNER JOIN t_user_info d ON (d.userId = a.userId) 
+		 INNER JOIN t_user_account f ON f.userId = a.userId
+		 LEFT JOIN t_room_default_vedio v ON v.roomId=a.roomId AND v.status=1
+		 <!-- 开播状态 -->
+		 LEFT JOIN t_live_record_cdn c ON c.userId = a.userId AND c.endTime IS NULL 
+		 <!-- 蜜桃成熟勋章 -->
+		 LEFT JOIN t_peach_decorated h ON h.roomId = a.roomId AND  h.endTime >= NOW()
+		 LEFT JOIN t_decorate_package nvShenDecoratedPac  ON nvShenDecoratedPac.userId = a.userId AND  nvShenDecoratedPac.endTime >= NOW() AND nvShenDecoratedPac.decorateId=9
+		 WHERE(a.anchorStatus = 0 OR a.anchorStatus IS NULL) AND (a.isForbidden =0 OR  a.isForbidden IS NULL)
+		 <!-- 一个月以内为新秀主播 -->
+		 AND a.actTime > DATE_SUB(NOW(),INTERVAL 1 MONTH)
+		 <if test="userIdList != null and userIdList != ''">
+			 	AND a.userId not in ${userIdList}
+		 </if> 
+		 <!--anchorType＝0 娱乐主播-->
+		 AND a.anchorType = 0
+		 GROUP BY a.userId
+		 <!-- 排序规则 ：开播、下沉、钻石日榜、周榜、月榜、是否有录像、主播等级-->
+		 ORDER BY status ASC, RAND()
+	</select>
+	
+	<!-- 获取分类类型主播，女神、好声音 -->
+	<select id="listAnchorByStyle" resultType="java.util.HashMap">
+		SELECT a.acttime,a.userId,a.roomId,a.showImg,a.sex, d.nickName,d.remark,d.icon,f.anchorLevel,f.userLevel,d.cs,
+			CASE WHEN ISNULL(c.roomId) THEN 2 ELSE 1 END status,
+			CASE WHEN ISNULL(h.id) THEN 'n' ELSE 'y' END isDecorated,
+		    CASE WHEN ISNULL(nvShenDecoratedPac.id) THEN 'n' ELSE 'y' END isNvShenDecorated ,
+		    a.fansCount AS attentionCount
+  		 FROM t_user_anchor a
+		 INNER JOIN t_user_info d ON (d.userId = a.userId) 
+		 INNER JOIN t_user_account f ON f.userId = a.userId
+		 <!-- 开播状态 -->
+		 LEFT JOIN t_live_record_cdn c ON c.userId = a.userId AND c.endTime IS NULL 
+		 <!-- 蜜桃成熟勋章 -->
+		 LEFT JOIN t_peach_decorated h ON h.roomId = a.roomId AND  h.endTime >= NOW()
+		 LEFT JOIN t_decorate_package nvShenDecoratedPac  ON nvShenDecoratedPac.userId = a.userId AND  nvShenDecoratedPac.endTime >= NOW() AND nvShenDecoratedPac.decorateId=9
+		 WHERE(a.anchorStatus = 0 OR a.anchorStatus IS NULL) AND (a.isForbidden =0 OR  a.isForbidden IS NULL)
+		 <!-- 分类类型，1-女神，2-好声音 -->
+		 AND a.anchorStyle = #{anchorStyle}
+		 <!--anchorType＝0 娱乐主播-->
+		 AND a.anchorType = 0
+		 <if test="userIdList != null and userIdList != ''">
+			 	AND a.userId not in ${userIdList}
+		 </if> 
+		 GROUP BY a.userId
+		 <!-- 排序规则 ：开播、下沉、钻石日榜、周榜、月榜、是否有录像、主播等级-->
+		 ORDER BY status ASC,RAND()
+	</select>
+	
+	<select id="listAllNearAnchor" resultType="java.util.HashMap">
+		SELECT a.acttime,a.userId,a.roomId,a.showImg,a.sex, d.nickName,d.remark,d.icon,f.anchorLevel,f.userLevel,d.cs,
+			CASE WHEN ISNULL(c.userId) THEN 2 ELSE 1 END status, a.lastAddress as sf,
+			CASE WHEN ISNULL(h.id) THEN 'n' ELSE 'y' END isDecorated,
+		    CASE WHEN ISNULL(nvShenDecoratedPac.id) THEN 'n' ELSE 'y' END isNvShenDecorated,
+		    a.fansCount AS attentionCount		 
+  		 FROM t_user_anchor a
+		 INNER JOIN t_user_info d ON (d.userId = a.userId) 
+		 INNER JOIN t_user_account f ON f.userId = a.userId
+		 LEFT JOIN t_live_record_cdn c ON c.userId = a.userId AND c.endTime IS NULL   	
+		 LEFT JOIN t_peach_decorated h ON h.roomId = a.roomId AND  h.endTime >= NOW()
+		 LEFT JOIN t_decorate_package nvShenDecoratedPac  ON nvShenDecoratedPac.userId = a.userId AND  nvShenDecoratedPac.endTime >= NOW() AND nvShenDecoratedPac.decorateId=9		 		 
+		 WHERE(a.anchorStatus = 0 OR a.anchorStatus IS NULL) AND (a.isForbidden =0 OR  a.isForbidden IS NULL)
+		 <if test="userIdList != null and userIdList != ''">
+			 	AND a.userId NOT IN ${userIdList}
+		 </if> 
+		 <if test="regionList != null and regionList != ''">
+			 	AND a.lastAddress IN ${regionList}
+		 </if> 
+		 AND a.showAddress = 1		 
+		 GROUP BY a.userId		 
+		 ORDER BY status ASC ,c.startTime ASC;
+	</select>
+	
+</mapper>

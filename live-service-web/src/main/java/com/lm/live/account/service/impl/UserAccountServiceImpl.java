@@ -22,6 +22,11 @@ import com.lm.live.common.service.impl.CommonServiceImpl;
 @Service("userAccountService")
 public class UserAccountServiceImpl extends CommonServiceImpl<UserAccountMapper, UserAccount> implements
 		IUserAccountService {
+	
+	@Resource
+	public void setDao(UserAccountMapper dao) {
+		this.dao = dao;
+	}
 
 	@Resource
 	private UserAccountBookMapper userAccountBookMapper;
@@ -99,6 +104,5 @@ public class UserAccountServiceImpl extends CommonServiceImpl<UserAccountMapper,
 		dao.updateAnchorLevel(userId, newAnchorLevel);
 	}
 
-	
 	
 }

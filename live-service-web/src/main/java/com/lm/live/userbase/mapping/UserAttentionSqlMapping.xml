@@ -3,7 +3,7 @@
     PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
     "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
    
-<mapper namespace="com.lm.live.userbase.domain.sqlmapping.UserAttentionDo">
+<mapper namespace="com.lm.live.userbase.dao.AttentionMapper">
 	<resultMap type="com.lm.live.userbase.domain.UserAttentionDo" id="vo">
 	    <result property="id" column="id" />
 	    <result property="userId" column="userId" />

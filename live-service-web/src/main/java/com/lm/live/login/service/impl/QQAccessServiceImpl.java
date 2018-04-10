@@ -1,6 +1,8 @@
 package com.lm.live.login.service.impl;
 
 
+import javax.annotation.Resource;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +28,11 @@ import com.lm.live.login.vo.QQConnectUserInfo;
 public class QQAccessServiceImpl extends CommonServiceImpl<QQConnectUserInfoDoMapper, QQConnectUserInfoDo>
 	implements IQQAccessService{
 
+	@Resource
+	public void setDao(QQConnectUserInfoDoMapper dao) {
+		this.dao = dao;
+	}
+	
 	@Override
 	public QQConnectUserInfo getUserinfo(String accessToken, String openid) throws Exception {
 		String reqUrl = SpringContextListener.getContextProValue("url_QQConnect_userinfo", "https://graph.qq.com/user/get_user_info");

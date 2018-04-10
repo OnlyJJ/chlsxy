@@ -3,7 +3,7 @@
     PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
     "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
    
-<mapper namespace="com.lm.live.base.domain.sqlmapping.Province">
+<mapper namespace="com.lm.live.base.dao.ProvinceMapper">
 	<resultMap type="com.lm.live.base.domain.Province" id="vo">
 	    <result property="id" column="id" />
 	    <result property="region" column="region" />
@@ -20,4 +20,26 @@
 	<select id="getListByAll"  resultMap="vo">
 		select * from t_province 
 	</select>
+	
+	<select id="listRegionByCode"  resultType="java.lang.String">
+		SELECT region FROM t_province 
+		WHERE code IN (
+				SELECT nearRegionId FROM t_region_relation WHERE regionId = #{regionId}
+			)
+	</select>	
+	
+	<select id="getByCode" resultMap="vo">
+		select * from t_province where code= #{code} LIMIT 1
+	</select>
+	
+	
+	<select id="listNearRegionByAppData"  resultType="java.lang.String">
+		SELECT region FROM t_province 
+		WHERE code IN (
+				SELECT nearRegionId FROM t_region_relation WHERE regionId = (
+					SELECT CONCAT(LEFT(code,2), '0000') FROM t_province WHERE region LIKE  CONCAT(#{mkName}, '%') LIMIT 1
+				)
+			)
+
+	</select>	
 </mapper>

@@ -26,4 +26,5 @@
 	<import resource="classpath:spring/spring-mvc.xml" />
 	<import resource="classpath:spring/spring-redis.xml" />
 	<import resource="classpath:spring/spring-redisson.xml" />
+	<import resource="classpath:spring/spring-quartz.xml"/>
 </beans>

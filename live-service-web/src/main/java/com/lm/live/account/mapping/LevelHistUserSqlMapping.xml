@@ -3,8 +3,8 @@
     PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
     "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
    
-<mapper namespace="com.jiujun.shows.level.his.domain.sqlmapping.LevelHistUser">
-	<resultMap type="com.jiujun.shows.level.his.domain.LevelHistUser" id="vo">
+<mapper namespace="com.lm.live.account.domain.sqlmapping.LevelHistUser">
+	<resultMap type="com.lm.live.account.domain.LevelHistUser" id="vo">
 	    <result property="id" column="id" />
 	    <result property="userId" column="userId" />
 	    <result property="userLevel" column="userLevel" />

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.lm.live.others.push.dao.PushDevMapper">
+	<resultMap type="com.lm.live.others.push.domain.PushDev" id="vo">
+		<id property="id" column="id" />
+		<result property="userId" column="userId" />
+		<result property="token" column="token" />
+		<result property="appType" column="appType" />
+		<result property="pckName" column="pckName" />
+		<result property="creatTime" column="creatTime" />
+		<result property="lastTime" column="lastTime" />
+		
+	</resultMap>
+
+	<!-- 定义可重用的SQL代码段，可以包含在其他语句中 -->
+	<sql id="base_column">
+		id
+		,userId
+		,token
+		,appType
+		,pckName
+		,creatTime
+		,lastTime
+	</sql>
+
+	<select id="getObjectById" parameterType="java.lang.Long"
+		resultMap="vo">
+		SELECT
+		<include refid="base_column" />
+		FROM t_push_dev
+		WHERE id= #{id}
+	</select>
+	
+	<select id="selectPushDev" resultMap="vo">
+		SELECT p.userId FROM t_push_dev p
+		WHERE p.userId= #{userId}
+		AND p.token = #{token}
+		LIMIT 1
+	</select>
+
+	<select id="listAndroidFans" resultType="java.lang.String">
+		SELECT p.userId AS userId FROM t_push_dev p, t_push_user_set_attention a 
+		WHERE p.userId=a.userId
+		AND p.appType = 0
+		AND a.toUserId= #{anchorId}
+		AND a.pushFlag = 1
+		GROUP BY p.userId;
+	</select>
+	
+	<select id="listIOSFans" resultType="java.lang.String">
+		SELECT p.userId AS userId FROM t_push_dev p, t_push_user_set_attention a 
+		WHERE p.userId=a.userId
+		AND p.appType = 3
+		AND p.pckName = #{pckName}
+		AND a.toUserId= #{anchorId}
+		AND a.pushFlag = 1
+		GROUP BY p.userId;
+	</select>
+	
+	<select id="listByApptype" resultType="java.lang.String">
+		SELECT userId FROM t_push_dev 
+		WHERE appType = #{appType}
+		GROUP BY token
+	</select>
+	
+	<select id="listByPckName" resultType="java.lang.String">
+		SELECT userId FROM t_push_dev 
+		WHERE pckName = #{pckName}
+		GROUP BY token
+	</select>
+	
+	<select id="listPushDev" resultMap="vo">
+		SELECT <include refid="base_column" /> 
+		FROM t_push_dev 
+		WHERE creatTime BETWEEN #{beginTime} AND #{endTime}
+		GROUP BY token
+	</select>
+	
+	<select id="listPushDevByUserId" resultMap="vo">
+		SELECT <include refid="base_column" /> 
+		FROM t_push_dev 
+		WHERE userId = #{userId}
+		AND appType = #{appType}
+		ORDER BY lastTime DESC, creatTime DESC
+		LIMIT 1
+	</select>
+	
+	
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		INSERT
+		INTO t_push_dev
+		(id
+		,userId
+		,token
+		,appType
+		,pckName
+		,creatTime
+		,lastTime
+		)
+		VALUES (#{id}
+		,#{userId}
+		,#{token}
+		,#{appType}
+		,#{pckName}
+		,#{creatTime}
+		,#{lastTime}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE t_push_dev
+		<set>
+			<if test="id != null and id != ''">
+				id = #{id},
+			</if>
+			<if test="userId != null and userId != ''">
+				userId = #{userId},
+			</if>
+			<if test="token != null and token != ''">
+				token = #{token},
+			</if>
+			<if test="appType != null and appType != ''">
+				appType = #{appType},
+			</if>
+			<if test="pckName != null and pckName != ''">
+				pckName = #{pckName},
+			</if>
+			<if test="creatTime != null and creatTime != ''">
+				creatTime = #{creatTime},
+			</if>
+		</set>
+		WHERE id = #{id}
+
+	</update>
+	
+	<update id="updateLastTime">
+		UPDATE t_push_dev SET lastTime = NOW() 
+		WHERE userId = #{userId}
+		AND token = #{token}
+	</update>
+
+	<delete id="removeById" parameterType="java.lang.Long">
+		DELETE FROM t_push_dev
+		WHERE id = #{id}
+	</delete>
+
+
+</mapper> 

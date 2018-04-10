@@ -2,6 +2,8 @@ package com.lm.live.base.dao;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.lm.live.base.domain.Province;
 import com.lm.live.common.dao.ICommonMapper;
 
@@ -18,5 +20,12 @@ public interface ProvinceMapper extends ICommonMapper<Province> {
 	 * @return
 	 */
 	List<Province> getListByAll();
+	
+	
+	List<String> listRegionByCode(String regionId);
+	
+	Province getByCode(String code);
+	
+	List<String> listNearRegionByAppData(@Param("appSf") String appSf);
 	
 }

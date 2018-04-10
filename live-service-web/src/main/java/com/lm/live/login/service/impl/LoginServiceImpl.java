@@ -25,6 +25,7 @@ import com.lm.live.base.service.IThirdpartyConfService;
 import com.lm.live.common.constant.LockKey;
 import com.lm.live.common.constant.MCTimeoutConstants;
 import com.lm.live.common.redis.RdLock;
+import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.utils.DateUntil;
 import com.lm.live.common.utils.FileTypeUtils;
 import com.lm.live.common.utils.HttpUtils;
@@ -40,11 +41,9 @@ import com.lm.live.common.vo.UserBaseInfo;
 import com.lm.live.framework.service.ServiceResult;
 import com.lm.live.login.constant.Constants;
 import com.lm.live.login.constant.MCPrefix;
-import com.lm.live.login.dao.CodeRandomMapper;
 import com.lm.live.login.dao.UserRegistAutoMapper;
 import com.lm.live.login.dao.WechatOauth2TokenRefreshMapper;
 import com.lm.live.login.dao.WechatUserMapper;
-import com.lm.live.login.domain.CodeRandom;
 import com.lm.live.login.domain.QQConnectUserInfoDo;
 import com.lm.live.login.domain.UserRegistAuto;
 import com.lm.live.login.domain.WechatOauth2TokenRefresh;
@@ -64,7 +63,10 @@ import com.lm.live.login.vo.WechatUserInfo;
 import com.lm.live.login.vo.WeiboUserInfo;
 import com.lm.live.user.service.IUserCacheInfoService;
 import com.lm.live.user.vo.UserInfo;
+import com.lm.live.userbase.dao.CodeRandomMapper;
+import com.lm.live.userbase.domain.CodeRandom;
 import com.lm.live.userbase.domain.UserInfoDo;
+import com.lm.live.userbase.service.ICodeRandomService;
 import com.lm.live.userbase.service.IUserBaseService;
 
 /**
@@ -80,7 +82,7 @@ public class LoginServiceImpl implements ILoginService {
 	private UserRegistAutoMapper userRegistAutoMapper;
 	
 	@Resource
-	private CodeRandomMapper codeRandomMapper;
+	private ICodeRandomService codeRandomService;
 	
 	@Resource
 	private ServiceLogMapper serviceLogMapper;
@@ -161,7 +163,6 @@ public class LoginServiceImpl implements ILoginService {
 			String encryptDbPwd = getPwd(nowDate, userId, imeiMd5Str);
 
 			// 根据ip获取省份
-			//my-todo 修改为目前MT获取用户省份的方法
 			String clientProvince = provinceService.getProviceBy(clientIp);
 			// 随机获取昵称
 			String[] strArr = Constants.DEFAULT_AUTOREGIST_NAME.split(Constants.SEPARATOR);
@@ -221,21 +222,20 @@ public class LoginServiceImpl implements ILoginService {
 
 			int eachIpAutoRegistNum = 0;
 			int eachDayAutoRegistNum = 0;
-			Object cacheObjOfAppAutoRegistEachIp = MemcachedUtil.get(cacheKeyOfAppAutoRegistEachIp);
-			Object cacheObjOfAppAutoRegistEveryDay = MemcachedUtil.get(cacheKeyOfAppAutoRegistEveryDay);
-			if (cacheObjOfAppAutoRegistEachIp != null) {
-				eachIpAutoRegistNum = Integer.parseInt(cacheObjOfAppAutoRegistEachIp.toString());
+			String cacheObjOfAppAutoRegistEachIp = RedisUtil.get(cacheKeyOfAppAutoRegistEachIp);
+			String cacheObjOfAppAutoRegistEveryDay = RedisUtil.get(cacheKeyOfAppAutoRegistEveryDay);
+			if (!StringUtils.isEmpty(cacheObjOfAppAutoRegistEachIp)) {
+				eachIpAutoRegistNum = Integer.parseInt(cacheObjOfAppAutoRegistEachIp);
 			}
 
-			if (cacheObjOfAppAutoRegistEveryDay != null) {
-				eachDayAutoRegistNum = Integer.parseInt(cacheObjOfAppAutoRegistEveryDay.toString());
+			if (!StringUtils.isEmpty(cacheObjOfAppAutoRegistEveryDay)) {
+				eachDayAutoRegistNum = Integer.parseInt(cacheObjOfAppAutoRegistEveryDay);
 			}
 
 			eachIpAutoRegistNum++;
 			eachDayAutoRegistNum++;
-			MemcachedUtil.set(cacheKeyOfAppAutoRegistEachIp, eachIpAutoRegistNum, MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
-
-			MemcachedUtil.set(cacheKeyOfAppAutoRegistEveryDay, eachDayAutoRegistNum, MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
+			RedisUtil.set(cacheKeyOfAppAutoRegistEachIp, eachIpAutoRegistNum, MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
+			RedisUtil.set(cacheKeyOfAppAutoRegistEveryDay, eachDayAutoRegistNum, MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
 
 		} else {
 			LogUtil.log.info(String.format("###自动注册,此设备已登录过,uuid:%s,devInfo；%s", uuid,
@@ -948,7 +948,7 @@ public class LoginServiceImpl implements ILoginService {
 	public void setMemcacheToSessionId(Session session, String userId) {
 		long time = System.currentTimeMillis();
 		String sessionid = MD5Util.serverEncode(userId + time);
-		MemcachedUtil.set(MCPrefix.MC_TOKEN_PREFIX + userId, sessionid,
+		RedisUtil.set(MCPrefix.MC_TOKEN_PREFIX + userId, sessionid,
 				MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
 		session.setTime(time);
 		session.setSessionid(sessionid);
@@ -1013,22 +1013,22 @@ public class LoginServiceImpl implements ILoginService {
 			RdLock.lock(lockname);
 			List<CodeRandom> list = null;
 			String cachekey = MCPrefix.LOGIN_USERCODE_RONDOM_CACHE;
-			Object obj = MemcachedUtil.get(cachekey);
+			List<CodeRandom> obj = RedisUtil.getList(cachekey, CodeRandom.class);
 			if(obj != null) {
-				list = (List<CodeRandom>) obj;
+				list = obj;
 				LogUtil.log.error("### getUserId-从缓存中获取code，剩余code数 = " + list.size());
 			} 
 			if(list == null || list.size() <= 0) {
-				list = codeRandomMapper.listCodeRandom();
+				list = codeRandomService.listCodeRandom();
 				LogUtil.log.error("### getUserId-从DB中获取code，总个数 = " + list.size());
 			}
 			if(list != null && list.size() >0) {
 				CodeRandom cr = list.get(new Random().nextInt(list.size()));
 				code = cr.getCode();
-				codeRandomMapper.updateStatus(code);
+				codeRandomService.updateStatus(code);
 				// 取出code后，从缓存中移除
 				list.remove(cr);
-				MemcachedUtil.set(cachekey, list);
+				RedisUtil.set(cachekey, list);
 			} else {
 				String errorMsg = "###表t_code_random的code已用完";
 				LogUtil.log.error(errorMsg);

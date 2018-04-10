@@ -2,10 +2,12 @@ package com.lm.live.common.utils;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSONObject;
+import com.lm.live.common.redis.RedisUtil;
 
 
 /**
@@ -22,6 +24,8 @@ public class IpUtils{
   private static final String TAOBAO_IP_REGION ="http://ip.taobao.com/service/getIpInfo.php?ip=";
   
   private static final String XINLANG_IP_REGION ="http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=json&ip=";
+  
+  private static final String USER_IP_REGION_CACHE = "user_ip_region_";
   
   /** 获取本机IP **/
   public static String getExterIp(HttpServletRequest request){
@@ -147,4 +151,29 @@ public class IpUtils{
 		}
 		return sb.toString();
 	} 
+	
+	/**
+	 * 根据ip获取省份code
+	 * @param ip
+	 * @return
+	 */
+	public static String getRegionCode(String ip) {
+		if(StringUtils.isEmpty(ip)) {
+			return null;
+		}
+		// 1、先从redis缓存中取，ip为前三段
+		String[] ip_split = ip.split("\\.");
+		String shortIp = ip_split[0] + "." + ip_split[1] + "." + ip_split[2];//取前三段ip缓存
+		String proChe = RedisUtil.get(shortIp);
+		if(proChe != null) {
+			return proChe;
+		}
+		String code = getTaobaoRegionByIp(ip);
+		if(!StringUtils.isEmpty(code)) {
+			// 淘宝获取到，放入缓存
+			RedisUtil.set(shortIp, code);
+			return code;
+		}
+		return code;
+	}
 }

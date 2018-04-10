@@ -22,6 +22,7 @@ import org.springframework.util.StringUtils;
 import com.lm.live.common.enums.ErrorCode;
 import com.lm.live.common.exception.SystemDefinitionException;
 import com.lm.live.common.vo.BaseDataRequest;
+import com.lm.live.common.vo.DeviceProperties;
 
 public class HttpUtils {
 	
@@ -60,9 +61,6 @@ public class HttpUtils {
 	public static  int androidClienttypeInt = 2;
 	public static  int iosClienttypeInt = 3;
 	
-	/** www主机地址 */
-	private static final String wwwProjServerHostIp = SpringContextListener.getContextProValue("wwwProjServerHostIp", "");
-
 
 	
 	public static String get(String url) throws Exception {
@@ -922,30 +920,7 @@ public class HttpUtils {
         }  
         return ip;  
     }  
-	/**
-	 * my-todo
-	 * 获取用户ip
-	 * @param data
-	 * @return
-	 */
-	public static String getUserReallyIp(BaseDataRequest data) {
-		if(data==null){
-			return null;
-		}
-		String ip = "";
-		String webIp = "";
-		// my-todo
-//		if(data.getUserBaseInfo() != null && data.getUserBaseInfo().getIp() != null) {
-//			webIp = data.getUserBaseInfo().getIp();
-//		}
-//		String userIp = HttpUtils.getIpAddress(data.getRequest());
-//		if(wwwProjServerHostIp.equals(userIp)) {
-//			ip = webIp;
-//		} else {
-//			ip = userIp;
-//		}
-		return ip;
-	}
+	
 
 	/**
 	 *  赠送免费礼物茄子,所用的方法 <br />

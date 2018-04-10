@@ -7,7 +7,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.utils.HttpUtils;
+import com.lm.live.userbase.domain.UserAnchor;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)

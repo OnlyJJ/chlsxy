@@ -3,7 +3,7 @@
     PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
     "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
    
-<mapper namespace="com.lm.live.login.domain.sqlmapping.UserRegistAuto">
+<mapper namespace="com.lm.live.login.dao.UserRegistAutoMapper">
 	<resultMap type="com.lm.live.login.domain.UserRegistAuto" id="vo">
 	    <result property="id" column="id" />
 	    <result property="userId" column="userId" />
@@ -12,7 +12,6 @@
 	    <result property="deviceProperties" column="deviceProperties" />
 	    <result property="recordTime" column="recordTime" />
 	    <result property="verifyId" column="verifyId" />
-	    <result property="comment" column="comment" />
 	    <result property="isChangeNickname" column="isChangeNickname" />
 	</resultMap>
 
@@ -56,9 +55,6 @@
 	 	<if test="verifyId != null and verifyId != ''">
 			AND verifyId like '%${verifyId}%'
 		</if> 	
-	 	<if test="comment != null and comment != ''">
-			AND comment like '%${comment}%'
-		</if> 	
 	 	<if test="isChangeNickname != null and isChangeNickname != ''">
 			AND isChangeNickname like '%${isChangeNickname}%'
 		</if> 	
@@ -97,7 +93,6 @@
 			deviceProperties,
 			recordTime,
 			verifyId,
-			comment,
 			isChangeNickname
 			) VALUES (
 			#{id,jdbcType=VARCHAR},
@@ -107,7 +102,6 @@
 			#{deviceProperties,jdbcType=VARCHAR},
 			#{recordTime,jdbcType=VARCHAR},
 			#{verifyId,jdbcType=VARCHAR},
-			#{comment,jdbcType=VARCHAR},
 			#{isChangeNickname,jdbcType=VARCHAR}
 		)	
 		]]>
@@ -123,13 +117,12 @@
 			deviceProperties,
 			recordTime,
 			verifyId,
-			comment,
 			isChangeNickname
 			) VALUES 
 		]]>
 		<foreach collection="list" item="item" separator=",">
 		<![CDATA[
-			 (#{item.id,jdbcType=VARCHAR},#{item.userId,jdbcType=VARCHAR},#{item.deviceMac,jdbcType=VARCHAR},#{item.uuId,jdbcType=VARCHAR},#{item.deviceProperties,jdbcType=VARCHAR},#{item.recordTime,jdbcType=VARCHAR},#{item.verifyId,jdbcType=VARCHAR},#{item.comment,jdbcType=VARCHAR},#{item.isChangeNickname,jdbcType=VARCHAR})
+			 (#{item.id,jdbcType=VARCHAR},#{item.userId,jdbcType=VARCHAR},#{item.deviceMac,jdbcType=VARCHAR},#{item.uuId,jdbcType=VARCHAR},#{item.deviceProperties,jdbcType=VARCHAR},#{item.recordTime,jdbcType=VARCHAR},#{item.verifyId,jdbcType=VARCHAR},#{item.isChangeNickname,jdbcType=VARCHAR})
 		]]>
 		</foreach>
 	  </insert>
@@ -154,9 +147,6 @@
 				</if> 
 			 	<if test="verifyId != null">
 					<![CDATA[verifyId = #{verifyId,jdbcType=VARCHAR},  ]]>
-				</if> 	
-			 	<if test="comment != null">
-					<![CDATA[comment = #{comment,jdbcType=VARCHAR},  ]]>
 				</if> 	
 			 	<if test="isChangeNickname != null">
 					<![CDATA[isChangeNickname = #{isChangeNickname,jdbcType=VARCHAR}  ]]>

@@ -9,9 +9,9 @@ public interface ICommonService<R> {
 
 	public R getObjectById(Object id);
 
-	public R insert(R vo);
+	public void insert(R vo);
 
-	public R update(R vo);
+	public void update(R vo);
 	
 	public void removeById(Object id);
 

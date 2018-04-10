@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE muserer PUBLIC "-//mybatis.org//DTD Muserer 3.0//EN" 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!-- namespace必须指向Dao接口 -->
-<mapper namespace="com.lm.live.login.domain.sqlmapping.CodeRandom">
-	<resultMap type="com.lm.live.login.domain.CodeRandom"  id="vo">
+<mapper namespace="com.lm.live.userbase.dao.CodeRandomMapper">
+	<resultMap type="com.lm.live.userbase.domain.CodeRandom"  id="vo">
 		<id property="id" column="id" />
 		<result property="code" column="code" />
 		<result property="isUserUse" column="isUserUse" />
@@ -30,6 +30,24 @@
 		WHERE isUserUse = 0
 		ORDER BY RAND() 
 		LIMIT 10000
+	</select>
+	
+	<select id="getMaxCode"  resultType="java.lang.String">
+		SELECT MAX(CAST(a.code AS UNSIGNED)) AS CODE FROM t_code_random a
+	</select>
+	
+	<select id="getUserCount"  resultType="java.lang.Integer">
+		SELECT COUNT(*) count FROM t_code_random a WHERE a.isUserUse=0
+	</select>
+	
+	<select id="getRoomCount"  resultType="java.lang.Integer">
+		SELECT COUNT(*) count FROM t_code_random a WHERE a.isRoomUse=0
+	</select>
+	
+	
+	<select id="getCodeRandom"  resultType="java.lang.Integer">
+		SELECT * FROM t_code_random a WHERE a.code = #{code}
+		LIMIT 1
 	</select>
 	
 	

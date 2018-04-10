@@ -8,13 +8,14 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.alibaba.dubbo.common.utils.StringUtils;
 import com.alibaba.fastjson.JSONObject;
+import com.lm.live.appclient.service.IAppInstallChannelService;
 import com.lm.live.base.service.IIpStoreService;
 import com.lm.live.common.controller.BaseController;
 import com.lm.live.common.utils.HttpServletResponseUtil;
@@ -34,11 +35,11 @@ import com.lm.live.pay.exception.PayBizException;
 import com.lm.live.pay.service.IAliPayService;
 import com.lm.live.pay.service.IPayChargeOrderService;
 import com.lm.live.pay.service.IWeChatPayService;
-import com.lm.live.web.vo.DataRequest;
 import com.lm.live.pay.vo.PayOrder;
 import com.lm.live.pay.vo.WechatJSAPIVo;
 import com.lm.live.pay.vo.WechatPayVo;
-import com.lm.live.appclient.service.IAppInstallChannelService;
+import com.lm.live.web.util.IpUtil;
+import com.lm.live.web.vo.DataRequest;
 
 /**
  * 支付服务
@@ -92,7 +93,7 @@ public class PayWeb extends BaseController {
 			String userId = userbase.getUserId();
 			PayOrder order = new PayOrder();
 			order.parseJson(data.getData().getJSONObject(order.getShortName()));
-			String ip = HttpUtils.getUserReallyIp(data);
+			String ip = IpUtil.getUserReallyIp(data);
 			ServiceResult<JSONObject> srt = aliPayService.createOrder(order, dv, userId, ip);
 			if(srt.isSucceed()) {
 				jsonRes = srt.getData();
@@ -217,7 +218,7 @@ public class PayWeb extends BaseController {
 			userbase.parseJson(data.getData().getJSONObject(userbase.getShortName()));
 			WechatPayVo wechat = new WechatPayVo();
 			wechat.parseJson(data.getData().getJSONObject(wechat.getShortName()));
-			String spbill_create_ip = HttpUtils.getUserReallyIp(data);
+			String spbill_create_ip = IpUtil.getUserReallyIp(data);
 			int total_free = wechat.getTotalFree();//充值金额(单位:分)
 			//代充时,金币接受者
 			String receiverUserId = wechat.getReceiverUserId();

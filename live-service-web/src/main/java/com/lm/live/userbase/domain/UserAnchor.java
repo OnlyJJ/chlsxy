@@ -68,6 +68,12 @@ public class UserAnchor extends BaseVo {
 	
 	/** 主播分类，默认0-无分类，1-女神，2-好声音 */
 	private int anchorStyle;
+	
+	/** 主播位置 */
+	private int showAddress;
+	
+	/** 最后开播时的地址 */
+	private String lastAddress;
 
 	public void setId(Integer id) {
 		this.id = id;
@@ -292,6 +298,22 @@ public class UserAnchor extends BaseVo {
 
 	public void setAnchorStyle(int anchorStyle) {
 		this.anchorStyle = anchorStyle;
+	}
+
+	public int getShowAddress() {
+		return showAddress;
+	}
+
+	public void setShowAddress(int showAddress) {
+		this.showAddress = showAddress;
+	}
+
+	public String getLastAddress() {
+		return lastAddress;
+	}
+
+	public void setLastAddress(String lastAddress) {
+		this.lastAddress = lastAddress;
 	}
 
 }

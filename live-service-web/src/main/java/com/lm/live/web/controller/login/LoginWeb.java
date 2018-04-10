@@ -38,6 +38,7 @@ import com.lm.live.login.service.ILoginService;
 import com.lm.live.login.service.IUuidBlackListService;
 import com.lm.live.login.vo.QQConnectUserInfoVo;
 import com.lm.live.user.vo.UserInfo;
+import com.lm.live.web.util.IpUtil;
 import com.lm.live.web.vo.DataRequest;
 
 /**
@@ -83,8 +84,8 @@ public class LoginWeb extends BaseController {
 			code.parseJson(data.getData().getJSONObject(code.getShortName()));
 			String accessToken = code.getUuid();
 			String clientType = HttpUtils.getClientTypeStr(data.getRequest());
-			String clientIp = HttpUtils.getUserReallyIp(data);
-			// 通过设备信息IMEI校验黑名单
+			String clientIp = IpUtil.getUserReallyIp(data);
+			// 通过设备信息uuid校验黑名单
 			String uuid = deviceProperties.getUuid();
 			if(StringUtils.isNotEmpty(uuid)) {
 				uuidBlackListService.checkBlackList(uuid);

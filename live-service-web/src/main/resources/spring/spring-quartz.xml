@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!-- 1.秒(0-59) 2.分钟(0-59) 3.小时(0-23) 4.月份中的是期(1-31) 5.月份(1-12或SUN-DEC) 6.星期中的日期(1-7或SUN-SAT) 
+	7.年份(1970-2099) “*”字符被用来指定所有的值。如：”*“在分钟的字段域里表示“每分钟”。 “-”字符被用来指定一个范围。如：“10-12”在小时域意味着“10点、11点、12点”。 
+	“,”字符被用来指定另外的值。如：“MON,WED,FRI”在星期域里表示”星期一、星期三、星期五”. “?”字符只在日期域和星期域中使用。它被用来指定“非明确的值”。当你需要通过在这两个域中的一个来指定一些东西的时候，它是有用的。看下面的例子你就会明白。 
+	“L”字符指定在月或者星期中的某天（最后一天）。即“Last ”的缩写。但是在星期和月中“Ｌ”表示不同的意思，如：在月子段中“L”指月份的最后一天-1月31日，2月28日，如果在星期字段中则简单的表示为“7”或者“SAT”。如果在星期字段中在某个value值得后面，则表示“某月的最后一个星期value”,如“6L”表示某月的最后一个星期五。 
+	“W”字符只能用在月份字段中，该字段指定了离指定日期最近的那个星期日。 “#”字符只能用在星期字段，该字段指定了第几个星期value在某月中 注：一次性定时器过期后，如果成为永远不会执行的定时器，将使项目启动不了 -->
+<beans>
+	<!-- 定时任务扫描t_code_random中可用的用户号、房间号 begin -->
+	<!-- 要调用的工作类 -->
+	<bean id="job_addRandomCode"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<!-- 调用的类 -->
+		<property name="targetObject">
+			<ref bean="quartzService" />
+		</property>
+		<!-- 调用类中的方法 -->
+		<property name="targetMethod">
+			<value>addRandomCode</value>
+		</property>
+		<!-- 是否允许任务并发执行。当值为false时，表示必须等到前一个线程处理完毕后才再启一个新的线程 -->
+		<property name="concurrent">
+			<value>false</value>
+		</property>
+	</bean>
+	<!-- 定义触发时间 -->
+	<bean id="trigger_addRandomCode"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="job_addRandomCode" />
+		</property>
+		<!-- cron表达式 -->
+		<property name="cronExpression">
+			<!-- <value>0 0 0 * * ?</value> -->
+			<!-- 30分钟执行一次 -->
+			<value>0 0/30 * * * ?</value>
+		</property>
+	</bean>
+	<!-- 定时任务扫描t_code_random表中可用的用户号、房间号 end -->
+
+
+	<!-- 总管理类 如果将lazy-init='false'那么容器启动就会执行调度程序 -->
+	<bean id="startQuertz" lazy-init="true"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="trigger_addRandomCode" />
+			</list>
+		</property>
+	</bean>
+</beans>

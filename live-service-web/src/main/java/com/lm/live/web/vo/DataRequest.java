@@ -10,7 +10,8 @@ import java.io.Serializable;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.alibaba.dubbo.common.utils.StringUtils;
+import org.apache.commons.lang.StringUtils;
+
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.common.enums.ErrorCode;
 import com.lm.live.common.exception.SystemDefinitionException;

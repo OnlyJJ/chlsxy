@@ -9,10 +9,12 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.common.constant.MCTimeoutConstants;
 import com.lm.live.common.enums.IMBusinessEnum;
+import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.utils.DateUntil;
 import com.lm.live.common.utils.IMutils;
 import com.lm.live.common.utils.LogUtil;
@@ -114,9 +116,9 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 		}
 		JSONObject ret = new JSONObject();
 		String key = MCPrefix.USER_ATTENTION_CACHE + userId;
-		Object obj = MemcachedUtil.get(key);
-		if(obj != null) {
-			ret = (JSONObject) obj;
+		String obj = RedisUtil.get(key);
+		if(!StringUtils.isEmpty(obj)) {
+			ret = JSON.parseObject(obj);
 			LogUtil.log.error("### listAttentions-获取用户关注列表，从缓存中获取数据。。。userId="+userId);
 		} else {
 			JSONArray array = new JSONArray();
@@ -130,7 +132,7 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 				ret.put(Constants.DATA_BODY, array.toString());
 			}
 		}
-		MemcachedUtil.set(key, ret, MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
+		RedisUtil.set(key, ret, MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
 		return ret;
 	}
 	
@@ -142,7 +144,7 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 		}
 		boolean isAnchor = false;
 		try {
-			UserAnchor vo = userAnchorService.getAnchorFromCacheByUserId(toUserId);;
+			UserAnchor vo = userAnchorService.getAnchorByIdChe(toUserId);;
 			if(vo == null) {
 				isAnchor = true;
 			}
@@ -158,10 +160,10 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 			userAttentionService.removeById(attention.getId());
 			// 操作成功，则删除缓存
 			String key = MCPrefix.USER_ATTENTION_CACHE + userId;
-			MemcachedUtil.delete(key);
+			RedisUtil.del(key);
 			// 删除被关注用户粉丝列表缓存
 			String fansKey = MCPrefix.USER_FANS_CACHE + toUserId;
-			MemcachedUtil.delete(fansKey);
+			RedisUtil.del(fansKey);
 			
 			if(isAnchor) {
 				try {
@@ -208,7 +210,7 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 				UserInfoDo user = null;
 				StringBuffer msg = new StringBuffer();
 				String userName = "";
-				UserAnchor anchor = userAnchorService.getAnchorFromCacheByUserId(toUserId);
+				UserAnchor anchor = userAnchorService.getAnchorByIdChe(toUserId);
 				String roomId = anchor.getRoomId();
 				try {
 					user = userBaseService.getUserInfoFromCache(userId);
@@ -271,14 +273,13 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 		JSONObject ret = new JSONObject();
 		List<UserBaseInfo> list = null;
 		String key = MCPrefix.USER_FANS_CACHE + userId;
-		Object obj = MemcachedUtil.get(key);
-		if(obj != null) {
-			list =  (List<UserBaseInfo>) obj;
+		List<UserBaseInfo> che = RedisUtil.getList(key, UserBaseInfo.class);
+		if(che != null) {
+			list = che;
 			LogUtil.log.error("### listAttentions-获取用户关注列表，从缓存中获取数据。。。userId="+userId);
 		} else {
-			list = new ArrayList<UserBaseInfo>();
 			list = dao.listFans(userId);
-			MemcachedUtil.set(key, list, MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
+			RedisUtil.set(key, list, MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
 		}
 		if(list != null) {
 			JSONArray array = new JSONArray();
@@ -401,5 +402,27 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 			dbUserInfo.setIcon(newIcon);
 		}
 		userBaseService.update(dbUserInfo);
+	}
+
+	@Override
+	public boolean checkIfHasLogin(String userId, String sessionId)
+			throws Exception {
+		if(StringUtils.isEmpty(userId)||StringUtils.isEmpty(sessionId)){
+			return false;
+		}
+		boolean flag = false;
+		//游客用户userId前缀
+		String visitorUserIdPreStr = Constants.PSEUDO_LOGIN_SESSION_KEY;
+		if(userId.indexOf(visitorUserIdPreStr) != -1 ){//游客
+			flag = false;
+		}else{
+			String cache = RedisUtil.get(MCPrefix.MC_TOKEN_PREFIX+ userId);
+			if(!StringUtils.isEmpty(cache) && cache.equals(sessionId)) {
+				flag = true;
+			}else {
+				flag = false ; 
+			}
+		}
+		return flag;
 	}
 }

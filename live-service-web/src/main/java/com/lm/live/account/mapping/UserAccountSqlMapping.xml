@@ -3,7 +3,7 @@
     PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
     "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
 
-<mapper namespace="com.lm.live.account.domain.sqlmapping.UserAccount">
+<mapper namespace="com.lm.live.account.dao.UserAccountMapper">
 	<resultMap type="com.lm.live.account.domain.UserAccount" id="vo">
 		<result property="id" column="id" />
 		<result property="userId" column="userId" />

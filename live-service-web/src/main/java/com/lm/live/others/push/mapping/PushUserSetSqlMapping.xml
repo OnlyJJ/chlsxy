@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.lm.live.others.push.dao.PushUserSetMapper">
+	<resultMap type="com.lm.live.others.push.domain.PushUserSet"  id="vo">
+		<id property="id" column="id" />
+		<result property="userId" column="userId" />
+		<result property="pushType" column="pushType" />
+		<result property="openFlag" column="openFlag" />
+		<result property="creatTime" column="creatTime" />
+		<result property="updateTime" column="updateTime" />
+	</resultMap>
+
+	<!-- 定义可重用的SQL代码段，可以包含在其他语句中 -->
+	<sql id="base_column">
+		 id
+		 ,userId
+		 ,pushType
+		 ,openFlag
+		 ,creatTime
+		 ,updateTime
+	</sql>
+	
+	<select id="getObjectById" parameterType="java.lang.Long" resultMap="vo">
+		SELECT	<include refid="base_column" />
+		FROM t_push_user_set
+		WHERE id= #{id}
+	</select>	
+	
+	<select id="getPushUserSet" resultMap="vo">
+		SELECT	<include refid="base_column" />
+		FROM t_push_user_set
+		WHERE userId= #{userId}
+		AND pushType = #{pushType}
+		LIMIT 1
+	</select>	
+	
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO t_push_user_set
+				(id
+				,userId
+				,pushType
+				,openFlag
+				,creatTime
+				,updateTime
+				)
+		VALUES	(#{id}
+				,#{userId}
+				,#{pushType}
+				,#{openFlag}
+				,#{creatTime}
+				,#{updateTime}
+				)
+	</insert>
+	
+	<update id="update">
+		UPDATE	t_push_user_set
+		<set>
+			<if test="id != null and id != ''">
+				id = #{id},
+			</if>
+			<if test="userId != null and userId != ''">
+				userId = #{userId},
+			</if>
+			<if test="pushType != null and pushType != ''">
+				pushType = #{pushType},
+			</if>
+			<if test="openFlag != null and openFlag != ''">
+				openFlag = #{openFlag},
+			</if>
+			<if test="creatTime != null and creatTime != ''">
+				creatTime = #{creatTime},
+			</if>
+			<if test="updateTime != null and updateTime != ''">
+				updateTime = #{updateTime},
+			</if>
+		</set>
+		WHERE	id = #{id}
+		  
+	</update>
+	
+	<update id="updateFlag">
+		UPDATE	t_push_user_set SET openFlag = #{openFlag},updateTime = NOW()
+		WHERE userId = #{userId}
+		AND pushType = #{pushType}
+	</update>
+	
+	
+	<delete id="removeById" parameterType="java.lang.Long">
+		DELETE FROM t_push_user_set
+		WHERE id = #{id}
+	</delete>
+	
+	
+</mapper> 

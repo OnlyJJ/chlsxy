@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+   
+<mapper namespace="com.lm.live.base.dao.ServiceLogMapper">
+	<resultMap type="com.lm.live.base.domain.ServiceLog" id="vo">
+	    <result property="id" column="id" />
+	    <result property="userId" column="userId" />
+	    <result property="info" column="info" />
+	    <result property="ip" column="ip" />
+	    <result property="actTime" column="actTime" />
+	    <result property="userName" column="userName" />
+	    <result property="deviceproperties" column="deviceproperties" />
+	    <result property="clientType" column="clientType" />
+	</resultMap>
+
+	<select id="getObjectById" parameterType="java.lang.Integer" resultMap="vo">
+		select * from t_service_log where id=#{id}
+	</select>
+	
+	<delete id="removeById" parameterType="java.lang.Integer">
+		delete from t_service_log where id = #{id}
+	</delete>
+	
+	<delete id="removeByIds" >
+		delete from t_service_log where id in 
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>	
+	
+	<delete id="removeEntityBatch" parameterType="java.util.List">
+		delete from t_service_log where id in 
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item.id}
+		</foreach>
+	</delete>	
+
+	<select id="getListByPage"  resultMap="vo">
+		select * from t_service_log 
+	<where>
+	 	<if test="userId != null and userId != ''">
+			AND userId like '%${userId}%'
+		</if> 	
+	 	<if test="info != null and info != ''">
+			AND info like '%${info}%'
+		</if> 	
+	 	<if test="ip != null and ip != ''">
+			AND ip like '%${ip}%'
+		</if> 	
+		<if test="ltActTime != null and ltActTime != ''">
+			<![CDATA[AND actTime >= #{ltActTime} ]]>
+		</if> 
+		<if test="gtActTime != null and gtActTime != ''">
+			<![CDATA[AND actTime <= #{gtActTime} ]]>
+		</if> 
+		<if test="appendWhere != null and appendWhere != ''">
+			${appendWhere}
+		</if>           
+      </where>
+        ORDER BY 
+		<choose>
+			<when test="orderBy != null and orderBy != ''">
+				${orderBy}
+			</when>
+			<otherwise>
+				id
+			</otherwise>
+		</choose>
+		<choose>
+			<when test="descOrAsc != null and descOrAsc != ''">
+				${descOrAsc}
+			</when>
+			<otherwise>
+				asc 
+			</otherwise>
+		</choose>
+	</select>
+	  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+	  <!--
+	  <selectKey resultType="int" keyProperty="baseId" order="BEFORE">select nextval('seq_xxx')</selectKey>
+	  -->
+	  <![CDATA[
+	  INSERT INTO t_service_log(
+			id,
+			userId,
+			info,
+			ip,
+			userName,
+			deviceproperties,
+			clientType,
+			actTime
+			) VALUES (
+			#{id,jdbcType=VARCHAR},
+			#{userId,jdbcType=VARCHAR},
+			#{info,jdbcType=VARCHAR},
+			#{ip,jdbcType=VARCHAR},
+			#{userName,jdbcType=VARCHAR},
+			#{deviceproperties,jdbcType=VARCHAR},
+			#{clientType,jdbcType=VARCHAR},
+			#{actTime,jdbcType=VARCHAR}
+		)	
+		]]>
+	  </insert>
+	  
+	  <insert id="insertBatch" parameterType="java.util.List">
+	  <![CDATA[
+	  		INSERT INTO t_service_log(
+			id,
+			userId,
+			info,
+			ip,
+			userName,
+			deviceproperties,
+			clientType,
+			actTime
+			) VALUES 
+		]]>
+		<foreach collection="list" item="item" separator=",">
+		<![CDATA[
+			 (#{item.id,jdbcType=VARCHAR},#{item.userId,jdbcType=VARCHAR},#{item.info,jdbcType=VARCHAR},#{item.ip,jdbcType=VARCHAR},#{item.userName,jdbcType=VARCHAR},#{item.deviceproperties,jdbcType=VARCHAR},#{item.clientType,jdbcType=VARCHAR},#{item.actTime,jdbcType=VARCHAR})
+		]]>
+		</foreach>
+	  </insert>
+	  
+	  <update id="update">
+		UPDATE t_service_log
+			<set>
+			 	<if test="userId != null">
+					<![CDATA[userId = #{userId,jdbcType=VARCHAR},  ]]>
+				</if> 	
+			 	<if test="info != null">
+					<![CDATA[info = #{info,jdbcType=VARCHAR},  ]]>
+				</if> 	
+			 	<if test="ip != null">
+					<![CDATA[ip = #{ip,jdbcType=VARCHAR},  ]]>
+				</if> 	
+				<if test="actTime != null">
+					<![CDATA[actTime = #{actTime,jdbcType=VARCHAR}  ]]>
+				</if> 
+			</set>
+			<where>
+			 <![CDATA[ and id = #{id,jdbcType=VARCHAR} ]]>  			  	
+			</where>  
+	  </update>	
+</mapper>

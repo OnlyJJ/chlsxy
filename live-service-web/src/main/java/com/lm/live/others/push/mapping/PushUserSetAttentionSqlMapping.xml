@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.lm.live.others.push.dao.PushUserSetAttentionMapper">
+	<resultMap type="com.lm.live.others.push.domain.PushUserSetAttention"  id="vo">
+		<id property="id" column="id" />
+		<result property="userId" column="userId" />
+		<result property="toUserId" column="toUserId" />
+		<result property="pushFlag" column="pushFlag" />
+		<result property="creatTime" column="creatTime" />
+		<result property="updateTime" column="updateTime" />
+	</resultMap>
+
+	<!-- 定义可重用的SQL代码段，可以包含在其他语句中 -->
+	<sql id="base_column">
+		 id
+		 ,userId
+		 ,toUserId
+		 ,pushFlag
+		 ,creatTime
+		 ,updateTime
+	</sql>
+	
+	<select id="getObjectById" parameterType="java.lang.Long" resultMap="vo">
+		SELECT	<include refid="base_column" />
+		FROM t_push_user_set_attention
+		WHERE id= #{id}
+	</select>	
+	
+	<select id="getPushUserSetAttention"  resultMap="vo">
+		SELECT	<include refid="base_column" />
+		FROM t_push_user_set_attention
+		WHERE userId= #{userId}
+		AND toUserId = #{toUserId}
+		LIMIT 1
+	</select>	
+	
+	<select id="listPushUserSetAttention"  resultMap="vo">
+		SELECT	<include refid="base_column" />
+		FROM t_push_user_set_attention
+		WHERE userId = #{userId}
+		ORDER BY creatTime DESC
+	</select>	
+	
+	
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO t_push_user_set_attention
+				(id
+				,userId
+				,toUserId
+				,pushFlag
+				,creatTime
+				,updateTime
+				)
+		VALUES	(#{id}
+				,#{userId}
+				,#{toUserId}
+				,#{pushFlag}
+				,#{creatTime}
+				,#{updateTime}
+				)
+	</insert>
+	
+	<update id="update">
+		UPDATE	t_push_user_set_attention
+		<set>
+			<if test="id != null and id != ''">
+				id = #{id},
+			</if>
+			<if test="userId != null and userId != ''">
+				userId = #{userId},
+			</if>
+			<if test="toUserId != null and toUserId != ''">
+				toUserId = #{toUserId},
+			</if>
+			<if test="pushFlag != null and pushFlag != ''">
+				pushFlag = #{pushFlag},
+			</if>
+			<if test="creatTime != null and creatTime != ''">
+				creatTime = #{creatTime},
+			</if>
+			<if test="updateTime != null and updateTime != ''">
+				updateTime = #{updateTime},
+			</if>
+		</set>
+		WHERE	id = #{id}
+		  
+	</update>
+	
+	<update id="updateFlag">
+		UPDATE	t_push_user_set_attention SET pushFlag = #{pushFlag},updateTime = NOW()
+		WHERE userId = #{userId}
+		AND toUserId = #{toUserId}
+	</update>
+	
+	<delete id="removeById" parameterType="java.lang.Long">
+		DELETE FROM t_push_user_set_attention
+		WHERE id = #{id}
+	</delete>
+	
+	
+</mapper> 

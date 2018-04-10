@@ -3,7 +3,7 @@
     PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
     "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
 
-<mapper namespace="com.lm.live.userbase.domain.sqlmapping.UserInfoDo">
+<mapper namespace="com.lm.live.userbase.dao.UserBaseMapper">
 	<resultMap type="com.lm.live.userbase.domain.UserInfoDo" id="vo">
 		<result property="id" column="id" />
 		<result property="userId" column="userId" />
@@ -70,7 +70,6 @@
 	  INSERT INTO t_user_info(
 			id,
 			userId,
-			userAccount,
 			pwd,
 			bindMobile,
 			bindEmail,
@@ -97,7 +96,6 @@
 			) VALUES (
 			#{id,jdbcType=VARCHAR},
 			#{userId,jdbcType=VARCHAR},
-			#{userAccount,jdbcType=VARCHAR},
 			#{pwd,jdbcType=VARCHAR},
 			#{bindMobile,jdbcType=VARCHAR},
 			#{bindEmail,jdbcType=VARCHAR},

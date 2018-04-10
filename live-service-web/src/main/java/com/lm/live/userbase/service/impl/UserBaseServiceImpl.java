@@ -1,6 +1,8 @@
 package com.lm.live.userbase.service.impl;
 
 
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -17,6 +19,10 @@ import com.lm.live.userbase.service.IUserBaseService;
 @Service("userBaseService")
 public class UserBaseServiceImpl extends CommonServiceImpl<UserBaseMapper, UserInfoDo> implements IUserBaseService {
 
+	@Resource
+	public void setDao(UserBaseMapper dao) {
+		this.dao = dao;
+	}
 	
 	@Override
 	public UserInfoDo getUserByUserId(String userId) {
@@ -84,6 +90,5 @@ public class UserBaseServiceImpl extends CommonServiceImpl<UserBaseMapper, UserI
 		}
 		return dao.getUserByNickName(nickName);
 	}
-
 
 }

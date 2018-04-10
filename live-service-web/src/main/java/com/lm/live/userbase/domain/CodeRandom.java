@@ -1,4 +1,4 @@
-package com.lm.live.login.domain;
+package com.lm.live.userbase.domain;
 
 import com.lm.live.common.vo.BaseVo;
 

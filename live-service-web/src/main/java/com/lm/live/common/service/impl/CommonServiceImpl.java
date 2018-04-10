@@ -14,7 +14,9 @@ import com.lm.live.common.service.ICommonService;
 public abstract class CommonServiceImpl<D extends ICommonMapper<R>, R> implements ICommonService<R> {
 
 	protected D dao;
-
+	
+	public abstract void setDao(D dao);
+	
 	public R getObjectById(Object id) {
 		return dao.getObjectById(id);
 	}
@@ -23,12 +25,12 @@ public abstract class CommonServiceImpl<D extends ICommonMapper<R>, R> implement
 		dao.removeById(id);
 	}
 
-	public R insert(R vo) {
-		return dao.insert(vo);
+	public void insert(R vo) {
+		dao.insert(vo);
 	}
 
-	public R update(R vo) {
-		return dao.update(vo);
+	public void update(R vo) {
+		dao.update(vo);
 	}
 
 }

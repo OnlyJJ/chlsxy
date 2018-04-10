@@ -1,13 +1,12 @@
-package com.lm.live.base.constant;
+package com.lm.live.base.enums;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 基础服务错误码<10000><br>
- * 	<说明：错误码应由各自模块维护，不应夸服务使用>
+ * 账户模块使用
  * @author shao.xiang
- * @date 2017-06-11
+ * @date 2017年6月25日
  *
  */
 public enum ErrorCode {
@@ -16,7 +15,15 @@ public enum ErrorCode {
 	ERROR_10001(10001,"参数错误，请重试！"),
 	ERROR_10000(10000,"上传失败，请重试！"),
 	
-	SUCCESS_0(0,"SUCCESS"),;
+	/** 参数错误 */
+	ERROR_101(101, "参数错误"),
+	/** 不需要重新请求，只提示错误（未知的异常应该统一使用此信息返回客户端）  */
+	ERROR_100(-100, "网络繁忙，请稍后重试"),
+	/** 需要重新请求的错误码 */
+	ERROR_1(-1, "网络繁忙，请稍后重试"),
+	/** 成功 */
+	SUCCESS_0(0, "SUCCESS");
+	
 	private int resultCode;
 	private String resultDescr;
 	

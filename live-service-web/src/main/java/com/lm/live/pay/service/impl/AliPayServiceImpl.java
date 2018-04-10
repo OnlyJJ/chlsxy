@@ -40,6 +40,11 @@ import com.lm.live.userbase.service.IUserBaseService;
 public class AliPayServiceImpl extends CommonServiceImpl<PayChargeOrderMapper, PayChargeOrder> implements IAliPayService {
 	
 	@Resource
+	public void setDao(PayChargeOrderMapper dao) {
+		this.dao = dao;
+	}
+	
+	@Resource
 	private IUserAccountService userAccountService;
 	
 	@Resource
@@ -174,5 +179,6 @@ public class AliPayServiceImpl extends CommonServiceImpl<PayChargeOrderMapper, P
 		srt.setSucceed(true);
 		return srt;
 	}
+
 	
 }

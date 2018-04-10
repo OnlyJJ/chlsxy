@@ -3,7 +3,7 @@
     PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
     "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
    
-<mapper namespace="com.lm.live.pay.domain.sqlmapping.PayChargeOrder">
+<mapper namespace="com.lm.live.pay.dao.PayChargeOrderMapper">
 	<resultMap type="com.lm.live.pay.domain.PayChargeOrder" id="vo">
 	    <result property="id" column="id" />
 	    <result property="orderId" column="orderId" />

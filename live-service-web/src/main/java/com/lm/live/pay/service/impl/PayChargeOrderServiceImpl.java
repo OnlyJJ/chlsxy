@@ -1,6 +1,8 @@
 package com.lm.live.pay.service.impl;
 
 
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -22,6 +24,11 @@ import com.lm.live.pay.service.IPayChargeOrderService;
 @Service("payChargeOrderService")
 public class PayChargeOrderServiceImpl extends CommonServiceImpl<PayChargeOrderMapper,PayChargeOrder> implements IPayChargeOrderService {
 
+	@Resource
+	public void setDao(PayChargeOrderMapper dao) {
+		this.dao = dao;
+	}
+	
 	@Override
 	public ServiceResult<Integer> getPayCountByUser(String userId) {
 		if(StringUtils.isEmpty(userId)) {
@@ -49,7 +56,5 @@ public class PayChargeOrderServiceImpl extends CommonServiceImpl<PayChargeOrderM
 		return srt;
 	}
 
-	
-	
 	
 }

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.lm.live.others.push.dao.PushConfigMapper">
+	<resultMap type="com.lm.live.others.push.domain.PushConfig"  id="vo">
+		<id property="id" column="id" />
+		<result property="accessId" column="accessId" />
+		<result property="secretKey" column="secretKey" />
+		<result property="appType" column="appType" />
+		<result property="pckName" column="pckName" />
+		<result property="useStatus" column="useStatus" />
+		<result property="addTime" column="addTime" />
+	</resultMap>
+
+	<!-- 定义可重用的SQL代码段，可以包含在其他语句中 -->
+	<sql id="base_column">
+		 id
+		 ,accessId
+		 ,secretKey
+		 ,appType
+		 ,pckName
+		 ,useStatus
+		 ,addTime
+	</sql>
+	
+	<select id="getObjectById" parameterType="java.lang.Long" resultMap="vo">
+		SELECT	<include refid="base_column" />
+		FROM t_push_config
+		WHERE id= #{id}
+	</select>	
+	
+	<select id="listPushConfig" resultMap="vo">
+		SELECT	<include refid="base_column" />
+		FROM t_push_config
+		WHERE appType= #{appType}
+		AND useStatus = 1
+	</select>	
+	
+	<select id="getPushConfig" resultMap="vo">
+		SELECT	<include refid="base_column" />
+		FROM t_push_config
+		WHERE pckName= #{pckName}
+		AND useStatus = 1
+		LIMIT 1
+	</select>	
+	
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO t_push_config
+				(id
+				,accessId
+				,secretKey
+				,appType
+				,pckName
+				,useStatus
+				,addTime
+				)
+		VALUES	(#{id}
+				,#{accessId}
+				,#{secretKey}
+				,#{appType}
+				,#{pckName}
+				,#{useStatus}
+				,#{addTime}
+				)
+	</insert>
+	
+	<update id="update">
+		UPDATE	t_push_config
+		<set>
+			<if test="id != null and id != ''">
+				id = #{id},
+			</if>
+			<if test="accessId != null and accessId != ''">
+				accessId = #{accessId},
+			</if>
+			<if test="secretKey != null and secretKey != ''">
+				secretKey = #{secretKey},
+			</if>
+			<if test="appType != null and appType != ''">
+				appType = #{appType},
+			</if>
+			<if test="pckName != null and pckName != ''">
+				pckName = #{pckName},
+			</if>
+			<if test="useStatus != null and useStatus != ''">
+				useStatus = #{useStatus},
+			</if>
+			<if test="addTime != null and addTime != ''">
+				addTime = #{addTime},
+			</if>
+		</set>
+		WHERE	id = #{id}
+		  
+	</update>
+	
+	<delete id="removeById" parameterType="java.lang.Long">
+		DELETE FROM t_push_config
+		WHERE id = #{id}
+	</delete>
+	
+	
+</mapper> 

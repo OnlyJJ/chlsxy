@@ -1,6 +1,7 @@
 package com.lm.live.common.utils;
 
-import com.alibaba.dubbo.common.utils.StringUtils;
+import org.apache.commons.lang.StringUtils;
+
 
 /**
  * app客户端相关工具类

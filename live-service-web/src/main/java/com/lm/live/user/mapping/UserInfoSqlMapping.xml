@@ -3,7 +3,7 @@
     PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
     "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
 
-<mapper namespace="com.lm.live.userinfo.domain.sqlmapping.UserInfo">
+<mapper namespace="com.lm.live.user.dao.UserInfoMapper">
 	<resultMap type="com.lm.live.userbase.domain.UserInfoDo" id="vo">
 		<result property="id" column="id" />
 		<result property="userId" column="userId" />
@@ -46,8 +46,8 @@
 		FROM t_user_info  a   
 		INNER JOIN t_user_account b ON (a.userId = b.userId)    
 		LEFT JOIN t_user_anchor d ON (a.userId=d.userId)    
-		LEFT JOIN t_level nextUserLevel ON nextUserLevel.levelType = 1 AND nextUserLevel.point > b.userPoint     
-		LEFT JOIN t_level nextAnchorLevel ON nextAnchorLevel.levelType = 2 AND nextAnchorLevel.point > b.anchorPoint       
+		LEFT JOIN t_level nextUserLevel ON nextUserLevel.type = 1 AND nextUserLevel.point > b.userPoint     
+		LEFT JOIN t_level nextAnchorLevel ON nextAnchorLevel.type = 2 AND nextAnchorLevel.point > b.anchorPoint       
 		WHERE a.userId = #{userId} 
 		LIMIT 1
 	</select>

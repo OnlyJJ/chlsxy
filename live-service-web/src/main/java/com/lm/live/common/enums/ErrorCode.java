@@ -11,7 +11,8 @@ import java.util.Map;
  */
 public enum ErrorCode {
 	
-	ERROR_404(205,"请求异常"),
+	ERROR_404(404,"请求异常"),
+	ERROR_403(403, "认证不通过"),
 	/** 非压缩 */
 	ERROR_205(205,"传输的是非压缩数据,请检查"),
 	

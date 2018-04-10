@@ -3,7 +3,7 @@
     PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
     "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
    
-<mapper namespace="com.lm.live.pay.domain.sqlmapping.WechatPayNotifyDo">
+<mapper namespace="com.lm.live.pay.dao.WechatPayNotifyMapper">
 	<resultMap type="com.lm.live.pay.domain.WechatPayNotifyDo" id="wechatPayNotifyDo">
 	    <result property="id" column="id" />
 	    <result property="userId" column="userId" />

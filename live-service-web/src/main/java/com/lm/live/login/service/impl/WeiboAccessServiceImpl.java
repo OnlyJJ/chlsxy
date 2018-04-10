@@ -1,5 +1,7 @@
 package com.lm.live.login.service.impl;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +28,11 @@ import com.lm.live.login.vo.WeiboUserInfo;
 public class WeiboAccessServiceImpl extends CommonServiceImpl<WeiboUserInfoDoMapper, WeiboUserInfoDo>
 	implements IWeiboAccessService{
 
+	@Resource
+	public void setDao(WeiboUserInfoDoMapper dao) {
+		this.dao = dao;
+	}
+	
 	@Override
 	public WeiboUserInfo getInfo(String accessToken, String uid)throws Exception {
 		LogUtil.log.info(String.format("###begin-请求微博服务器获取用户信息,accessToken:%s,uid:%s", accessToken,uid));

@@ -3,6 +3,9 @@ package com.lm.live.login.service.impl;
 import java.util.Date;
 
 
+
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 
 import com.lm.live.common.service.impl.CommonServiceImpl;
@@ -15,6 +18,11 @@ import com.lm.live.login.service.IUuidBlackListService;
 @Service("uuidBlackListService")
 public class UuidBlackListServiceImpl extends CommonServiceImpl<UuidBlackListMapper, UuidBlackList> implements IUuidBlackListService {
 
+	@Resource
+	public void setDao(UuidBlackListMapper dao) {
+		this.dao = dao;
+	}
+	
 	@Override
 	public void checkBlackList(String uuid) throws Exception {
 		UuidBlackList blackList = dao.getBlackListByUuid(uuid);

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.lm.live.decorate.dao.DecorateMapper">
+	<resultMap type="com.lm.live.decorate.domain.Decorate" id="vo">
+		<result property="id" column="id" />
+		<result property="type" column="type" />
+		<result property="name" column="name" />
+		<result property="buyAble" column="buyAble" />
+		<result property="lightenImg" column="lightenImg" />
+		<result property="grayImg" column="grayImg" />
+		<result property="lightenDay" column="lightenDay" />
+		<result property="validDay" column="validDay" />
+		<result property="resource" column="resource" />
+		<result property="category" column="category" />
+		<result property="remark" column="remark" />
+		<result property="sortWeight" column="sortWeight" />
+		<result property="isShow" column="isShow" />
+		<result property="isAdornUserDecorate" column="isAdornUserDecorate" />
+
+	</resultMap>
+
+	<select id="findListOfCommonUser" resultMap="vo">
+		SELECT decorate.*,decoratePackage.isAdornUserDecorate as
+		isAdornUserDecorate
+		FROM t_decorate decorate
+		JOIN t_decorate_package
+		decoratePackage on decoratePackage.decorateId = decorate.id
+		WHERE
+		decoratePackage.userId=#{userId}
+		AND decorate.category=#{category}
+		<![CDATA[
+		AND (isPeriod=0 or (isPeriod=1 and now() >= beginTime and now() <= endTime) )
+		]]>
+		AND decorate.type=0
+		<if test="isAdornUserDecorate != null and isAdornUserDecorate != ''">
+			AND decoratePackage.isAdornUserDecorate =
+			#{isAdornUserDecorate}
+		</if>
+		ORDEY BY decoratePackage.isPeriod ASC ,decoratePackage.endTime DESC
+		,decorate.sortWeight DESC
+
+	</select>
+
+</mapper>

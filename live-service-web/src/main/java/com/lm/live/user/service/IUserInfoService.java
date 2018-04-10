@@ -70,4 +70,15 @@ public interface IUserInfoService  {
 	 *@data 2018年3月20日
 	 */
 	void modifyUserBase(UserInfo user) throws Exception;
+	
+	/**
+	 * 校验是否登录
+	 *@param userId
+	 *@param sessionId
+	 *@return
+	 *@throws Exception
+	 *@author shao.xiang
+	 *@data 2018年4月8日
+	 */
+	boolean checkIfHasLogin(String userId,String sessionId) throws Exception;
 }

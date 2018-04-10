@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -24,6 +26,11 @@ import com.lm.live.login.vo.AccessToken;
 @Service("wechatOauth2TokenRefreshService")
 public class WechatOauth2TokenRefreshServiceImpl extends CommonServiceImpl<WechatOauth2TokenRefreshMapper,WechatOauth2TokenRefresh> implements IWechatOauth2TokenRefreshService {
 
+	@Resource
+	public void setDao(WechatOauth2TokenRefreshMapper dao) {
+		this.dao = dao;	
+	}
+	
 	@Override
 	public WechatOauth2TokenRefresh getByCode(String code) throws Exception {
 		if(StringUtils.isEmpty(code)){
@@ -112,5 +119,6 @@ public class WechatOauth2TokenRefreshServiceImpl extends CommonServiceImpl<Wecha
 	public void delExpireAccessToken() {
 		this.dao.delExpireAccessToken();
 	}
+
 
 }

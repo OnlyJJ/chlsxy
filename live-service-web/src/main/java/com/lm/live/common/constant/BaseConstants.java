@@ -10,7 +10,7 @@ public class BaseConstants {
 	/** 个人用户头像 */
 	public static final String ICON_IMG_FILE_URI = "images/icon"; 
 	/** 用户默认头像图片 ，这个需要修改，my-todo*/
-	public static final String USER_DEFAULT_ICON = "145432501711592.png";
+	public static final String USER_DEFAULT_ICON = "default.jpg";
 	/** 礼物图片存储位置  */
 	public static final String GIFT_IMG_FILE_URI = "images/gift";
 	/** 工具（宝箱，钥匙，大喇叭…）图片存储位置 */
@@ -84,6 +84,5 @@ public class BaseConstants {
 	/** 图片后缀 */
 	public static String IMG_PNG = ".png";
 	public static String IMG_JPG = ".jpg";
-	
 	
 }

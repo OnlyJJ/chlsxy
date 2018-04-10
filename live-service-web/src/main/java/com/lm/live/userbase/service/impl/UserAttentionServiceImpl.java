@@ -4,29 +4,39 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.lm.live.common.service.impl.CommonServiceImpl;
 import com.lm.live.common.vo.Page;
 import com.lm.live.userbase.dao.AttentionMapper;
 import com.lm.live.userbase.domain.UserAttentionDo;
-import com.lm.live.userbase.service.IUserAnchorService;
+import com.lm.live.userbase.enums.ErrorCode;
+import com.lm.live.userbase.exception.UserBaseBizException;
 import com.lm.live.userbase.service.IUserAttentionService;
 
 @Service("userAttentionService")
 public class UserAttentionServiceImpl extends CommonServiceImpl<AttentionMapper, UserAttentionDo> implements IUserAttentionService {
 
+	@Resource
+	public void setDao(AttentionMapper dao) {
+		this.dao = dao;
+	}
 	
 	@Override
 	public int getFansounts(String userId) {
-		// TODO Auto-generated method stub
-		return 0;
+		if(StringUtils.isEmpty(userId)) {
+			return 0;
+		}
+		return dao.getFansounts(userId);
 	}
 
 	@Override
 	public int getAttentionCounts(String userId) {
-		// TODO Auto-generated method stub
-		return 0;
+		if(StringUtils.isEmpty(userId)) {
+			return 0;
+		}
+		return dao.getAttentionCounts(userId);
 	}
 
 	@Override
@@ -56,8 +66,10 @@ public class UserAttentionServiceImpl extends CommonServiceImpl<AttentionMapper,
 
 	@Override
 	public UserAttentionDo findAttentions(String userId, String toUserId) {
-		// TODO Auto-generated method stub
-		return null;
+		if(StringUtils.isEmpty(userId) || StringUtils.isEmpty(toUserId)) {
+			throw new UserBaseBizException(ErrorCode.ERROR_101);
+		}
+		return dao.getAttention(userId, toUserId);
 	}
 
 }

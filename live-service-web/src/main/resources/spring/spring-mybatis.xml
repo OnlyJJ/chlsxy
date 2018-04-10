@@ -35,7 +35,8 @@
 	<!-- 将数据源映射到sqlSessionFactory中 -->
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
-		<property name="mapperLocations" value="classpath:**/mapping/*.xml" />
+		<!-- 所有mapper文件命名必须以Mapper结尾 -->
+		<property name="mapperLocations" value="classpath:com/lm/live/**/mapping/*.xml" />
 	</bean>
 
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
