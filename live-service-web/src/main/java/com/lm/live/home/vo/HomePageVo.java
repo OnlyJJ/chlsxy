@@ -15,7 +15,7 @@ import com.lm.live.home.contant.Constants;
  * @author shao.xiang
  * @date 2017-09-04
  */
-public abstract class HomePageVo extends UserBaseInfo implements Serializable {
+public class HomePageVo extends UserBaseInfo implements Serializable {
 	
 	private static final long serialVersionUID = -6874129572214793335L;
 	/** 视频图片地址 */
@@ -30,8 +30,8 @@ public abstract class HomePageVo extends UserBaseInfo implements Serializable {
 	private List<String> downLogoUrl;
 	/** 主播分类 ，0：未分类*/
 	private int anchorStyle;
-	/** 显示规则：1-热门，2-新秀，3-推荐，4-普通*/
-	private int recommend;
+	/** 显示规则：0-普通，1-热门，2-推荐，3-新秀，*/
+	private int showType;
 	
 	// 字段key
 	private static final String h_showImg = "a";
@@ -40,7 +40,7 @@ public abstract class HomePageVo extends UserBaseInfo implements Serializable {
 	private static final String h_upLogoUrl = "d";
 	private static final String h_downLogoUrl = "e";
 	private static final String h_anchorStyle = "f"; 
-	private static final String h_recommend = "g";
+	private static final String h_showType = "g";
 	
 	@Override
 	public JSONObject buildJson() {
@@ -65,7 +65,7 @@ public abstract class HomePageVo extends UserBaseInfo implements Serializable {
 				setList(json, h_downLogoUrl, list);
 			}
 			setInt(json,h_anchorStyle, anchorStyle);
-			setInt(json, h_recommend, recommend);
+			setInt(json, h_showType, showType);
 			
 		} catch (Exception e) {
 			LogUtil.log.error(e.getMessage(),e);
@@ -101,12 +101,6 @@ public abstract class HomePageVo extends UserBaseInfo implements Serializable {
 	public void setStatus(int status) {
 		this.status = status;
 	}
-	public int getAnchorStyle() {
-		return anchorStyle;
-	}
-	public void setAnchorStyle(int anchorStyle) {
-		this.anchorStyle = anchorStyle;
-	}
 	public List<String> getUpLogoUrl() {
 		return upLogoUrl;
 	}
@@ -119,11 +113,16 @@ public abstract class HomePageVo extends UserBaseInfo implements Serializable {
 	public void setDownLogoUrl(List<String> downLogoUrl) {
 		this.downLogoUrl = downLogoUrl;
 	}
-	public int getRecommend() {
-		return recommend;
+	public int getAnchorStyle() {
+		return anchorStyle;
 	}
-	public void setRecommend(int recommend) {
-		this.recommend = recommend;
+	public void setAnchorStyle(int anchorStyle) {
+		this.anchorStyle = anchorStyle;
 	}
-	
+	public int getShowType() {
+		return showType;
+	}
+	public void setShowType(int showType) {
+		this.showType = showType;
+	}
 }

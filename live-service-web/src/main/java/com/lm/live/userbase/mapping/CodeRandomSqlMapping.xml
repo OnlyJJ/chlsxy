@@ -8,6 +8,7 @@
 		<result property="code" column="code" />
 		<result property="isUserUse" column="isUserUse" />
 		<result property="isRoomUse" column="isRoomUse" />
+		<result property="type" column="type" />
 	</resultMap>
 
 	<!-- 定义可重用的SQL代码段，可以包含在其他语句中 -->
@@ -16,6 +17,7 @@
 		 ,code
 		 ,isUserUse
 		 ,isRoomUse
+		 ,type
 	</sql>
 	
 	<select id="getObjectById" parameterType="java.lang.Long" resultMap="vo">
@@ -24,10 +26,12 @@
 		WHERE id= #{id}
 	</select>	
 	
+	<!-- 取用户code，7位以上，6位一下作为房间号和靓号使用 -->
 	<select id="listCodeRandom" resultMap="vo">
 		SELECT	<include refid="base_column" />
 		FROM t_code_random
 		WHERE isUserUse = 0
+		AND type = 0
 		ORDER BY RAND() 
 		LIMIT 10000
 	</select>
@@ -37,11 +41,11 @@
 	</select>
 	
 	<select id="getUserCount"  resultType="java.lang.Integer">
-		SELECT COUNT(*) count FROM t_code_random a WHERE a.isUserUse=0
+		SELECT COUNT(*) count FROM t_code_random a WHERE a.isUserUse=0 AND type = 0
 	</select>
 	
 	<select id="getRoomCount"  resultType="java.lang.Integer">
-		SELECT COUNT(*) count FROM t_code_random a WHERE a.isRoomUse=0
+		SELECT COUNT(*) count FROM t_code_random a WHERE a.isRoomUse=0 AND type = 1
 	</select>
 	
 	
@@ -57,11 +61,13 @@
 				,code
 				,isUserUse
 				,isRoomUse
+				,type
 				)
 		VALUES	(#{id}
 				,#{code}
 				,#{isUserUse}
 				,#{isRoomUse}
+				,#{type}
 				)
 	</insert>
 	
@@ -79,6 +85,9 @@
 			</if>
 			<if test="isRoomUse != null and isRoomUse != ''">
 				isRoomUse = #{isRoomUse},
+			</if>
+			<if test="type != null and type != ''">
+				type = #{type},
 			</if>
 		</set>
 		WHERE	id = #{id}

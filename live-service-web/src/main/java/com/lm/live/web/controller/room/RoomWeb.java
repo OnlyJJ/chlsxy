@@ -158,12 +158,9 @@ public class RoomWeb  extends BaseController{
 		JSONObject jsonRes = new JSONObject();
 		try {
 			if(data==null  
-					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())
-					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
+					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())) {
 				throw new UserBizException(ErrorCode.ERROR_101);
 			}
-			RequestVo req = new RequestVo();
-			req.parseJson(data.getData().getJSONObject(req.getShortName()));
 		} catch(UserBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());

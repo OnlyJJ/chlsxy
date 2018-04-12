@@ -22,6 +22,8 @@ public class CodeRandom extends BaseVo {
 	 */
 	private int isRoomUse;
 	
+	private int type;
+	
 	public int getId() {
 		return id;
 	}
@@ -50,5 +52,12 @@ public class CodeRandom extends BaseVo {
 	
 	public void setIsroomuse(int isRoomUse) {
 		this.isRoomUse = isRoomUse;
+	}
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
 	}
 }

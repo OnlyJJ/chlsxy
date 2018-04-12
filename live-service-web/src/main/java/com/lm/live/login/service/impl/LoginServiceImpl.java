@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
+import com.lm.live.account.domain.UserAccount;
+import com.lm.live.account.service.IUserAccountService;
 import com.lm.live.appclient.enums.AppType;
 import com.lm.live.appclient.service.IAppInstallChannelService;
 import com.lm.live.base.dao.ServiceLogMapper;
@@ -63,7 +65,6 @@ import com.lm.live.login.vo.WechatUserInfo;
 import com.lm.live.login.vo.WeiboUserInfo;
 import com.lm.live.user.service.IUserCacheInfoService;
 import com.lm.live.user.vo.UserInfo;
-import com.lm.live.userbase.dao.CodeRandomMapper;
 import com.lm.live.userbase.domain.CodeRandom;
 import com.lm.live.userbase.domain.UserInfoDo;
 import com.lm.live.userbase.service.ICodeRandomService;
@@ -116,6 +117,9 @@ public class LoginServiceImpl implements ILoginService {
 	
 	@Resource
 	private IWeiboAccessService weiboAccessService;
+	
+	@Resource
+	private IUserAccountService userAccountService;
 
 	@Override
 	public UserInfo autoRegist(String clientType, String clientIp,
@@ -215,6 +219,11 @@ public class LoginServiceImpl implements ILoginService {
 			userRegistAuto.setRecordTime(nowDate);
 			userRegistAuto.setIsChangeNickname(Constants.STATUS_0);
 			userRegistAutoMapper.insert(userRegistAuto);
+			
+			// 插入账户表
+			UserAccount account = new UserAccount();
+			account.setUserId(userId);
+			userAccountService.insert(account);
 
 			String cacheKeyOfAppAutoRegistEachIp = MCPrefix.AUTO_REGIST_LIMIT_CACHE + clientIp;
 			String dateStr = DateUntil.getFormatDate(Constants.DATEFORMAT_YMD, nowDate);

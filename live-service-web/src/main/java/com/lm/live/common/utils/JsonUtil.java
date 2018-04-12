@@ -1,5 +1,6 @@
 package com.lm.live.common.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
@@ -19,7 +20,7 @@ public class JsonUtil {
 		JSONObject json = null;
  		try{
 			if(!StrUtil.isNullOrEmpty(jsonString)){
-				json = JSONObject.parseObject(jsonString);
+				json = JSON.parseObject(jsonString);
 			}
 		}catch(Exception e){
 			LogUtil.log.error(e.getMessage());
@@ -37,7 +38,7 @@ public class JsonUtil {
 		Object obj = null;
 		try{
 			if(null != json){
-				obj = JSONObject.toJavaObject(json, Object.class);
+				obj = JSON.toJavaObject(json, Object.class);
 			}
 		}catch(Exception e){
 			LogUtil.log.error(e.getMessage());
@@ -55,7 +56,7 @@ public class JsonUtil {
 		String json = null;
 		try{
 			if(null != obj){
-				json = JSONObject.toJSONString(obj);
+				json = JSON.toJSONString(obj);
 			}
 		}catch(Exception e){
 			try {
@@ -78,7 +79,7 @@ public class JsonUtil {
 		String json = null;
 		try{
 			if(null != obj){
-				json = JSONArray.toJSONString(obj);
+				json = JSON.toJSONString(obj);
 			}
 		}catch(Exception e){
 			LogUtil.log.error(e.getMessage());
@@ -97,7 +98,7 @@ public class JsonUtil {
 		JSONArray jsonArray = null;
  		try{
 			if(!StrUtil.isNullOrEmpty(jsonString)){
-				jsonArray = JSONArray.parseArray(jsonString);
+				jsonArray = JSON.parseArray(jsonString);
 			}
 		}catch(Exception e){
 			LogUtil.log.error(e.getMessage());

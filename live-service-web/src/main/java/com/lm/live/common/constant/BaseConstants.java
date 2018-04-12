@@ -32,12 +32,12 @@ public class BaseConstants {
 	public static final String ANCHOR_SCREENSHOT_URL = "http://screenshot.9shows.com/live/";
 	
 	/** 测试服务器的http请求url */
-	public static final String URL_TEST_SERVER = SpringContextListener.getContextProValue("testServiceHttpUrl", "http://testservice.9mitao.com/");
+	public static final String URL_TEST_SERVER = SpringContextListener.getContextProValue("testServiceHttpUrl", "http://192.168.1.70:8616/");
 	
 	/** 是否测试服务器:依据配置文件serviceIsTestSite属性判断 */
 	public static final boolean flagServiceIsTestSite = "true".equals(SpringContextListener.getContextProValue("serviceIsTestSite", "false"));
 	
-	public static final String cdnPath = SpringContextListener.getContextProValue("cdnPath", "http://cdn.9shows.com/");
+	public static final String cdnPath = SpringContextListener.getContextProValue("cdnPath", "http://192.168.1.70:8616/upload/");
 	
 	public static final String SENDUSER_DEFAULT = "system"; //默认系统赠送
 	
@@ -48,7 +48,7 @@ public class BaseConstants {
 	public static final String 	WHOLE_SITE_NOTICE_ROOMID = SpringContextListener.getContextProValue("whole_site_notice_roomId", "100000");
 	
 	/** service端接口项目地址 */
-	public static final String SERVICEURL = SpringContextListener.getContextProValue("serviceUrl", "http://testservice.9mitao.com");
+	public static final String SERVICEURL = SpringContextListener.getContextProValue("serviceUrl", "http://192.168.1.70:8616");
 	
 	/** app版本xxx后，采用aac视频格式的 */
 	public static final int AppVersionOfAac = 999999999;
@@ -57,8 +57,8 @@ public class BaseConstants {
 	
 	public static final String REQ_ATTR_DATA = "request_attribute_data";
 	
-	/** 需要屏蔽掉的用户 */
-	public static final String HIDE_USER = "";
+	/** 需要屏蔽掉的用户 ，多个账号以逗号隔开*/
+	public static final String HIDE_USER = "100000";
 	
 	
 	/** 默认字符编码，UTF-8 */

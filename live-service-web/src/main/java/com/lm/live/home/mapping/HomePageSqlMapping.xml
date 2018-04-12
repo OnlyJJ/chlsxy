@@ -35,15 +35,15 @@
 
 	<!-- 热门位主播 -->
 	<select id="listHotAnchor" resultType="com.lm.live.home.vo.HomePageVo">
-		SELECT a.userId,a.roomId,a.showImg,a.sex, d.nickName,d.remark,d.icon, 1 AS STATUS,IFNULL(s.gold,0) AS gold
+		SELECT a.userId,a.roomId,a.showImg,a.sex, d.nickName,d.remark,d.icon, 1 AS status,IFNULL(s.gold,0) AS gold
 			FROM t_user_anchor a
 			INNER JOIN t_user_info d ON (d.userId = a.userId) 
 			INNER JOIN  (
 				SELECT m.gold AS gold,r.userId FROM t_live_record_cdn r
 				INNER JOIN t_stat_crystal m ON r.userId=m.userId AND r.endTime IS NULL 
 				WHERE m.timeframe= #{timeframe}	
-				<if test="userIdList != null and userIdList != ''">
-	 				AND r.userId not in ${userIdList}
+				<if test="userIdList != null and userIdList　!= ''">
+	 				AND r.userId NOT IN ${userIdList}
 				 </if> 	
 				AND  r.userId NOT IN(SELECT p.anchorId FROM t_anchor_punisment p WHERE p.status=1 AND NOW() BETWEEN beginTime AND endTime)				
 				GROUP BY r.userId
@@ -58,7 +58,7 @@
 	
 	<!-- 新秀位主播 -->
 	<select id="listNewAnchor" resultType="com.lm.live.home.vo.HomePageVo">
-		SELECT a.userId,a.roomId,a.showImg,a.sex, d.nickName,d.remark,d.icon, 1 AS STATUS,IFNULL(s.gold,0) AS gold
+		SELECT a.userId,a.roomId,a.showImg,a.sex, d.nickName,d.remark,d.icon, 1 AS status,IFNULL(s.gold,0) AS gold
 			FROM t_user_anchor a
 			INNER JOIN t_user_info d ON (d.userId = a.userId) 
 			INNER JOIN  (
@@ -69,7 +69,7 @@
 				]]>
 				WHERE m.timeframe= #{timeframe}	
 				<if test="userIdList != null and userIdList != ''">
-	 				AND r.userId not in ${userIdList}
+	 				AND r.userId NOT IN ${userIdList}
 				 </if> 	
 				AND  r.userId NOT IN(SELECT p.anchorId FROM t_anchor_punisment p WHERE p.status=1 AND NOW() BETWEEN beginTime AND endTime)				
 				GROUP BY r.userId
@@ -84,16 +84,18 @@
 	
 	<!-- 推荐位主播 -->
 	<select id="listRecommendAnchor" resultType="com.lm.live.home.vo.HomePageVo">
-		SELECT a.userId,a.roomId,a.showImg,a.sex, d.nickName,d.remark,d.icon, 1 AS STATUS,IFNULL(s.gold,0) AS gold
+		SELECT a.userId AS userId, a.roomId AS roomId, a.showImg AS showImg, a.sex AS sex,
+			d.nickName AS nickName, d.icon AS icon, 1 AS status, 2 AS showType,
+			IFNULL(s.gold,0) AS gold
 			FROM t_user_anchor a
 			INNER JOIN t_user_info d ON (d.userId = a.userId) 
-			LEFT JOIN  (
+			INNER JOIN  (
 				SELECT m.gold AS gold,r.userId FROM t_live_record_cdn r
 				INNER JOIN t_stat_crystal m ON r.userId=m.userId AND r.endTime IS NULL 
 				INNER JOIN t_recommend_anchor c ON c.userId=r.userId AND NOW() BETWEEN c.startTime  AND c.endTime
 				WHERE m.timeframe= #{timeframe}	
 				<if test="userIdList != null and userIdList != ''">
-	 				AND r.userId not in ${userIdList}
+	 				AND r.userId NOT IN ${userIdList}
 				 </if> 	
 				AND  r.userId NOT IN(SELECT p.anchorId FROM t_anchor_punisment p WHERE p.status=1 AND NOW() BETWEEN beginTime AND endTime)				
 				GROUP BY r.userId
@@ -107,15 +109,16 @@
 	
 	<!-- 其他普通主播 -->
 	<select id="listCommonAnchor" resultType="com.lm.live.home.vo.HomePageVo">
-		SELECT a.userId,a.roomId,a.showImg,a.sex, d.nickName,d.remark,d.icon, 
-			CASE WHEN ISNULL(c.roomId) THEN 2 ELSE 1 END STATUS,
+		SELECT a.userId AS userId, a.roomId AS roomId, a.showImg AS showImg, a.sex AS sex, 
+			d.nickName AS nickName, d.icon AS icon, 0 AS showType,
+			CASE WHEN ISNULL(c.roomId) THEN 2 ELSE 1 END status,
 			CASE WHEN ISNULL(v.url) THEN 1 ELSE 2 END isVideo,
 			CASE WHEN ISNULL(p.anchorId) THEN 2 ELSE 1 END punishment,
 			IFNULL(cry.gold,0) AS crystal,
 			IFNULL(c1.sort1,0) AS weekML,
-			IFNULL(c2.sort2,0) AS mounthML,
+			IFNULL(c2.sort2,0) AS mounthML
 			FROM t_user_anchor a
-			INNER JOIN t_user_info d ON d.userId = a.userId 
+			INNER JOIN t_user_info d ON d.userId = a.userId
 			LEFT JOIN t_room_default_vedio v ON v.roomId=a.roomId AND v.status=1
 			LEFT JOIN t_live_record_cdn c ON c.userId = a.userId AND c.endTime IS NULL 
 			LEFT JOIN t_stat_crystal cry ON a.userId=cry.userId AND cry.timeframe= #{timeframe}
@@ -126,11 +129,11 @@
 			LEFT JOIN t_anchor_punisment p ON p.anchorId=a.userId AND p.status=1 AND NOW() BETWEEN p.beginTime AND p.endTime
 		WHERE a.anchorStatus = 1 
 		<if test="userIdList != null and userIdList != ''">
-	 		AND r.userId not in ${userIdList}
+	 		AND a.userId NOT IN ${userIdList}
 		</if> 	
 		AND a.isForbidden = 0
 		
-		ORDER BY STATUS ASC,punishment DESC,crystal DESC,weekML DESC,mounthML DESC ,isVideo DESC
+		ORDER BY status ASC,punishment DESC,crystal DESC,weekML DESC,mounthML DESC ,isVideo DESC
 		LIMIT #{size}
 	</select>
 	

@@ -42,6 +42,8 @@ public class UserBaseInfo extends JsonParseInterface implements Serializable {
 	private static final String u_identity = "b5";
 	private static final String u_sex = "b6";
 	private static final String u_targetId = "b7";
+	
+	public UserBaseInfo() {}
 
 	@Override
 	public JSONObject buildJson() {

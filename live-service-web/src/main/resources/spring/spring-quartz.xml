@@ -34,7 +34,7 @@
 		<property name="cronExpression">
 			<!-- <value>0 0 0 * * ?</value> -->
 			<!-- 30分钟执行一次 -->
-			<value>0 0/30 * * * ?</value>
+			<value>0 0/50 * * * ?</value>
 		</property>
 	</bean>
 	<!-- 定时任务扫描t_code_random表中可用的用户号、房间号 end -->

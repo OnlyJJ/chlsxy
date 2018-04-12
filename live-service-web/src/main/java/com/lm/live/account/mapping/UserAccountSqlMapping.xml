@@ -102,4 +102,16 @@
 			 <![CDATA[ and userId = #{userId,jdbcType=VARCHAR} ]]>
 		</where>
 	</update>
+	
+	 <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+	  <![CDATA[
+		 INSERT INTO t_user_account
+		   (
+		 		userId
+		 	) VALUES (
+				#{userId,jdbcType=VARCHAR}
+			)	
+		]]>
+	  </insert>
+	
 </mapper>

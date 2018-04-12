@@ -6,13 +6,15 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.common.constant.MCTimeoutConstants;
+import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.utils.DateUntil;
+import com.lm.live.common.utils.JsonUtil;
 import com.lm.live.common.utils.LogUtil;
 import com.lm.live.common.utils.MemcachedUtil;
 import com.lm.live.common.vo.Page;
@@ -161,15 +163,15 @@ public class HomePageServiceImpl implements IHomePageService {
 		int pageLimit = page.getPagelimit();
 		// 先从缓存中取-一级缓存
 		String oneDataKey = MCPrefix.HOMEPAGE_ANCHOR_ONE_CACHE + pageNum;
-		Object oneData = MemcachedUtil.get(oneDataKey);
-		if(oneData != null) {
-			ret = (JSONObject) oneData;
+		String oneData = RedisUtil.get(oneDataKey);
+		if(!StringUtils.isEmpty(oneData)) {
+			ret = JsonUtil.strToJsonObject(oneData);
 		} else {
 			// 一级缓存失效，从二级缓存中取
 			String twoDataKey = MCPrefix.HOMEPAGE_ANCHOR_TWO_CACHE + pageNum;
-			Object twoData = MemcachedUtil.get(twoDataKey);
-			if(twoData != null) {
-				ret = (JSONObject) twoData;
+			String twoData = RedisUtil.get(twoDataKey);
+			if(!StringUtils.isEmpty(twoData)) {
+				ret = JsonUtil.strToJsonObject(twoData);
 			}
 			// 做并发控制，同时只允许一个线程查询
 			boolean selectDbFlag = false;
@@ -186,44 +188,54 @@ public class HomePageServiceImpl implements IHomePageService {
 				String startWeekTime = DateUntil.getWeek(); // 周
 				String startMounthTime = DateUntil.getMonthDatetime(); // 月
 				String endTime = DateUntil.getFormatDate(Constants.DATEFORMAT_YMD_1, new Date());
-				List<String> userIdList = new ArrayList<String>();
-				userIdList.add(Constants.HIDE_USER);//屏蔽百万直播吃饭
+				StringBuilder userIdList = new StringBuilder();
+				userIdList.append("(");
+				if(!StringUtils.isEmpty(Constants.HIDE_USER)) {
+					String[] ids = Constants.HIDE_USER.split(Constants.SEPARATOR);
+					for(String uid: ids) {
+						userIdList.append("'").append(uid).append("'");
+					}
+				}
+				
+				// 前期主播少，只保留一个热门推荐，后期再细化
 				
 				// 分页依据
 				List<HomePageVo> all = new ArrayList<HomePageVo>();
 				// 1、取热门
-				List<HomePageVo> hot = dao.listHotAnchor(endTime, Constants.HOT_ANCHOR_NUM, userIdList);
+//				List<HomePageVo> hot = dao.listHotAnchor(endTime, Constants.HOT_ANCHOR_NUM, userIdList);
 				// 2、取新秀前2
 				// 先排除热门
-				if(hot != null && hot.size() >0) {
-					all.addAll(hot);
-					for(HomePageVo vo : hot) {
-						userIdList.add(vo.getUserId());
-					}
-				}
-				List<HomePageVo> news = dao.listNewAnchor(endTime, Constants.HOT_ANCHOR_NUM, userIdList);
+//				if(hot != null && hot.size() >0) {
+//					all.addAll(hot);
+//					for(HomePageVo vo : hot) {
+//						userIdList.add(vo.getUserId());
+//					}
+//				}
+//				List<HomePageVo> news = dao.listNewAnchor(endTime, Constants.HOT_ANCHOR_NUM, userIdList);
 				// 3、取推荐
-				// 排除热门
-				if(news != null && news.size() >0) {
-					all.addAll(news);
-					for(HomePageVo vo : news) {
-						userIdList.add(vo.getUserId());
-					}
-				}
-				List<HomePageVo> rems = dao.listRecommendAnchor(endTime, userIdList);
+				// 排除新秀
+//				if(news != null && news.size() >0) {
+//					all.addAll(news);
+//					for(HomePageVo vo : news) {
+//						userIdList.add(vo.getUserId());
+//					}
+//				}
+				String outIds = userIdList.toString() + ")";
+				List<HomePageVo> rems = dao.listRecommendAnchor(endTime, outIds);
 				// 4、取其他普通
 				// 排除推荐
 				if(rems != null && rems.size() >0) {
 					all.addAll(rems);
 					for(HomePageVo vo : rems) {
-						userIdList.add(vo.getUserId());
+						userIdList.append("'").append(vo.getUserId()).append("'");
 					}
 				}
 				int size = Constants.DEFAULT_SIZE * pageNum;
 				if(all != null && all.size() >0) {
 					size -= all.size();
 				}
-				List<HomePageVo> others = dao.listCommonAnchor(endTime, startWeekTime, startMounthTime, size, userIdList);
+				userIdList.append(")"); // 这里注意，以后要扩展，则这里的括号应该放在最后添加
+				List<HomePageVo> others = dao.listCommonAnchor(endTime, startWeekTime, startMounthTime, size, userIdList.toString());
 				if(others != null && others.size() >0) {
 					all.addAll(others);
 				}
@@ -243,12 +255,16 @@ public class HomePageServiceImpl implements IHomePageService {
 				}
 				
 				ret.put(Constants.DATA_BODY, jsonArray);
-//			page.setCount(count);
+				int count = all.size();
+				if(count > pageLimit) {
+					count = pageNum * pageLimit + 1;
+				}
+				page.setCount(count);
 				ret.put(page.getShortName(), page.buildJson());
 				
 				// 放入缓存
-				MemcachedUtil.set(oneDataKey, ret, MCTimeoutConstants.DEFAULT_TIMEOUT_3M);
-				MemcachedUtil.set(twoDataKey, ret, MCTimeoutConstants.DEFAULT_TIMEOUT_10M);
+				RedisUtil.set(oneDataKey, ret, MCTimeoutConstants.DEFAULT_TIMEOUT_3M);
+				RedisUtil.set(twoDataKey, ret, MCTimeoutConstants.DEFAULT_TIMEOUT_10M);
 			} catch(Exception e) {
 				LogUtil.log.error(e.getMessage(), e);
 				throw new HomeBizException(ErrorCode.ERROR_100);

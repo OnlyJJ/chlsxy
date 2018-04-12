@@ -41,7 +41,13 @@ public class CodeRandomServiceImpl extends
 			throw new UserBaseBizException(ErrorCode.ERROR_101);
 		}
 		// 过滤的正则表达式集合
-		List patternStringList = new ArrayList();
+		List<String> patternStringList = new ArrayList<String>();
+		// AABB
+		patternStringList.add("\\d*(\\d)\\1(\\d)\\2\\d*");
+		// AAABBB
+		patternStringList.add("\\d*(\\d)\\1\\1\\d*(\\d)\\2\\2\\d*");
+		// ABCABC
+		patternStringList.add("\\d*(\\d)(\\d)(\\d)\\1\\2\\3\\d*");
 		// --------------- 3位靓号
 		// 　3位以上的重复数字
 		patternStringList.add("\\d*(\\d)\\1{2,}\\d*");
@@ -56,8 +62,8 @@ public class CodeRandomServiceImpl extends
 		patternStringList
 				.add("\\d*(?:(?:0(?=1)|1(?=2)|2(?=3)|3(?=4)|4(?=5)|5(?=6)|6(?=7)|7(?=8)|8(?=9)){2}|(?:9(?=8)|8(?=7)|7(?=6)|6(?=5)|5(?=4)|4(?=3)|3(?=2)|2(?=1)|1(?=0)){2})\\d*");
 
-		// 至少有两组重复2次以上的数
-		patternStringList.add("\\d*(\\d)\\1{1,}\\d*(\\d)\\2{1,}\\d*");
+		// 两组重复2次以上的数
+		patternStringList.add("\\d*(\\d)\\1{1,}(\\d)\\2{1,}\\d*");
 		// 二连号 ABABAB...
 		patternStringList.add("\\d*(\\d{2})\\1{1,}\\d*");
 
@@ -125,13 +131,6 @@ public class CodeRandomServiceImpl extends
 					LogUtil.log.info("--------break,over maxUserId:"
 							+ maxUserId);
 					break;
-				}
-
-				// 跳过7位id，直接生成8位
-				if (generateStartCode > 999999 && generateStartCode < 10000000) {
-					generateStartCode = 10000000;
-					insertSuccessSize--;
-					continue;
 				}
 
 				// 检测是否靓号
