@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+   
+<mapper namespace="com.lm.live.home.dao.GwFilesMapper">
+	<resultMap type="com.lm.live.home.domain.GwFiles" id="vo">
+	    <result property="id" column="id" />
+	    <result property="attaId" column="attaId" />
+	    <result property="title" column="title" />
+	    <result property="treeId" column="treeId" />
+	    <result property="indexs" column="indexs" />
+	    <result property="url" column="url" />
+	    <result property="fileSize" column="fileSize" />
+	    <result property="addTime" column="addTime" />
+	    <result property="fileName" column="fileName" />
+	    <result property="appShowImg" column="appShowImg" />
+	    <result property="status" column="status" />
+	    <result property="titleColor" column="titleColor" />
+	    <result property="mediaType" column="mediaType" />
+	    <result property="usePurpose" column="usePurpose" />
+	    <result property="content" column="content" />
+	    <result property="contentColor" column="contentColor" />
+	    <result property="beginTime" column="beginTime" />
+	    <result property="endTime" column="endTime" />
+	    <result property="bannerType" column="bannerType" />
+	    <result property="showPage" column="showPage" />
+	</resultMap>
+
+	<select id="getObjectById" parameterType="java.lang.Integer" resultMap="vo">
+		SELECT title,url,fileName FROM t_gw_files ORDER BY addTime DESC LIMIT 1
+	</select>
+	
+	<select id="getById" parameterType="java.lang.Integer" resultMap="vo">
+		SELECT title,url,fileName FROM t_gw_files where id = #{id}
+	</select>
+	
+	<select id="getIndexPageBanner" parameterType="java.lang.Integer" resultMap="vo">
+		SELECT title,url,fileName,appShowImg,titleColor,mediaType,usePurpose,content,contentColor,beginTime,endTime,bannerType
+			,showPage,status FROM t_gw_files 
+			<where>
+				<if test="bannerType != null and bannerType != ''">
+					AND  bannerType in ( #{bannerType} , 0 )
+				</if>
+				<if test="showPage != null">
+					AND  showPage  = #{showPage}
+				</if>
+			</where>
+			<if test="showPage != 2">
+				AND status= 1 
+			</if>
+			AND usePurpose=0
+			 AND isShow in(0,2) 
+			ORDER BY addTime DESC
+	</select>
+	
+	<delete id="removeById" parameterType="java.lang.Integer">
+		delete from t_gw_files where id = #{id}
+	</delete>
+	
+	<delete id="removeByIds" >
+		delete from t_gw_files where id in 
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>	
+	
+	<delete id="removeEntityBatch" parameterType="java.util.List">
+		delete from t_gw_files where id in 
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item.id}
+		</foreach>
+	</delete>	
+
+	<select id="getListByPage"  resultMap="vo">
+		select * from t_gw_files 
+	<where>
+	 	<if test="attaId != null and attaId != ''">
+			AND attaId like '%${attaId}%'
+		</if> 	
+	 	<if test="title != null and title != ''">
+			AND title like '%${title}%'
+		</if> 	
+		<if test="treeId != null">
+			AND treeId = #{treeId}
+		</if>	
+		<if test="indexs != null">
+			AND indexs = #{indexs}
+		</if>	
+	 	<if test="url != null and url != ''">
+			AND url like '%${url}%'
+		</if> 	
+	 	<if test="fileName != null and fileName != ''">
+			AND fileName like '%${fileName}%'
+		</if> 	
+		<if test="fileSize != null">
+			AND fileSize = #{fileSize}
+		</if>	
+		<if test="status != null">
+			AND status = #{status}
+		</if>	
+		<if test="ltAddTime != null and ltAddTime != ''">
+			<![CDATA[AND addTime >= #{ltAddTime} ]]>
+		</if> 
+		<if test="gtAddTime != null and gtAddTime != ''">
+			<![CDATA[AND addTime <= #{gtAddTime} ]]>
+		</if> 
+		<if test="appendWhere != null and appendWhere != ''">
+			${appendWhere}
+		</if>           
+      </where>
+        ORDER BY 
+		<choose>
+			<when test="orderBy != null and orderBy != ''">
+				${orderBy}
+			</when>
+			<otherwise>
+				id
+			</otherwise>
+		</choose>
+		<choose>
+			<when test="descOrAsc != null and descOrAsc != ''">
+				${descOrAsc}
+			</when>
+			<otherwise>
+				asc 
+			</otherwise>
+		</choose>
+	</select>
+	  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+	  <!--
+	  <selectKey resultType="int" keyProperty="baseId" order="BEFORE">select nextval('seq_xxx')</selectKey>
+	  -->
+	  <![CDATA[
+	  INSERT INTO t_gw_files(
+			id,
+			attaId,
+			title,
+			treeId,
+			indexs,
+			url,
+			fileName,
+			appShowImg,			
+			fileSize,
+			addTime,
+			status,
+			titleColor,
+			usePurpose,
+			mediaType,
+			content,
+			contentColor,
+			beginTime,
+			endTime
+			) VALUES (
+			#{id,jdbcType=VARCHAR},
+			#{attaId,jdbcType=VARCHAR},
+			#{title,jdbcType=VARCHAR},
+			#{treeId,jdbcType=VARCHAR},
+			#{indexs,jdbcType=VARCHAR},
+			#{url,jdbcType=VARCHAR},
+			#{fileName,jdbcType=VARCHAR},
+			#{appShowImg,jdbcType=VARCHAR},
+			#{fileSize,jdbcType=VARCHAR},
+			#{addTime,jdbcType=VARCHAR},
+			#{status,jdbcType=VARCHAR},
+			#{titleColor,jdbcType=VARCHAR},
+			#{mediaType,jdbcType=VARCHAR},
+			#{usePurpose,jdbcType=VARCHAR},
+			#{content,jdbcType=VARCHAR},
+			#{contentColor,jdbcType=VARCHAR},
+			#{beginTime,jdbcType=VARCHAR},
+			#{endTime,jdbcType=VARCHAR}
+		)	
+		]]>
+	  </insert>
+	  
+	  <insert id="insertBatch" parameterType="java.util.List">
+	  <![CDATA[
+	  		INSERT INTO t_gw_files(
+			id,
+			attaId,
+			title,
+			treeId,
+			indexs,
+			fileName,
+			url,
+			fileSize,
+			addTime,
+			status,
+			titleColor,
+			usePurpose,
+			mediaType,
+			content,
+			contentColor,
+			beginTime,
+			endTime
+			) VALUES 
+		]]>
+		<foreach collection="list" item="item" separator=",">
+		<![CDATA[
+			 (#{item.id,jdbcType=VARCHAR},#{item.attaId,jdbcType=VARCHAR},#{item.title,jdbcType=VARCHAR},#{item.treeId,jdbcType=VARCHAR},#{item.fileName,jdbcType=VARCHAR},#{item.status,jdbcType=VARCHAR},#{item.indexs,jdbcType=VARCHAR},#{item.url,jdbcType=VARCHAR},#{item.fileSize,jdbcType=VARCHAR},#{item.addTime,jdbcType=VARCHAR},
+			 #{item.titleColor,jdbcType=VARCHAR},
+			#{item.mediaType,jdbcType=VARCHAR},
+			#{item.usePurpose,jdbcType=VARCHAR},
+			#{item.content,jdbcType=VARCHAR},
+			#{item.contentColor,jdbcType=VARCHAR},
+			#{item.beginTime,jdbcType=VARCHAR},
+			#{item.endTime,jdbcType=VARCHAR})
+		]]>
+		</foreach>
+	  </insert>
+	  
+	  <update id="update">
+		UPDATE t_gw_files
+			<set>
+			 	<if test="attaId != null">
+					<![CDATA[attaId = #{attaId,jdbcType=VARCHAR},  ]]>
+				</if> 	
+			 	<if test="title != null">
+					<![CDATA[title = #{title,jdbcType=VARCHAR},  ]]>
+				</if> 	
+				<if test="treeId != null">
+					 <![CDATA[ treeId = #{treeId,jdbcType=VARCHAR},  ]]>
+				</if>	
+				<if test="indexs != null">
+					 <![CDATA[ indexs = #{indexs,jdbcType=VARCHAR},  ]]>
+				</if>	
+			 	<if test="url != null">
+					<![CDATA[url = #{url,jdbcType=VARCHAR},  ]]>
+				</if> 	
+			 	<if test="status != null">
+					<![CDATA[status = #{status,jdbcType=VARCHAR},  ]]>
+				</if> 	
+				<if test="fileSize != null">
+					 <![CDATA[ fileSize = #{fileSize,jdbcType=VARCHAR},  ]]>
+				</if>	
+				<if test="fileName != null">
+					 <![CDATA[ fileName = #{fileName,jdbcType=VARCHAR},  ]]>
+				</if>	
+				<if test="status != null">
+					 <![CDATA[ status = #{status,jdbcType=VARCHAR},  ]]>
+				</if>	
+				<if test="addTime != null">
+					<![CDATA[addTime = #{addTime,jdbcType=VARCHAR}  ]]>
+				</if> 
+				<if test="titleColor != null">
+					<![CDATA[titleColor = #{titleColor,jdbcType=VARCHAR}  ]]>
+				</if>
+				<if test="mediaType != null">
+					<![CDATA[mediaType = #{mediaType,jdbcType=VARCHAR}  ]]>
+				</if>
+				<if test="usePurpose != null">
+					<![CDATA[usePurpose = #{usePurpose,jdbcType=VARCHAR}  ]]>
+				</if>
+				<if test="content != null">
+					<![CDATA[content = #{content,jdbcType=VARCHAR}  ]]>
+				</if>
+				<if test="contentColor != null">
+					<![CDATA[contentColor = #{contentColor,jdbcType=VARCHAR}  ]]>
+				</if>
+				<if test="beginTime != null">
+					<![CDATA[beginTime = #{beginTime,jdbcType=VARCHAR}  ]]>
+				</if>
+				<if test="endTime != null">
+					<![CDATA[endTime = #{endTime,jdbcType=VARCHAR}  ]]>
+				</if>
+			</set>
+			<where>
+			 <![CDATA[ and id = #{id,jdbcType=VARCHAR} ]]>  			  	
+			</where>  
+	  </update>	
+	  
+	  	<select id="getStartImgs" parameterType="java.lang.Integer" resultMap="vo">
+		SELECT title,url,fileName,appShowImg,titleColor,mediaType,usePurpose,content,contentColor,beginTime,endTime,addTime
+			FROM t_gw_files a 
+			WHERE a.status= 1 
+			<!-- usePurpose,0 banner,1 startImg -->
+			and usePurpose=1
+			ORDER BY a.addTime DESC
+	</select>
+</mapper>

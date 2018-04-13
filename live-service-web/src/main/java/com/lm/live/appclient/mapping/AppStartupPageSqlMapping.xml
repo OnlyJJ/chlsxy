@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.lm.live.appclient.dao.AppStartupPageMapper">
+	<resultMap type="com.lm.live.appclient.domain.AppStartupPage"
+		id="vo">
+		<result property="id" column="id" />
+		<result property="inUse" column="inUse" />
+		<result property="themeType" column="themeType" />
+		<result property="updateTime" column="updateTime" />
+		<result property="jumpType" column="jumpType" />
+		<result property="jumpTarget" column="jumpTarget" />
+		<result property="comment" column="comment" />
+		<result property="beginTime" column="beginTime" />
+		<result property="endTime" column="endTime" />
+		<result property="mediaUrl" column="mediaUrl" />
+	</resultMap>
+
+	<select id="getObjectById" parameterType="java.lang.Integer"
+		resultMap="vo">
+		select * from t_app_startup_page where id=#{id}
+	</select>
+
+	<delete id="removeById" parameterType="java.lang.Integer">
+		delete from
+		t_app_startup_page where id = #{id}
+	</delete>
+
+	<select id="getInuseConf" resultMap="vo">
+		select *
+		from t_app_startup_page
+		where inUse =1
+		and now() BETWEEN beginTime AND endTime
+		order by updateTime desc
+		limit 1
+	</select>
+
+</mapper>

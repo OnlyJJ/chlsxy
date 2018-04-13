@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.alibaba.fastjson.JSONObject;
+import com.lm.live.appclient.exception.AppClientBizException;
+import com.lm.live.appclient.service.IAppStartupPageService;
+import com.lm.live.appclient.vo.AppStartupPageVo;
 import com.lm.live.common.controller.BaseController;
 import com.lm.live.common.utils.LogUtil;
 import com.lm.live.common.utils.RequestUtil;
@@ -17,6 +20,8 @@ import com.lm.live.common.vo.DeviceProperties;
 import com.lm.live.common.vo.Page;
 import com.lm.live.common.vo.RequestVo;
 import com.lm.live.common.vo.Result;
+import com.lm.live.home.exception.HomeBizException;
+import com.lm.live.home.service.IGwFilesService;
 import com.lm.live.home.service.IHomePageService;
 import com.lm.live.home.vo.BannerVo;
 import com.lm.live.home.vo.Kind;
@@ -35,6 +40,12 @@ public class HomeWeb extends BaseController {
 	
 	@Resource
 	private IHomePageService homePageService;
+	
+	@Resource
+	private IGwFilesService gwFilesService;
+	
+	@Resource
+	private IAppStartupPageService appStartupPageService;
 	
 	/**
 	 * H1
@@ -63,7 +74,7 @@ public class HomeWeb extends BaseController {
 			Kind kind = new Kind();
 			kind.parseJson(data.getData().getJSONObject(kind.getShortName()));
 			jsonRes = homePageService.getHomePageData(page, kind);
-		} catch(UserBizException e) {
+		} catch(HomeBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
 			result.setResultDescr(e.getErrorCode().getResultDescr());
@@ -102,8 +113,8 @@ public class HomeWeb extends BaseController {
 			}
 			BannerVo vo = new BannerVo();
 			vo.parseJson(data.getData().getJSONObject(vo.getShortName()));
-			jsonRes = homePageService.getBannerData(vo);
-		} catch(UserBizException e) {
+			jsonRes = gwFilesService.getIndexPageBanner(vo);
+		} catch(HomeBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
 			result.setResultDescr(e.getErrorCode().getResultDescr());
@@ -146,7 +157,7 @@ public class HomeWeb extends BaseController {
 			Rank rank = new Rank();
 			rank.parseJson(data.getData().getJSONObject(rank.getShortName()));
 			jsonRes = homePageService.getRankData(page, rank);
-		} catch(UserBizException e) {
+		} catch(HomeBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
 			result.setResultDescr(e.getErrorCode().getResultDescr());
@@ -190,7 +201,7 @@ public class HomeWeb extends BaseController {
 			vo.parseJson(data.getData().getJSONObject(vo.getShortName()));
 			String condition = vo.getTargetId();
 			jsonRes = homePageService.serach(page, condition);
-		} catch(UserBizException e) {
+		} catch(HomeBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
 			result.setResultDescr(e.getErrorCode().getResultDescr());
@@ -205,4 +216,41 @@ public class HomeWeb extends BaseController {
 		handleInfo(LogUtil.log, request, data.getRequestStr(), spendTimes, jsonRes.toString(), true);
 		out(jsonRes, request, response, q);
 	}
+	
+	/**
+	 * H5
+	 * 获取开机页图片
+	 *@param request
+	 *@param response
+	 *@param q
+	 *@author shao.xiang
+	 *@data 2018年4月13日
+	 */
+	@RequestMapping(value = {"H5/{q}"} , method= {RequestMethod.POST})
+	public void getAppStartPageData(HttpServletRequest request,HttpServletResponse response, @PathVariable String q){
+		long time1 = System.currentTimeMillis();
+		DataRequest data = (DataRequest) RequestUtil.getDataRequest(request, response);
+		Result result = new Result(ErrorCode.SUCCESS_0.getResultCode(),ErrorCode.SUCCESS_0.getResultDescr());  
+		JSONObject jsonRes = new JSONObject();
+		try {
+			AppStartupPageVo vo = appStartupPageService.getAppStartupPage();
+			if(vo != null) {
+				jsonRes.put(vo.getShortName(), vo.buildJson());
+			}
+		} catch(AppClientBizException e) {
+			LogUtil.log.error(e.getMessage(), e);
+			result.setResultCode(e.getErrorCode().getResultCode());
+			result.setResultDescr(e.getErrorCode().getResultDescr());
+		} catch (Exception e) {
+			LogUtil.log.error(e.getMessage(), e);
+			result.setResultCode(ErrorCode.ERROR_100.getResultCode());
+			result.setResultDescr(ErrorCode.ERROR_100.getResultDescr());
+		}
+		jsonRes.put(result.getShortName(),result.buildJson());
+		long time2 = System.currentTimeMillis();
+		long spendTimes = time2 - time1;
+		handleInfo(LogUtil.log, request, data.getRequestStr(), spendTimes, jsonRes.toString(), true);
+		out(jsonRes, request, response, q);
+	}
+	
 }

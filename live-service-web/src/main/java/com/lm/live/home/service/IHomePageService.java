@@ -26,16 +26,6 @@ public interface IHomePageService {
 	JSONObject getHomePageData(Page page, Kind kind) throws Exception;
 	
 	/**
-	 * 获取banner信息
-	 *@param vo
-	 *@return
-	 *@throws Exception
-	 *@author shao.xiang
-	 *@data 2018年3月26日
-	 */
-	JSONObject getBannerData(BannerVo vo) throws Exception;
-	
-	/**
 	 * 获取榜单数据（首页/房间）
 	 *@param page
 	 *@param rank

@@ -4,29 +4,20 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lm.live.common.vo.BaseVo;
-/**
- * @entity
- * @table t_app_startup_page
- * @date 2016-12-28 18:12:17
- * @author test2
- */
+
 public class AppStartupPage extends BaseVo {
 	private static final long serialVersionUID = 1L;
 	/** id */
-	private Integer id;
+	private int id;
 	/** 是否启用,0:不启用;1:启用 */
-	private Integer inUse;
-	/** 主题类型，1：单张图片自动滚动2：多张图片自动滑动  3：多张图片手动滑动 4：渐变 5：单张图片没动画 */
-	private Integer themeType;
+	private int inUse;
+	/** 主题类型，0：单张图片没动画 */
+	private int themeType;
 	/** 更新时间 */
 	private Date updateTime;
-	/**判断updateTime，大于或等于 */
-	private Date	gtUpdateTime;
-	/**判断updateTime，小于或等于 */
-	private Date	ltUpdateTime;
-	/** 0:不跳转;1:URL跳转;2:房间跳转 */
+	/** 0:不跳转;1:URL跳转;*/
 	private int jumpType;
-	/** 跳转目标(根据jumpType而定,url地址或房间号) */
+	/** 跳转目标(根据jumpType而定,url地址) */
 	private String jumpTarget;
 	/** 说明 */
 	private String comment;
@@ -36,28 +27,33 @@ public class AppStartupPage extends BaseVo {
 	
 	/** 到期时间 */
 	private Date endTime;
+	
+	/**
+	 * 开机页图片地址
+	 */
+	private String mediaUrl;
 
-	public void setId(Integer id){
+	public void setId(int id){
 		this.id = id;
 	}
 	
-	public Integer getId() {
+	public int getId() {
 		return this.id;
 	}
 	
-	public void setInUse(Integer inUse){
+	public void setInUse(int inUse){
 		this.inUse = inUse;
 	}
 	
-	public Integer getInUse() {
+	public int getInUse() {
 		return this.inUse;
 	}
 	
-	public void setThemeType(Integer themeType){
+	public void setThemeType(int themeType){
 		this.themeType = themeType;
 	}
 	
-	public Integer getThemeType() {
+	public int getThemeType() {
 		return this.themeType;
 	}
 	
@@ -67,24 +63,6 @@ public class AppStartupPage extends BaseVo {
 	
 	public Date getUpdateTime() {
 		return this.updateTime;
-	}
-	
-	public void setGtUpdateTime(Date gtUpdateTime){
-		this.gtUpdateTime = gtUpdateTime;
-	}
-	
-	@JsonIgnore
-	public Date getGtUpdateTime() {
-		return this.gtUpdateTime;
-	}
-	
-	public void setLtUpdateTime(Date ltUpdateTime){
-		this.ltUpdateTime = ltUpdateTime;
-	}
-	
-	@JsonIgnore
-	public Date getLtUpdateTime() {
-		return this.ltUpdateTime;
 	}
 	
 	public void setJumpType(int jumpType){
@@ -125,5 +103,13 @@ public class AppStartupPage extends BaseVo {
 
 	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
+	}
+
+	public String getMediaUrl() {
+		return mediaUrl;
+	}
+
+	public void setMediaUrl(String mediaUrl) {
+		this.mediaUrl = mediaUrl;
 	}
 }

@@ -66,12 +66,6 @@ public class HomePageServiceImpl implements IHomePageService {
 	}
 
 	@Override
-	public JSONObject getBannerData(BannerVo vo) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public JSONObject getRankData(Page page, Rank rank) throws Exception {
 		if(page == null || rank == null) {
 			throw new HomeBizException(ErrorCode.ERROR_101);
