@@ -41,7 +41,7 @@ public class AppStartupPageServiceImpl extends CommonServiceImpl<AppStartupPageM
 				appStartupPageVo.setJumpTarget(jumpTarget);
 			}
 			if(!StringUtils.isEmpty(mediaUrl)) {
-				appStartupPageVo.setImgArr(mediaUrl);
+				appStartupPageVo.setImgUrl(mediaUrl);
 			}
 		}
 		return appStartupPageVo;			
