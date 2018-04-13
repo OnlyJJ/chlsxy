@@ -16,6 +16,16 @@ import com.lm.live.user.vo.UserInfo;
  * @data 2018年3月20日
  */
 public interface UserInfoMapper {
+	
+	/**
+	 * 根据房间获取主播信息
+	 *@param roomId
+	 *@return
+	 *@author shao.xiang
+	 *@data 2018年4月13日
+	 */
+	UserInfo getUserByRoomId(String roomId);
+	
 	/**
 	 * 获取用户基本信息
 	 * @param userId

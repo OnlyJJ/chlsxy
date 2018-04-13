@@ -14,6 +14,7 @@ import com.lm.live.common.service.impl.CommonServiceImpl;
 import com.lm.live.decorate.contants.MCPrefix;
 import com.lm.live.decorate.dao.DecorateMapper;
 import com.lm.live.decorate.domain.Decorate;
+import com.lm.live.decorate.enums.DecorateTableEnum;
 import com.lm.live.decorate.enums.ErrorCode;
 import com.lm.live.decorate.exception.DecorateBizException;
 import com.lm.live.decorate.service.IDecorateService;
@@ -43,7 +44,8 @@ public class DecorateServiceImpl extends CommonServiceImpl<DecorateMapper, Decor
 		if(list != null) {
 			return list;
 		} 
-		list = dao.findListOfCommonUser(userId);
+		int category = DecorateTableEnum.Category.USER.getValue();
+		list = dao.findListOfCommonUser(userId, category);
 		if(list == null) {
 			list = new ArrayList<Decorate>();
 		}

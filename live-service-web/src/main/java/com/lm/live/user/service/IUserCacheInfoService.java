@@ -1,6 +1,7 @@
 package com.lm.live.user.service;
 
 import com.lm.live.user.vo.UserCacheInfo;
+import com.lm.live.user.vo.UserInfo;
 import com.lm.live.user.vo.UserInfoVo;
 
 /**
@@ -10,6 +11,15 @@ import com.lm.live.user.vo.UserInfoVo;
  *
  */
 public interface IUserCacheInfoService {
+	
+	/**
+	 * 通过房间查找主播（基本信息，缓存）
+	 *@param roomId
+	 *@return
+	 *@author shao.xiang
+	 *@data 2018年4月13日
+	 */
+	UserInfo getAnchorByRoomId(String roomId);
 	
 	/**
 	 * 从cache中获取用户在房间内的信息

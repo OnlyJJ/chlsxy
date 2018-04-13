@@ -1,37 +1,49 @@
 package com.lm.live.guard.service.impl;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.common.constant.MCTimeoutConstants;
-import com.lm.live.common.utils.LogUtil;
-import com.lm.live.common.utils.MemcachedUtil;
+import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.vo.Page;
 import com.lm.live.guard.constant.Constants;
 import com.lm.live.guard.constant.MCPrefix;
+import com.lm.live.guard.dao.GuardWorkMapper;
 import com.lm.live.guard.service.IGuardService;
 import com.lm.live.guard.vo.GuardVo;
+import com.lm.live.user.service.IUserCacheInfoService;
 
 @Service("guardService")
 public class GuardServiceImpl implements IGuardService {
+	
+	@Resource
+	private GuardWorkMapper gwMapper;
+	
+	@Resource
+	private IUserCacheInfoService userCacheInfoService;
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public JSONObject getGuardData(String userId, Page page) throws Exception {
 		JSONObject json = new JSONObject();
 		List<GuardVo> guardList = null;
 		String key = MCPrefix.GUARD_USER_CACHE + userId;
-		Object cache = MemcachedUtil.get(key);
-		if(cache != null){
-			guardList = (List<GuardVo>) cache;
+		List<GuardVo> cache = RedisUtil.getList(key, GuardVo.class);
+		if(cache != null) {
+			guardList = cache;
 		}else{
-//			guardList = getUserGuardAllData(userId);
-			if(guardList != null && guardList.size()>0){
-				MemcachedUtil.set(key, guardList,MCTimeoutConstants.DEFAULT_TIMEOUT_2H);
+			guardList = gwMapper.getAllUserGuard(userId);
+			if(guardList == null ){
+				guardList = new ArrayList<GuardVo>();
 			}
+			RedisUtil.set(key, guardList, MCTimeoutConstants.DEFAULT_TIMEOUT_10M);
 		}
 		JSONArray jsonArray = new JSONArray();
 		JSONArray resultArray = new JSONArray();
@@ -83,5 +95,6 @@ public class GuardServiceImpl implements IGuardService {
 		json.put(Constants.DATA_BODY, resultArray);		
 		return json;
 	}
+	
 
 }

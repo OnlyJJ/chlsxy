@@ -10,4 +10,7 @@ public class MCPrefix {
 	
 	/** 用户登录后，服务端派发给客户端用于数据加密token的key前缀 */
 	public static final String MC_TOKEN_PREFIX = "mc_data_token_";
+	
+	/** 主播基本信息缓存 */
+	public static final String ANCHOR_ROOM_CACHE = "anchor:room:";
 }

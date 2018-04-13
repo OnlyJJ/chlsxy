@@ -142,10 +142,10 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 		if(StringUtils.isEmpty(userId) || StringUtils.isEmpty(toUserId)) {
 			throw new UserBizException(ErrorCode.ERROR_101);
 		}
-		boolean isAnchor = false;
+		boolean isAnchor = false; // 是否是主播
 		try {
 			UserAnchor vo = userAnchorService.getAnchorByIdChe(toUserId);;
-			if(vo == null) {
+			if(vo != null) {
 				isAnchor = true;
 			}
 		} catch (Exception e) {
@@ -194,10 +194,10 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 				
 			// 操作成功，则删除缓存
 			String key = MCPrefix.USER_ATTENTION_CACHE + userId;
-			MemcachedUtil.delete(key);
+			RedisUtil.del(key);
 			// 删除被关注用户粉丝列表缓存
 			String fansKey = MCPrefix.USER_FANS_CACHE + toUserId;
-			MemcachedUtil.delete(fansKey);
+			RedisUtil.del(fansKey);
 			
 			// 处理主播相关业务
 			if(isAnchor) {

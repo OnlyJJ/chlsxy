@@ -6,7 +6,7 @@ public class DecorateTableEnum {
 
 	/**
 	 * category
-	 * 类型,0:主播勋章(所有主播通用),1:普通用户勋章(所有用户通用),2:主播勋章(针对单个主播)';
+	 * 类型,1:主播勋章(所有主播通用),0:普通用户勋章(所有用户通用);
 	 */
 	public static enum Category{
 		/**

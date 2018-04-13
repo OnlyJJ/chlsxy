@@ -95,7 +95,7 @@
 		AND toUserId = #{toUserId}
 	</update>
 	
-	<delete id="removeById" parameterType="java.lang.Long">
+	<delete id="removeById" >
 		DELETE FROM t_push_user_set_attention
 		WHERE id = #{id}
 	</delete>

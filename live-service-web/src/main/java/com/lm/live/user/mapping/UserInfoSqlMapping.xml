@@ -75,4 +75,17 @@
 		ORDER BY a.addTime DESC
 	</select>
 	
+	<!-- 根据roomId获取主播信息 -->
+	<select id="getUserByRoomId" resultType="com.lm.live.user.vo.UserInfo">
+		SELECT   					
+			a.userId AS userId, a.nickName AS nickname, a.icon icon,
+			b.gold AS gold, b.anchorLevel AS anchorLevel, b.userLevel AS userLevel,
+			d.roomId AS roomId
+		FROM t_user_info  a   
+		INNER JOIN t_user_account b ON (a.userId = b.userId)    
+		INNER JOIN t_user_anchor d ON (a.userId=d.userId)    
+		WHERE d.roomId = #{roomId} 
+		LIMIT 1
+	</select>
+	
 </mapper>

@@ -23,24 +23,15 @@
 	</resultMap>
 
 	<select id="findListOfCommonUser" resultMap="vo">
-		SELECT decorate.*,decoratePackage.isAdornUserDecorate as
-		isAdornUserDecorate
-		FROM t_decorate decorate
-		JOIN t_decorate_package
-		decoratePackage on decoratePackage.decorateId = decorate.id
-		WHERE
-		decoratePackage.userId=#{userId}
-		AND decorate.category=#{category}
+		SELECT d.* FROM t_decorate d ,t_decorate_package p
+		WHERE p.decorateId = d.id
+		AND p.userId=#{userId}
+		AND d.category=#{category}
 		<![CDATA[
-		AND (isPeriod=0 or (isPeriod=1 and now() >= beginTime and now() <= endTime) )
+		AND (p.isPeriod=0 OR (p.isPeriod=1 AND NOW() >= p.beginTime AND NOW() <= p.endTime) )
 		]]>
-		AND decorate.type=0
-		<if test="isAdornUserDecorate != null and isAdornUserDecorate != ''">
-			AND decoratePackage.isAdornUserDecorate =
-			#{isAdornUserDecorate}
-		</if>
-		ORDEY BY decoratePackage.isPeriod ASC ,decoratePackage.endTime DESC
-		,decorate.sortWeight DESC
+		AND d.type=0
+		ORDER BY p.isPeriod ASC ,p.endTime DESC,d.sortWeight DESC
 
 	</select>
 

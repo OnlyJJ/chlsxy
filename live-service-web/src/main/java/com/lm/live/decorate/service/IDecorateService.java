@@ -14,7 +14,7 @@ import com.lm.live.decorate.domain.Decorate;
 public interface IDecorateService extends ICommonService<Decorate>{
 	
 	/**
-	 * 获取用户勋章列表（有效的）
+	 * 获取普通用户勋章列表（有效的）
 	 * @param userId
 	 * @return
 	 */

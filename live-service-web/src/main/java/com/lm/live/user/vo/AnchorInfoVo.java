@@ -11,7 +11,7 @@ import com.lm.live.common.vo.UserBaseInfo;
  * @author shao.xiang
  * @date 2017-09-04
  */
-public abstract class AnchorInfoVo extends UserBaseInfo implements Serializable {
+public class AnchorInfoVo extends UserBaseInfo implements Serializable {
 	
 	private static final long serialVersionUID = -6874129572214793335L;
 	

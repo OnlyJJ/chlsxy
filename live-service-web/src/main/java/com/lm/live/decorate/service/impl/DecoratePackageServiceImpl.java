@@ -48,7 +48,7 @@ public class DecoratePackageServiceImpl extends CommonServiceImpl<DecoratePackag
 		int category = DecorateTableEnum.Category.USER.getValue();
 		String cacheKey = MCPrefix.DECORATEPACKAGE_USER_CACHE + userId;
 		String cacheObj = RedisUtil.get(cacheKey);
-		if(StringUtils.isEmpty(cacheObj)){
+		if(!StringUtils.isEmpty(cacheObj)){
 			ret = JSON.parseObject(cacheObj);
 		}else{
 			List<DecoratePackageVo> list = dao.findValidDecorate(userId,category);
@@ -59,15 +59,20 @@ public class DecoratePackageServiceImpl extends CommonServiceImpl<DecoratePackag
 				}
 				ret.put(Constants.DATA_BODY, array.toString());
 			}
-			MemcachedUtil.set(cacheKey, ret, MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
+			RedisUtil.set(cacheKey, ret, MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
 		}
 		return ret;
 	}
 
 	@Override
 	public void updateStatus(String userId, int decorateId, int status) throws Exception {
-		// TODO Auto-generated method stub
-		
+		if(StringUtils.isEmpty(userId)) {
+			return;
+		}
+		dao.updateStatus(userId, decorateId, status);
+		// 完成之后，更新缓存
+		String cacheKey = MCPrefix.DECORATEPACKAGE_USER_CACHE + userId;
+		RedisUtil.del(cacheKey);
 	}
 
 
