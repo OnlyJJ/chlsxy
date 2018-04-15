@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+   
+<mapper namespace="com.lm.live.base.dao。UserAccusationInfoMapper">
+	<resultMap type="com.lm.live.base.domain.UserAccusationInfo" id="vo">
+	    <result property="id" column="id" />
+	    <result property="userId" column="userId" />
+	    <result property="toUserId" column="toUserId" />
+	    <result property="nickName" column="nickName" />
+	    <result property="accusationType" column="accusationType" />
+	    <result property="accusationDesc" column="accusationDesc" />
+	    <result property="accusationTime" column="accusationTime" />
+	    <result property="proceStatus" column="proceStatus" />
+	    <result property="operateUserId" column="operateUserId" />
+	</resultMap>
+
+	<select id="qryByCondition"  resultMap="vo">
+		select * from t_user_accusation_info where userId = #{userId} and toUserId = #{toUserId} and proceStatus = 0
+	</select>
+
+    <insert id="insertAccusationInfo" parameterType="com.lm.live.base.domain.UserAccusationInfo" 
+    	useGeneratedKeys="true" keyProperty="id" >
+		  <![CDATA[
+			  INSERT INTO t_user_accusation_info (
+					userId,
+					toUserId,
+					nickName,
+					accusationType,
+					accusationDesc,
+					accusationTime,
+					proceStatus,
+					operateUserId
+					) VALUES (
+					#{userId},
+					#{toUserId},
+					#{nickName},
+					#{accusationType},
+					#{accusationDesc},
+					#{accusationTime},
+					#{proceStatus},
+					#{operateUserId}
+				)	
+		  ]]>
+	  </insert>
+	  
+</mapper>

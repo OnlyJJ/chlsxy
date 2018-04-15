@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+   
+<mapper namespace="com.lm.live.room.dao.ShareInfoMapper">
+	<resultMap type="com.lm.live.room.domain.UserShareInfo" id="vo">
+	    <result property="id" column="id"/>
+		<result property="userId" column="userId"/>
+		<result property="roomId" column="roomId"/>
+		<result property="shareType" column="shareType"/>
+		<result property="shareTime" column="shareTime"/>
+		<result property="ip" column="ip"/>
+		<result property="content" column="content"/>
+		<result property="sharePosition" column="sharePosition"/>
+	</resultMap>
+
+	<select id="getObjectById"  resultMap="vo">
+		select * from t_user_share_info where id=#{id}
+	</select>	
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+	  <![CDATA[
+	  INSERT INTO t_user_share_info(
+			userId,
+			roomId,
+			shareType,
+			shareTime,
+			ip,
+			content,
+			sharePosition
+			) VALUES (
+			#{userId,jdbcType=VARCHAR},
+			#{roomId,jdbcType=VARCHAR},
+			#{shareType,jdbcType=VARCHAR},
+			#{shareTime,jdbcType=VARCHAR},
+			#{ip,jdbcType=VARCHAR},
+			#{content,jdbcType=VARCHAR},
+			#{sharePosition,jdbcType=TINYINT}
+		)	
+		]]>
+	  </insert>
+	  
+	  <select id="getUserShareCount" resultType="java.lang.Integer">
+		select count(*) as total from t_user_share_info  
+		where 1=1
+		and userId = #{userId}
+		<![CDATA[
+		AND shareTime >= #{startTime} 
+		AND shareTime <= #{endTime}
+		]]>
+	</select>
+	
+	 <select id="getUserShareDaysCount" resultType="java.lang.Integer">
+		select count(*) as total from (select  DATE_FORMAT(shareTime,'%Y-%m-%d') as days
+		from t_user_share_info  
+		where 1=1
+		and userId = #{userId}
+		<![CDATA[
+		AND shareTime >= #{startTime} 
+		AND shareTime <= #{endTime}
+		]]>
+		group by DATE_FORMAT(shareTime,'%Y-%m-%d'))A
+	</select>
+	
+</mapper>

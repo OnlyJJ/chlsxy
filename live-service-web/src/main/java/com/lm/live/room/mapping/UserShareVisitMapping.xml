@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+   
+<mapper namespace="com.lm.live.room.dao">
+	<resultMap type="com.lm.live.room.domain.UserShareVisit" id="vo">
+	    <result property="id" column="id"/>
+		<result property="userId" column="userId"/>
+		<result property="roomId" column="roomId"/>
+		<result property="shareType" column="shareType"/>
+		<result property="visitTime" column="visitTime"/>
+		<result property="ip" column="ip"/>
+		<result property="sharePosition" column="sharePosition"/>
+	</resultMap>
+
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+	  <![CDATA[
+	  INSERT INTO t_user_share_visit(
+			userId,
+			roomId,
+			shareType,
+			visitTime,
+			ip,
+			sharePosition
+			) VALUES (
+			#{userId},
+			#{roomId,jdbcType=VARCHAR},
+			#{shareType},
+			#{visitTime},
+			#{ip,jdbcType=VARCHAR},
+			#{sharePosition,jdbcType=TINYINT}
+		)	
+		]]>
+	  </insert>
+	  
+	
+</mapper>
