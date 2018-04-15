@@ -65,6 +65,31 @@ public class DecoratePackageServiceImpl extends CommonServiceImpl<DecoratePackag
 	}
 
 	@Override
+	public JSONObject getRoomDecorateData(String anchorId) throws Exception {
+		if(StringUtils.isEmpty(anchorId)) {
+			throw new DecorateBizException(ErrorCode.ERROR_101);
+		}
+		JSONObject ret = new JSONObject();
+		int category = DecorateTableEnum.Category.ANCHOR.getValue();
+		String cacheKey = MCPrefix.DECORATE_ROOM_CACHE + anchorId;
+		String cacheObj = RedisUtil.get(cacheKey);
+		if(!StringUtils.isEmpty(cacheObj)){
+			ret = JSON.parseObject(cacheObj);
+		}else{
+			List<DecoratePackageVo> list = dao.findValidDecorate(anchorId,category);
+			if(list != null && list.size() >0) {
+				JSONArray array = new JSONArray();
+				for(DecoratePackageVo vo : list) {
+					array.add(vo.buildJson());
+				}
+				ret.put(Constants.DATA_BODY, array.toString());
+			}
+			RedisUtil.set(cacheKey, ret, MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
+		}
+		return ret;
+	}
+	
+	@Override
 	public void updateStatus(String userId, int decorateId, int status) throws Exception {
 		if(StringUtils.isEmpty(userId)) {
 			return;
@@ -74,6 +99,7 @@ public class DecoratePackageServiceImpl extends CommonServiceImpl<DecoratePackag
 		String cacheKey = MCPrefix.DECORATEPACKAGE_USER_CACHE + userId;
 		RedisUtil.del(cacheKey);
 	}
+
 
 
 }

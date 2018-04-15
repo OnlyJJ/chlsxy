@@ -204,8 +204,8 @@
 		#{userId}
 	</select>
 
-	<update id="updateIconByUserid">
-		UPDATE t_user_info set icon = #{icon} where userId = #{userId}
+	<update id="updateIcon">
+		UPDATE t_user_info SET icon = #{icon} where userId = #{userId}
 	</update>
 
 	<update id="updateByUserId">

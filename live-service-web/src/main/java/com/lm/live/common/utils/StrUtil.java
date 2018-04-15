@@ -489,12 +489,12 @@ public class StrUtil {
 	public static String trimStr(String str) {
 		StringBuffer sbf = new StringBuffer();
 		String[] trims = str.trim().split(" ");
-			if(trims != null && trims.length>0) {
-				for(int i=0;i<trims.length;i++) {
-					sbf.append(trims[i]);
-				}
-			} 
-			return sbf.toString();
+		if(trims != null && trims.length>0) {
+			for(int i=0;i<trims.length;i++) {
+				sbf.append(trims[i]);
+			}
+		} 
+		return sbf.toString();
 	}
 	
 	/**
@@ -604,5 +604,17 @@ public class StrUtil {
 	        numberFormat.setMaximumFractionDigits(minimumFractionDigits);  
 	        String result = numberFormat.format((float) currentVal / (float) totalVal * 100);
 	        return result+"%";
+	}
+	
+	/**
+	 * 替换掉sql特殊字符[null]，为全角的
+	 * @param srt
+	 * @return
+	 * @author shao.xiang
+	 * @data 2018年4月14日
+	 */
+	public static String replaceSqlspecial(String srt) {
+		srt = srt.replaceAll("\\[+?", "［").replaceAll("\\]+?", "］");
+		return srt;
 	}
 }

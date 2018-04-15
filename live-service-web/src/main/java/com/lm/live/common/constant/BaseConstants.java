@@ -25,6 +25,8 @@ public class BaseConstants {
 	public static final String INBOX_IMG_FILE_URL = "images/inbox";
 	/** 用户直播间举报图片 */
 	public static final String ACCUSATION_IMG_FILE_URL = "images/accusation";
+	/** 主播秀图片目录 */
+	public static final String ANCHOR_SHOW_IMG_FILE_URL = "images/anchorshow";
 	// 图片路径，end!
 	
 	// 直播
@@ -60,6 +62,10 @@ public class BaseConstants {
 	/** 需要屏蔽掉的用户 ，多个账号以逗号隔开*/
 	public static final String HIDE_USER = "100000";
 	
+	/** 游客用户前缀 */
+	public static final String PSEUDO_PREFIX = "pesudo_";
+	/** 机器人用户前缀 */
+	public static final String ROBOT_PREFIX = "robot";
 	
 	/** 默认字符编码，UTF-8 */
 	public static final String DEFAULT_UNICODE = "UTF-8";

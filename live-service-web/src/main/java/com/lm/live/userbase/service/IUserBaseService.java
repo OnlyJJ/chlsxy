@@ -75,4 +75,13 @@ public interface IUserBaseService  extends ICommonService<UserInfoDo>{
 	 */
 	UserInfoDo getUserByNickname(String nickName);
 	
+	/**
+	 * 修改图片
+	 * @param userId
+	 * @param icon
+	 * @author shao.xiang
+	 * @data 2018年4月15日
+	 */
+	void updateIcon(String userId, String icon);
+	
 }

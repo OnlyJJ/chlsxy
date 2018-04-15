@@ -3,7 +3,6 @@ package com.lm.live.base.service;
 import javax.servlet.http.HttpServletRequest;
 
 import com.alibaba.fastjson.JSONObject;
-import com.lm.live.framework.service.ServiceResult;
 
 /**
  * 文件上传服务
@@ -17,20 +16,15 @@ public interface IFileUploadService {
 	 * @param data
 	 * @return
 	 */
-	public ServiceResult<JSONObject> uploadFile(HttpServletRequest request, String userId);
+	public void uploadFile(HttpServletRequest request, String userId) throws Exception;
+	
+//	public JSONObject uploadFile2(HttpServletRequest request, String userId);
 	
 	/**
-	 * F2-动态图片上传接口
+	 * F2-举报图片上传接口
 	 * @param data
 	 * @return
 	 */
-	public ServiceResult<JSONObject> uploadFile2(HttpServletRequest request, String userId);
-	
-	/**
-	 * F3-举报图片上传接口
-	 * @param data
-	 * @return
-	 */
-	public ServiceResult<JSONObject> uploadImgs(HttpServletRequest request, String userId);
+	public JSONObject uploadImgs(HttpServletRequest request, String userId) throws Exception;
 	
 }

@@ -48,7 +48,7 @@ public class UserInfoDo  extends BaseVo{
 	/** 登录方式 */
 	private int loginType;
 	
-	/**是否可以修改资料，0-可修改，1-不可修改*/
+	/**是否可以修改资料，0-不可修改，1-可修改*/
 	private int isModifyInfo;
 	
 	/** 用户状态，1-正常; 0-停用; */

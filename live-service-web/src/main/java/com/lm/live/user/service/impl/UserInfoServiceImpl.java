@@ -344,7 +344,7 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 			throw new UserBizException(ErrorCode.ERROR_1000);
 		}
 		int isModifyInfo = dbUserInfo.getIsModifyInfo();
-		if (isModifyInfo == 1) { // 检测是否可以修改资料
+		if (isModifyInfo == Constants.STATUS_0) { // 检测是否可以修改资料
 			throw new UserBizException(ErrorCode.ERROR_1001);
 		}
 		String newNickName = user.getNickName();
@@ -361,6 +361,7 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 			if(newNickName.equals(dbUserInfo.getNickName())) { 
 				return;
 			}
+			newNickName = StrUtil.replaceSqlspecial(newNickName);
 			UserInfoDo userinfo = userBaseService.getUserByNickname(newNickName);
 			if(userinfo !=null && userinfo.getUserId() != userId){
 				throw new UserBizException(ErrorCode.ERROR_1003);

@@ -30,7 +30,7 @@ public class UserInfoVo implements Serializable{
 	/**
 	 * 发送者等级(指用户等级)
 	 */
-	private String level; 
+	private int level; 
 	
 	/**
 	 * 发送者类型  1:主播，2:普通用户，3:房管  4:游客
@@ -140,11 +140,11 @@ public class UserInfoVo implements Serializable{
 		this.avatar = avatar;
 	}
 
-	public String getLevel() {
+	public int getLevel() {
 		return level;
 	}
 
-	public void setLevel(String level) {
+	public void setLevel(int level) {
 		this.level = level;
 	}
 

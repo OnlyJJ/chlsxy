@@ -12,4 +12,8 @@ import com.lm.live.guard.vo.GuardVo;
 public interface GuardWorkMapper extends ICommonMapper<GuardWork> {
 	
 	List<GuardVo> getAllUserGuard(String userId);
+	
+	List<Map> getGuardWorkDataByRoom(String roomId);
+	
+	List<Map> getGuardWorkData(String userId, String roomId);
 }

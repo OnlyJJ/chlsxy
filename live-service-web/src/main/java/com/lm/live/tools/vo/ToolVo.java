@@ -24,7 +24,7 @@ public class ToolVo  extends JsonParseInterface implements Serializable {
 	private static final String t_buyAble = "g";
 	private static final String t_toolId = "h";
 	
-	/** 类型,3:大喇叭(传送门),4:钥匙(用户等级宝箱),5:用户等级宝箱，6蜜桃种子，7隔空喊话*/
+	/** 类型,1:大喇叭,2-传送门,3:用户等级宝箱，*/
 	private int type; 
 	/** 名称  */
 	private String name; 

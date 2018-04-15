@@ -21,6 +21,16 @@ public interface IDecoratePackageService extends ICommonService<DecoratePackage>
 	 */
 	JSONObject getUserDecorateData(String userId) throws Exception;
 	
+	/**
+	 * 获取房间勋章列表
+	 * @param userId
+	 * @return
+	 * @throws Exception
+	 * @author shao.xiang
+	 * @data 2018年4月14日
+	 */
+	JSONObject getRoomDecorateData(String anchorId) throws Exception;
+	
 	
 	/**
 	 * 更新用户勋章佩戴与否

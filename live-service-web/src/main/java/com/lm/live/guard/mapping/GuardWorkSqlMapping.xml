@@ -78,51 +78,8 @@
 	GROUP BY roomId 
 	]]>
  	</select>
-	<!-- 2016-11-30 优化查询，去掉关联富豪表
+	
 	<select id="getGuardWorkDataByRoom"  resultType="java.util.HashMap">
-	<![CDATA[
-		SELECT 
-		  r.id AS guardId,
-		  r.workId AS workId,
-		  r.userId AS gdUserId,
-		  r.name AS name,
-		  r.image AS image,
-		  r.level AS level,
-		  r.guardType AS guardType,
-		  r.priceType AS priceType,
-		  r.endTime AS endTime
-		FROM
-		  (SELECT 
-		  	c.id,
-		  	w.id AS workId,
-		  	w.userId,
-		    c.name,
-		    c.image,
-		    c.level,
-		    c.guardType,
-		    c.priceType,
-		    w.endTime,
-		    a.num 
-		  FROM
-		    t_guard_work w 
-		    LEFT JOIN t_guard_conf c 
-		      ON w.guardId = c.id
-		    LEFT JOIN 
-		      (SELECT 
-		        userId,
-		        SUM(gold) AS num 
-		      FROM
-		        t_stat_fuhao 
-		      GROUP BY userId) a 
-		      ON w.userId = a.userId 
-		  WHERE w.roomId = #{roomId}
-		     AND  (w.isPeriod = 0 OR ( w.isPeriod = 1 AND w.endTime >= NOW()))
-		  ORDER BY c.level DESC,a.num DESC
-		 ) r 
-	]]>
-	</select> 
-	 -->
-	 <select id="getGuardWorkDataByRoom"  resultType="java.util.HashMap">
 	<![CDATA[
 		SELECT 
 		  r.id AS guardId,
@@ -160,16 +117,13 @@
 		  JOIN t_user_account userAcc ON userAcc.userId=r.userId
  		  ORDER BY useAsSortIndex asc,r.level DESC ,userAcc.userPoint DESC
 	]]>
-		<!-- 
-		 排序:金/银、用户等级
-		  -->
 	</select>
 	
 	<select id="getGuardWorkByCondition" resultMap="guardWorkVo">
 		SELECT * FROM t_guard_work WHERE userId=#{userId} AND roomId=#{roomId} AND guardId=#{guardId}
 	</select>
 	
-	<select id="qryRoomGuradList" resultType="java.util.Map">
+	<select id="qryRoomGuradList" resultType="com.lm.live.guard.vo.GuardVo">
 			SELECT e.nickName as nickname,e.icon as avatar,b.guardType,b.priceType ,b.diamond,b.validate,DATE_FORMAT(a.beginTime,'%Y-%m-%d %T') as beginTime
 			FROM t_guard_pay_his   a 
 			JOIN t_guard_conf b ON a.guardId=b.id
@@ -225,7 +179,7 @@
 	</update>
 	
 	<!-- 获取用户所有有效守护 -->
-	<select id="getAllUserGuard" resultType="java.util.HashMap">
+	<select id="getAllUserGuard" resultType="com.lm.live.guard.vo.GuardVo">
  	<![CDATA[
 	SELECT r.id AS workId,r.guardId AS guardId,r.level AS level,r.image AS image,r.guardType AS guardType,
 	r.priceType AS priceType,r.roomId AS roomId,r.toUserId AS anchorId,r.beginTime AS beginTime,r.endTime AS endTime,

@@ -61,4 +61,6 @@ public interface UserBaseMapper extends ICommonMapper<UserInfoDo> {
 	 * @date 2018年3月15日
 	 */
 	UserInfoDo getByWeiboUid(@Param("uid") String uid);
+	
+	void updateIcon(@Param("userId") String userId, @Param("icon") String icon);
 }

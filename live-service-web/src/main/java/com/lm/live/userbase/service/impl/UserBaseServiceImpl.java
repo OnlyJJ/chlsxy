@@ -91,4 +91,12 @@ public class UserBaseServiceImpl extends CommonServiceImpl<UserBaseMapper, UserI
 		return dao.getUserByNickName(nickName);
 	}
 
+	@Override
+	public void updateIcon(String userId, String icon) {
+		if(StringUtils.isEmpty(userId) || StringUtils.isEmpty(icon)) {
+			throw new UserBaseBizException(ErrorCode.ERROR_101);
+		}
+		dao.updateIcon(userId, icon);
+	}
+
 }

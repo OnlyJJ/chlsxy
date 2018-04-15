@@ -447,6 +447,7 @@ public class LoginServiceImpl implements ILoginService {
 				//昵称=微信昵称（昵称过长时，截取前18个字符）
 				nickName = StrUtil.jiequStr(nickName,18);
 			}
+			nickName = StrUtil.replaceSqlspecial(nickName);
 			dbUserInfo.setNickName(nickName);
 			dbUserInfo.setSex(convertWechatSex(wechatUserInfo.getSex())) ;
 			dbUserInfo.setSf(wechatUserInfo.getProvince()) ;
@@ -1207,6 +1208,7 @@ public class LoginServiceImpl implements ILoginService {
 				//昵称=微信昵称（昵称过长时，截取前18个字符）
 				nickName = StrUtil.jiequStr(nickName,18);
 			}
+			nickName = StrUtil.replaceSqlspecial(nickName);
 			dbUserInfo.setNickName(nickName);
 			dbUserInfo.setUserId(userId);
 			dbUserInfo.setSex(qqConnectUserInfoVo.getGender());
@@ -1363,6 +1365,7 @@ public class LoginServiceImpl implements ILoginService {
 				//昵称=微信昵称（昵称过长时，截取前18个字符）
 				nickName = StrUtil.jiequStr(nickName,18);
 			}
+			nickName = StrUtil.replaceSqlspecial(nickName);
 			dbUserInfo.setNickName(nickName);
 			// 微信返回的sex是英文字符，得转换为中文字符
 			dbUserInfo.setSex(transerWeiboSex(weiboUserInfo.getGender())) ;

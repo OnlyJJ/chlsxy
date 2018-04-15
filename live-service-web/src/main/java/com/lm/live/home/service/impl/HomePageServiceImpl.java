@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.common.constant.MCTimeoutConstants;
@@ -75,15 +76,15 @@ public class HomePageServiceImpl implements IHomePageService {
 		int pageLimit = page.getPagelimit();
 		// 1、从一级缓存中取
 		String oneKey = MCPrefix.HOMEPAGE_RANK_ONE_CACHE + pageNum;
-		Object oneChe = MemcachedUtil.get(oneKey);
-		if(oneChe != null) {
-			ret = (JSONObject) oneChe;
+		String oneChe = RedisUtil.get(oneKey);
+		if(!StringUtils.isEmpty(oneChe)) {
+			ret = JSON.parseObject(oneChe);
 		} else {
 			// 一级缓存失效，从二级缓存取
 			String twoKey = MCPrefix.HOMEPAGE_RANK_TWO_CACHE + pageNum;
-			Object twoChe = MemcachedUtil.get(twoKey);
-			if(twoChe != null) {
-				ret = (JSONObject) twoChe;
+			String twoChe = RedisUtil.get(twoKey);
+			if(!StringUtils.isEmpty(twoChe)) {
+				ret = JSON.parseObject(twoChe);
 			}
 			// 从二级缓存取完后，需要重新更新缓存
 			boolean isReget = false;
@@ -91,49 +92,54 @@ public class HomePageServiceImpl implements IHomePageService {
 				isReget = true;
 			}
 			if(isReget) {
-				String startTime = null;
-				String endTime = null;
-				String roomId = rank.getRoomId();
-				String kind = rank.getKind();
-				int type = rank.getType();
-				Date now = new Date();
-				if(Constants.D.equals(kind)){
-					startTime = DateUntil.getFormatDate(Constants.DATEFORMAT_YMD_1, now);
-					endTime = DateUntil.getFormatDate(Constants.DATEFORMAT_YMD_1, now);
-				}else if(Constants.W.equals(kind)){
-					startTime = DateUntil.getWeek();
-					endTime = DateUntil.getFormatDate(Constants.DATEFORMAT_YMD_1, now);
-				}else if(Constants.M.equals(kind)){
-					startTime = DateUntil.getMonthDatetime();
-					endTime = DateUntil.getFormatDate(Constants.DATEFORMAT_YMD_1, now);
-				}else if(Constants.T.equals(kind)){
-					startTime = "";
-					endTime = "";
-				} else if(Constants.LW.equals(kind)) { // 上周
-					startTime = DateUntil.getLastWeek();
-					endTime = DateUntil.getWeek();
-				} else if(Constants.TW.equals(kind)) { // 本周
-					startTime = DateUntil.getWeek();
-					endTime = DateUntil.getFormatDate(Constants.DATEFORMAT_YMD_1, now);
-				}
-				if(StringUtils.isEmpty(startTime) || StringUtils.isEmpty(endTime)) {
-					throw new HomeBizException(ErrorCode.ERROR_101);
-				}
-				
-				switch(type) {
-				case 1: // 主播水晶榜単
-					ret = getCrystalRank(startTime, endTime, roomId);
-					break;
-				case 2: // 用户财富榜
-					ret = getRichesRank(startTime, endTime, roomId);
-					break;
-				default :
-					LogUtil.log.error("### getRank-no match type!");
-					return ret;
+				try {
+					String startTime = null;
+					String endTime = null;
+					String roomId = rank.getRoomId();
+					String kind = rank.getKind();
+					int type = rank.getType();
+					Date now = new Date();
+					if(Constants.D.equals(kind)){
+						startTime = DateUntil.getFormatDate(Constants.DATEFORMAT_YMD_1, now);
+						endTime = DateUntil.getFormatDate(Constants.DATEFORMAT_YMD_1, now);
+					}else if(Constants.W.equals(kind)){
+						startTime = DateUntil.getWeek();
+						endTime = DateUntil.getFormatDate(Constants.DATEFORMAT_YMD_1, now);
+					}else if(Constants.M.equals(kind)){
+						startTime = DateUntil.getMonthDatetime();
+						endTime = DateUntil.getFormatDate(Constants.DATEFORMAT_YMD_1, now);
+					}else if(Constants.T.equals(kind)){
+						startTime = "";
+						endTime = "";
+					} else if(Constants.LW.equals(kind)) { // 上周
+						startTime = DateUntil.getLastWeek();
+						endTime = DateUntil.getWeek();
+					} else if(Constants.TW.equals(kind)) { // 本周
+						startTime = DateUntil.getWeek();
+						endTime = DateUntil.getFormatDate(Constants.DATEFORMAT_YMD_1, now);
+					}
+					if(StringUtils.isEmpty(startTime) || StringUtils.isEmpty(endTime)) {
+						throw new HomeBizException(ErrorCode.ERROR_101);
+					}
+					
+					switch(type) {
+					case 1: // 主播水晶榜単
+						ret = getCrystalRank(pageNum, pageLimit,startTime, endTime, roomId);
+						break;
+					case 2: // 用户财富榜
+						ret = getRichesRank(startTime, endTime, roomId);
+						break;
+					default :
+						LogUtil.log.error("### getRank-no match type!");
+						return ret;
+					}
+				} catch(Exception e) {
+					LogUtil.log.error(e.getMessage(), e);
+				} finally {
+					isReGetRankData = false;
 				}
 			}
 		}
-		
 		return ret;
 	}
 
@@ -269,7 +275,7 @@ public class HomePageServiceImpl implements IHomePageService {
 		return ret;
 	}
 
-	private JSONObject getCrystalRank(String startTime,String endTime,String roomId) {
+	private JSONObject getCrystalRank(int pageNum, int pageLimit,String startTime,String endTime,String roomId) {
 		JSONObject ret = new JSONObject();
 		
 		return ret;

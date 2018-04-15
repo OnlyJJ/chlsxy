@@ -3,6 +3,7 @@ package com.lm.live.user.service.impl;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.stereotype.Service;
 
 import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.user.constant.Constants;
@@ -12,6 +13,7 @@ import com.lm.live.user.service.IUserCacheInfoService;
 import com.lm.live.user.vo.UserInfo;
 import com.lm.live.user.vo.UserInfoVo;
 
+@Service("userCacheInfoService")
 public class UserCacheInfoServiceImpl implements IUserCacheInfoService {
 
 	@Resource

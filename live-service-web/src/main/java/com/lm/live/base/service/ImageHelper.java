@@ -17,7 +17,7 @@ public interface ImageHelper {
 	 * @param ratioIndex 图片序号
 	 * @param tempFile 临时文件地址
 	 */
-	public JSONObject creatFile(String userId, long diaryInfoId, int ratioIndex, String tempFile);
+//	public JSONObject creatFile(String userId, long diaryInfoId, int ratioIndex, String tempFile);
 	
 	/**
 	 * 举报图片处理
@@ -28,7 +28,7 @@ public interface ImageHelper {
 	 * @return 返回参数说明：<br>
 	 * 		JSONObject，{"img":"xxx"}，img为处理后的图片地址
 	 */
-	public JSONObject accusationImgDispose(String userId, long aiId, int ratioIndex, String tempImg);
+	public void accusationImgDispose(String userId, long aiId, int ratioIndex, String tempImg);
 	
 	/**
 	 * 删除重复举报时上传到临时目录的图片

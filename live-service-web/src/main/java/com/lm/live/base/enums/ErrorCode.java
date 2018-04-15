@@ -4,14 +4,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 账户模块使用
+ * 基础服务模块使用
  * @author shao.xiang
  * @date 2017年6月25日
  *
  */
 public enum ErrorCode {
 	// 10000 基础服务模块使用
-	ERROR_10002(10002,"上传文件格式有问题，请上传png或jpg格式"),
+	/** 禁止修改图片 */
+	ERROR_10004(10004,"图片过大"),
+	ERROR_10003(10003,"您暂时无法修改图片，请联系客服"),
+	ERROR_10002(10002,"上传文件格式不支持，请上传png或jpg格式"),
 	ERROR_10001(10001,"参数错误，请重试！"),
 	ERROR_10000(10000,"上传失败，请重试！"),
 	
