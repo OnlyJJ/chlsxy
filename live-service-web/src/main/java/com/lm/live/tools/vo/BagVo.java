@@ -8,11 +8,14 @@ import com.lm.live.common.constant.BaseConstants;
 import com.lm.live.common.utils.JsonParseInterface;
 import com.lm.live.common.utils.LogUtil;
 
-public class ToolVo  extends JsonParseInterface implements Serializable {
+/**
+ * 用户背包
+ * @author shao.xiang
+ * @Company lm
+ * @data 2018年4月19日
+ */
+public class BagVo  extends JsonParseInterface implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -3977344269230063939L;
 	//字段key
 	private static final String t_type = "a";

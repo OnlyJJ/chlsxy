@@ -862,7 +862,7 @@ public class RoomServiceImpl implements IRoomService {
 			throw new RoomBizException(ErrorCode.ERROR_8001);
 		}
 		// 是否正常使用
-		if(gift.getIsUse() == Constants.STATUS_0) {
+		if(gift.getUseFlag() == Constants.STATUS_0) {
 			throw new RoomBizException(ErrorCode.ERROR_8001);
 		}
 		// 是否可购买

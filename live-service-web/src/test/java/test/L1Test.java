@@ -19,7 +19,7 @@ import com.lm.live.login.dao.UuidBlackListMapper;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({  "classpath*:spring/spring-context.xml"})
+@ContextConfiguration({"classpath*:spring/spring-context.xml"})
 public class L1Test {
 	@Resource
 	private UuidBlackListMapper uuidBlackListMapper;

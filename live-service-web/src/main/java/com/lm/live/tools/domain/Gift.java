@@ -25,7 +25,7 @@ public class Gift extends BaseVo {
 	private int price;
 	/** 主播分成比例:0.55 */
 	private Double rate;
-	/** 蓝钻价值=price*rate，对应主播收入，单位：钻石 */
+	/** 蓝钻价值=price*rate，对应主播收入，单位：水晶*/
 	private int crystal;
 	/** 对应RMB价值，单位：分 */
 	private Double priceRMB;
@@ -34,220 +34,145 @@ public class Gift extends BaseVo {
 	/** 用户获得经验(点) */
 	private int userPoint;
 	/** 是否启用该礼物/商品，0-停用，1-启用 */
-	private int isUse;
-	/** 启用之后开始生效时间，为空表示即时生效 */
-	private Date startTime;
-	/** 停用时间，为空表示长期有效 */
-	private Date endTime;
+	private int useFlag;
 	/** 添加时间 */
 	private Date addTime;
-	/**flash显示效果ID*/
-	private int showType;
-	/**flash显示效果名称*/
-	private String showName;
-	
-	/** 桃子成长魅力值  */
-	private int meili;
-	
-	/** 桃子成长人气值  */
-	private int renqi;
-	
-	/** 桃子成长女神值 */
-	private int nvshen;
-
 	/** 是否可以购买 ,0-可以，1-不可以*/
 	private int buyable;
-	
 	/** 礼物分类，默认0-经典，1-活动，5-守护,6-幸运礼物,7-用户礼物,8-奢华 */
 	private int giftType;
-	/**守护礼物对应的守护等级，默认1,1级守护可赠送1级的礼物，2级守护可以赠送2以下的，以此类推 */
-	private int guardLevel;
-	/**特殊标记，默认0(无),1:指定为送出后滚屏礼物 */
-	private int specialFlag;
-	
-	public void setId(int id){
-		this.id = id;
-	}
+	/** 排序权重 */
+	private int sortWeight;
+	/** 角标类型，预留扩展 */
+	private int markType;
+	/** 角标图片，app使用 */
+	private String markImg;
+	/** 角标图片，web使用 */
+	private String markImgWeb;
+	/** 是否显示角标， 0-不显示，1-显示*/
+	private int showMark;
+	/** 是否显示礼物，0-不显示，1-显示 */
+	private int showGift;
 	
 	public int getId() {
-		return this.id;
+		return id;
 	}
-	
-	public void setName(String name){
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
 		this.name = name;
 	}
-	
-	public String getName() {
-		return this.name;
+	public String getInfo() {
+		return info;
 	}
-	
-	public void setInfo(String info){
+	public void setInfo(String info) {
 		this.info = info;
 	}
-	
-	public String getInfo() {
-		return this.info;
+	public String getImage() {
+		return image;
 	}
-	
-	public void setImage(String image){
+	public void setImage(String image) {
 		this.image = image;
 	}
-	
-	public String getImage() {
-		return this.image;
+	public int getPrice() {
+		return price;
 	}
-	
-	public void setPrice(int price){
+	public void setPrice(int price) {
 		this.price = price;
 	}
-	
-	public int getPrice() {
-		return this.price;
+	public Double getRate() {
+		return rate;
 	}
-	
-	public void setRate(Double rate){
+	public void setRate(Double rate) {
 		this.rate = rate;
 	}
-	
-	public Double getRate() {
-		return this.rate;
-	}
-	
-	
-	public void setPriceRMB(Double priceRMB){
-		this.priceRMB = priceRMB;
-	}
-	
-	public Double getPriceRMB() {
-		return this.priceRMB;
-	}
-	
-	public void setAnchorPoint(int anchorPoint){
-		this.anchorPoint = anchorPoint;
-	}
-	
-	public int getAnchorPoint() {
-		return this.anchorPoint;
-	}
-	
-	public void setUserPoint(int userPoint){
-		this.userPoint = userPoint;
-	}
-	
-	public int getUserPoint() {
-		return this.userPoint;
-	}
-	
-	public void setIsUse(int isUse){
-		this.isUse = isUse;
-	}
-	
-	public int getIsUse() {
-		return this.isUse;
-	}
-	
-	public void setStartTime(Date startTime){
-		this.startTime = startTime;
-	}
-	
-	public Date getStartTime() {
-		return this.startTime;
-	}
-	
-	public void setEndTime(Date endTime){
-		this.endTime = endTime;
-	}
-	
-	public Date getEndTime() {
-		return this.endTime;
-	}
-	
-	public void setAddTime(Date addTime){
-		this.addTime = addTime;
-	}
-	
-	public Date getAddTime() {
-		return this.addTime;
-	}
-	
-	public int getShowType() {
-		return showType;
-	}
-
-	public void setShowType(int showType) {
-		this.showType = showType;
-	}
-
-	public String getShowName() {
-		return showName;
-	}
-
-	public void setShowName(String showName) {
-		this.showName = showName;
-	}
-
-	public int getRenqi() {
-		return renqi;
-	}
-
-	public void setRenqi(int renqi) {
-		this.renqi = renqi;
-	}
-
-	public int getNvshen() {
-		return nvshen;
-	}
-
-	public void setNvshen(int nvshen) {
-		this.nvshen = nvshen;
-	}
-
-	public int getBuyable() {
-		return buyable;
-	}
-
-	public void setBuyable(int buyable) {
-		this.buyable = buyable;
-	}
-
-	public int getGiftType() {
-		return giftType;
-	}
-
-	public void setGiftType(int giftType) {
-		this.giftType = giftType;
-	}
-
-	public int getGuardLevel() {
-		return guardLevel;
-	}
-
-	public void setGuardLevel(int guardLevel) {
-		this.guardLevel = guardLevel;
-	}
-
-	public int getMeili() {
-		return meili;
-	}
-
-	public void setMeili(int meili) {
-		this.meili = meili;
-	}
-
-	public int getSpecialFlag() {
-		return specialFlag;
-	}
-
-	public void setSpecialFlag(int specialFlag) {
-		this.specialFlag = specialFlag;
-	}
-
 	public int getCrystal() {
 		return crystal;
 	}
-
 	public void setCrystal(int crystal) {
 		this.crystal = crystal;
+	}
+	public Double getPriceRMB() {
+		return priceRMB;
+	}
+	public void setPriceRMB(Double priceRMB) {
+		this.priceRMB = priceRMB;
+	}
+	public int getAnchorPoint() {
+		return anchorPoint;
+	}
+	public void setAnchorPoint(int anchorPoint) {
+		this.anchorPoint = anchorPoint;
+	}
+	public int getUserPoint() {
+		return userPoint;
+	}
+	public void setUserPoint(int userPoint) {
+		this.userPoint = userPoint;
+	}
+	public int getUseFlag() {
+		return useFlag;
+	}
+	public void setUseFlag(int useFlag) {
+		this.useFlag = useFlag;
+	}
+	public Date getAddTime() {
+		return addTime;
+	}
+	public void setAddTime(Date addTime) {
+		this.addTime = addTime;
+	}
+	public int getBuyable() {
+		return buyable;
+	}
+	public void setBuyable(int buyable) {
+		this.buyable = buyable;
+	}
+	public int getGiftType() {
+		return giftType;
+	}
+	public void setGiftType(int giftType) {
+		this.giftType = giftType;
+	}
+	public int getSortWeight() {
+		return sortWeight;
+	}
+	public void setSortWeight(int sortWeight) {
+		this.sortWeight = sortWeight;
+	}
+	public int getMarkType() {
+		return markType;
+	}
+	public void setMarkType(int markType) {
+		this.markType = markType;
+	}
+	public String getMarkImg() {
+		return markImg;
+	}
+	public void setMarkImg(String markImg) {
+		this.markImg = markImg;
+	}
+	public String getMarkImgWeb() {
+		return markImgWeb;
+	}
+	public void setMarkImgWeb(String markImgWeb) {
+		this.markImgWeb = markImgWeb;
+	}
+	public int getShowMark() {
+		return showMark;
+	}
+	public void setShowMark(int showMark) {
+		this.showMark = showMark;
+	}
+	public int getShowGift() {
+		return showGift;
+	}
+	public void setShowGift(int showGift) {
+		this.showGift = showGift;
 	}
 	
 }

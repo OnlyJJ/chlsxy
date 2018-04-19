@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.lm.live.tools.dao.GiftMapper">
+	<resultMap type="com.lm.live.tools.domain.Gift" id="vo">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="info" column="info" />
+		<result property="image" column="image" />
+		<result property="price" column="price" />
+		<result property="rate" column="rate" />
+		<result property="crystal" column="crystal" />
+		<result property="priceRMB" column="priceRMB" />
+		<result property="anchorPoint" column="anchorPoint" />
+		<result property="userPoint" column="userPoint" />
+		<result property="useFlag" column="useFlag" />
+		<result property="addTime" column="addTime" />
+		<result property="buyable" column="buyable" />
+		<result property="giftType" column="giftType" />
+		<result property="sortWeight" column="sortWeight" />
+		<result property="markType" column="markType" />
+		<result property="markImg" column="markImg" />
+		<result property="markImgWeb" column="markImgWeb" />
+		<result property="showMark" column="showMark" />
+		<result property="showGift" column="showGift" />
+	</resultMap>
+
+	<select id="getObjectById" parameterType="java.lang.Integer"
+		resultMap="vo">
+		select * from t_gift where id=#{id}
+	</select>
+	
+	<select id="getGift"  resultMap="vo">
+		select * from t_gift where id=#{giftId}
+	</select>
+
+	<!-- 获取所有有效的礼物 -->
+	<select id="listGift" resultMap="vo">
+		SELECT * FROM t_gift
+		WHERE useFlag = 1
+		ORDER BY sortWeight DESC , price ASC
+	</select>
+
+</mapper>

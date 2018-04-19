@@ -11,9 +11,9 @@ import com.lm.live.common.vo.BaseVo;
 public class Tool extends BaseVo {
 	private static final long serialVersionUID = 1L;
 	/** id */
-	private Integer id;
-	/** 类型,3:传送门,4:钥匙(用户等级宝箱),5:用户等级宝箱，6蜜桃种子，7隔空喊话*/
-	private Integer type;
+	private int id;
+	
+	private int type;
 	/** 名称 */
 	private String name;
 	/** 说明 */
@@ -21,9 +21,9 @@ public class Tool extends BaseVo {
 	/** 图片 */
 	private String image;
 	/** 花费金币 */
-	private Integer gold;
+	private int price;
 	/** 用户获得经验 */
-	private Integer userPoint;
+	private int userPoint;
 	/** 添加时间 */
 	private String addTime;
 	
@@ -31,19 +31,19 @@ public class Tool extends BaseVo {
 	
 	private int buyAble;
 
-	public void setId(Integer id){
+	public void setId(int id){
 		this.id = id;
 	}
 	
-	public Integer getId() {
+	public int getId() {
 		return this.id;
 	}
 	
-	public void setType(Integer type){
+	public void setType(int type){
 		this.type = type;
 	}
 	
-	public Integer getType() {
+	public int getType() {
 		return this.type;
 	}
 	
@@ -71,19 +71,19 @@ public class Tool extends BaseVo {
 		return this.image;
 	}
 	
-	public void setGold(Integer gold){
-		this.gold = gold;
+	public void setPrice(int price){
+		this.price = price;
 	}
 	
-	public Integer getGold() {
-		return this.gold;
+	public int getPrice() {
+		return this.price;
 	}
 	
-	public void setUserPoint(Integer userPoint){
+	public void setUserPoint(int userPoint){
 		this.userPoint = userPoint;
 	}
 	
-	public Integer getUserPoint() {
+	public int getUserPoint() {
 		return this.userPoint;
 	}
 	

@@ -11,19 +11,5 @@ import com.lm.live.tools.vo.ToolVo;
  * @date 2017-06-29
  */
 public interface ItoolService extends ICommonService<Tool> {
-	/**
-	 * 查找用户的工具箱
-	 * @param userId
-	 * @return
-	 */
-	public List<ToolVo> findUserToolList(String userId) throws Exception;
-	
-	/**
-	 * 查找用户的工具箱
-	 * @param userId
-	 * @param type 
-	 * @return
-	 */
-	public List<ToolVo> findUserToolList(String userId, int type) throws Exception;
 	
 }

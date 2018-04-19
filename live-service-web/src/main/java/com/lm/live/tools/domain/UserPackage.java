@@ -23,13 +23,13 @@ public class UserPackage extends BaseVo {
 	/** 数量 */
 	private int number;
 	/** 是否具备有效期：0-长期有效，1-有效期内有效 */
-	private int isPeriod;
+	private int validity;
 	/** 有效期结束时间 */
 	private Date endTime;
 	/** 添加进背包中的时间 */
 	private Date addTime;
 	/** 是否有效：0-无效，1-有效 */
-	private int isValid;
+	private int status;
 	public int getId() {
 		return id;
 	}
@@ -60,11 +60,11 @@ public class UserPackage extends BaseVo {
 	public void setNumber(int number) {
 		this.number = number;
 	}
-	public int getIsPeriod() {
-		return isPeriod;
+	public int getValidity() {
+		return validity;
 	}
-	public void setIsPeriod(int isPeriod) {
-		this.isPeriod = isPeriod;
+	public void setValidity(int validity) {
+		this.validity = validity;
 	}
 	public Date getEndTime() {
 		return endTime;
@@ -78,13 +78,14 @@ public class UserPackage extends BaseVo {
 	public void setAddTime(Date addTime) {
 		this.addTime = addTime;
 	}
-	public int getIsValid() {
-		return isValid;
+	public int getStatus() {
+		return status;
 	}
-	public void setIsValid(int isValid) {
-		this.isValid = isValid;
+	public void setStatus(int status) {
+		this.status = status;
 	}
 
+	
 	
 
 }

@@ -1,10 +1,11 @@
 package com.lm.live.tools.service;
 
 import java.util.List;
-import java.util.Map;
 
+import com.alibaba.fastjson.JSONObject;
 import com.lm.live.common.service.ICommonService;
 import com.lm.live.tools.domain.Gift;
+import com.lm.live.tools.vo.GiftVo;
 
 
 /**
@@ -23,10 +24,9 @@ public interface IGiftService extends ICommonService<Gift> {
 	public Gift getGiftInfoFromCache(int giftId);
 	
 	/**
-	 * 查询房间内显示的礼物
-	 * @param roomId
+	 * 获取礼物列表
 	 * @return
 	 */
-	public List<Map<String, Object>> qryRoomGiftData(String roomId);
+	public JSONObject qryGiftData();
 
 }

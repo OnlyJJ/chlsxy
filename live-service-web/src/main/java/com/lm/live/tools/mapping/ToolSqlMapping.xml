@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.lm.live.tools.dao.ToolMapper">
+	<resultMap type="com.lm.live.tools.domain.Tool" id="vo">
+		<result property="id" column="id" />
+		<result property="type" column="type" />
+		<result property="name" column="name" />
+		<result property="info" column="info" />
+		<result property="image" column="image" />
+		<result property="price" column="price" />
+		<result property="userPoint" column="userPoint" />
+		<result property="addTime" column="addTime" />
+		<result property="number" column="number" />
+		<result property="buyAble" column="buyAble" />
+	</resultMap>
+
+	<select id="getObjectById" parameterType="java.lang.Integer"
+		resultMap="vo">
+		select * from t_tool where id=#{id}
+	</select>
+
+	<select id="findUserToolList" resultMap="vo">
+		select a.*,b.number
+		from t_tool a
+		left join t_tool_user_package b on b.toolId = a.id
+		<where>
+			<if test="type != null">
+				AND a.type = #{type}
+			</if>
+			<if test="userId != null and userId != ''">
+				AND b.userId = #{userId}
+			</if>
+		</where>
+	</select>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+	  <![CDATA[
+	  INSERT INTO t_tool(
+			id,
+			type,
+			name,
+			info,
+			image,
+			price,
+			userPoint,
+			addTime
+			) VALUES (
+			#{id,jdbcType=VARCHAR},
+			#{type,jdbcType=TINYINT},
+			#{name,jdbcType=VARCHAR},
+			#{info,jdbcType=VARCHAR},
+			#{image,jdbcType=VARCHAR},
+			#{price,jdbcType=TINYINT},
+			#{userPoint,jdbcType=TINYINT},
+			#{addTime,jdbcType=TIMESTAMP}
+		)	
+		]]>
+	</insert>
+
+</mapper>

@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSONObject;
 import com.lm.live.common.service.ICommonService;
 import com.lm.live.tools.domain.UserPackage;
 
@@ -35,5 +36,5 @@ public interface IUserPackageService extends ICommonService<UserPackage> {
 	 * @author shao.xiang
 	 * @data 2018年4月1日
 	 */
-	List<UserPackage> listUserAllBag(String userId) throws Exception;
+	JSONObject listUserBagData(String userId) throws Exception;
 }

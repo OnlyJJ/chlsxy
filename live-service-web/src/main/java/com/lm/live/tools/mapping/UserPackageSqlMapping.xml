@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.lm.live.tools.dao.UserPackageMapper">
+	<resultMap type="com.lm.live.tools.domain.UserPackage" id="vo">
+		<result property="id" column="id" />
+		<result property="userId" column="userId" />
+		<result property="giftId" column="giftId" />
+		<result property="number" column="number" />
+		<result property="validity" column="validity" />
+		<result property="endTime" column="endTime" />
+		<result property="addTime" column="addTime" />
+		<result property="status" column="status" />
+		<result property="type" column="type" />
+	</resultMap>
+
+	<select id="getObjectById" parameterType="java.lang.Integer"
+		resultMap="vo">
+		select * from t_user_package where id=#{id}
+	</select>
+
+	<select id="getByUserId" parameterType="java.lang.Integer"
+		resultMap="vo">
+		select * from t_user_package where userId=#{userId} and
+		giftId=#{giftId} and validity = #{validity}
+	</select>
+	
+	<select id="listUserPackage" resultMap="vo">
+		select * from t_user_package where userId=#{userId}
+	</select>
+	
+
+	<delete id="removeById" parameterType="java.lang.Integer">
+		delete from t_user_package
+		where id = #{id}
+	</delete>
+
+	<delete id="removeByIds">
+		delete from t_user_package where id in
+		<foreach item="item" index="index" collection="list" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+	  <![CDATA[
+	  INSERT INTO t_user_package(
+			userId,
+			toolId,
+			number,
+			type,
+			validity,
+			endTime,
+			addTime,
+			status
+			) VALUES (
+			#{userId,jdbcType=VARCHAR},
+			#{toolId,jdbcType=VARCHAR},
+			#{number,jdbcType=VARCHAR},
+			#{type,jdbcType=VARCHAR},
+			#{validity,jdbcType=TINYINT},
+			#{endTime,jdbcType=VARCHAR},
+			#{addTime,jdbcType=VARCHAR},
+			#{status,jdbcType=TINYINT}
+		)	
+		]]>
+	</insert>
+
+
+
+</mapper>

@@ -103,6 +103,15 @@ public class CacheKey {
 	/** 游客昵称缓存 */
 	public static final String USER_PESUDONAME_CACHE = "pesudo:name:";
 	
+	
+	// 道具模块
+	/** 礼物缓存 */
+	public static final String TOOL_GIFT_CACHE = "tool:gift:";
+	/** 礼物列表缓存，返回给客户端展示的礼物栏列表 */
+	public static final String TOOL_GIFT_ALL_CACHE = "tool:all:gift";
+	/** 用户背包缓存 */
+	public static final String TOOL_USER_BAG_CACHE = "tool:user:bag:";
+	
 	// others模块
 	public static final String XINGE_PUSH_CACHE = "xinge_token_";
 	

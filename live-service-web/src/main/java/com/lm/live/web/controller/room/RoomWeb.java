@@ -28,6 +28,9 @@ import com.lm.live.decorate.service.IDecoratePackageService;
 import com.lm.live.guard.service.IGuardService;
 import com.lm.live.guard.vo.GuardVo;
 import com.lm.live.room.service.IRoomService;
+import com.lm.live.tools.service.IGiftService;
+import com.lm.live.tools.service.IUserPackageService;
+import com.lm.live.tools.service.impl.GiftServiceImpl;
 import com.lm.live.user.enums.ErrorCode;
 import com.lm.live.user.exception.UserBizException;
 import com.lm.live.web.vo.DataRequest;
@@ -46,6 +49,12 @@ public class RoomWeb  extends BaseController{
 	
 	@Resource
 	private IUserAccusationInfoService userAccusationInfoService;
+	
+	@Resource
+	private IGiftService giftService;
+	
+	@Resource
+	private IUserPackageService userPackageService;
 	
 	/**
 	 * R1
@@ -193,6 +202,7 @@ public class RoomWeb  extends BaseController{
 					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())) {
 				throw new UserBizException(ErrorCode.ERROR_101);
 			}
+			jsonRes = giftService.qryGiftData();
 		} catch(UserBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
@@ -232,6 +242,8 @@ public class RoomWeb  extends BaseController{
 			}
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
+			String userId = req.getUserId();
+			jsonRes = userPackageService.listUserBagData(userId);
 		} catch(UserBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
