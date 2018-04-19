@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+   
+<mapper namespace="com.lm.live.userbase.dao.UserRoomMemberMapper">
+	<resultMap type="com.lm.live.userbase.domain.UserRoomMember" id="vo">
+	    <result property="id" column="id" />
+	    <result property="userId" column="userId" />
+	    <result property="roomId" column="roomId" />
+	    <result property="roleType" column="roleType" />
+	     <result property="addTime" column="addTime" />
+	</resultMap>
+	
+	 <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+	  <![CDATA[
+	  INSERT INTO t_user_room_member(
+			id,
+			userId,
+			roomId,
+			roleType,
+			addTime
+			) VALUES (
+			#{id,jdbcType=VARCHAR},
+			#{userId,jdbcType=VARCHAR},
+			#{roomId,jdbcType=VARCHAR},
+			#{roleType,jdbcType=VARCHAR},
+			#{addTime,jdbcType=VARCHAR}
+		)	
+		]]>
+	  </insert>
+	
+	<select id="findRoomAdmin" resultMap="vo">
+		select * from t_user_room_member where roomId=#{roomId} and roleType = 1
+	</select>
+	
+	<select id="getUserRoomMember"  resultMap="vo">
+		select * from t_user_room_member where userId=#{userId} and roomId=#{roomId}
+	</select>
+	
+	<delete id="removeById" parameterType="java.lang.Integer">
+		delete from t_user_room_member where id = #{id}
+	</delete>
+	
+</mapper>

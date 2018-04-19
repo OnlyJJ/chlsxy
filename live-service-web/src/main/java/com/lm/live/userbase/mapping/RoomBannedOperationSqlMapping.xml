@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+   
+<mapper namespace="com.lm.live.userbase.dao.RoomBannedOperationMapper">
+	<resultMap type="com.lm.live.userbase.domain.RoomBannedOperation" id="vo">
+	 	<result property="id" column="id" />
+	 	<result property="fromUserId" column="fromUserId" />
+	    <result property="userId" column="userId" />
+	    <result property="roomId" column="roomId" />
+	    <result property="type" column="type" />
+	    <result property="beginTime" column="beginTime" />
+	    <result property="endTime" column="endTime" />
+	   	<result property="status" column="status" />
+	    
+	</resultMap>
+	
+	<select id="getToUserBehaviorInfo" resultMap="vo">
+		SELECT * 
+		FROM t_room_banned_operation 
+		WHERE userId = #{userId} AND roomId = #{roomId} AND type = #{type}
+		LIMIT 1
+	</select>
+	
+	<select id="getUserBehaviorInfo" resultMap="vo">
+		SELECT *
+		FROM t_room_banned_operation 
+		where fromUserId = #{fromUserId} AND userId=#{userId} AND type = #{type}
+		LIMIT 1
+	</select>
+	
+	<insert id="insert">
+		insert into t_room_banned_operation(roomId,fromUserId,userId,type,beginTime,endTime,status)
+		values(#{roomId},#{fromUserId},#{userId},#{type},#{beginTime},#{endTime},#{status})
+	</insert>
+	
+	
+	
+</mapper>
