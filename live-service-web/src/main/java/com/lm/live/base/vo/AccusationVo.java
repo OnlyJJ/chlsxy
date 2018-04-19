@@ -23,7 +23,7 @@ public class AccusationVo extends JsonParseInterface implements Serializable {
 	/** 直播间举报类型
 	 *  举报类型：1政治敏感，2辱骂骚扰，3色情欺诈，4虚假广告，5虚假中奖信息，6其他
 	 * */
-	private String accusationType;
+	private int accusationType;
 	
 	/** 举报详细描述*/
 	private String accusationDesc;
@@ -35,7 +35,7 @@ public class AccusationVo extends JsonParseInterface implements Serializable {
 	public JSONObject buildJson() {
 		JSONObject json = new JSONObject();
 		try {
-			setString(json, u_accusationType, accusationType);
+			setInt(json, u_accusationType, accusationType);
 			setString(json, u_accusationDesc, accusationDesc);
 			setJSONArray(json, u_imageList, imageList);
 		} catch (Exception e) {
@@ -50,7 +50,7 @@ public class AccusationVo extends JsonParseInterface implements Serializable {
 			return ;
 		}
 		try {
-			accusationType = getString(json, u_accusationType);
+			accusationType = getInt(json, u_accusationType);
 			accusationDesc = getString(json, u_accusationDesc);
 			imageList = getJSONArray(json, u_imageList);
 		} catch (Exception e) {
@@ -58,11 +58,11 @@ public class AccusationVo extends JsonParseInterface implements Serializable {
 		}
 	}
 
-	public String getAccusationType() {
+	public int getAccusationType() {
 		return accusationType;
 	}
 
-	public void setAccusationType(String accusationType) {
+	public void setAccusationType(int accusationType) {
 		this.accusationType = accusationType;
 	}
 

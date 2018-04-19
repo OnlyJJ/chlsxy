@@ -56,19 +56,19 @@ public class UserAccusationInfoServiceImpl extends CommonServiceImpl<UserAccusat
 		if(info == null) {
 			return;
 		}
-		String nickName = info.getNickName();
-		String accusationType = vo.getAccusationType();
-		Date accusationTime = new Date();
-		UserAccusationInfo uai = new UserAccusationInfo();
-		uai.setUserId(userId);
-		uai.setToUserId(toUserId);
-		uai.setNickName(nickName);
-		uai.setAccusationType(accusationType);
-		uai.setAccusationDesc(accusationDesc);
-		uai.setAccusationTime(accusationTime);
-		uai.setProceStatus(0);
 		UserAccusationInfo uaidb = dao.qryByCondition(userId, toUserId);
 		if(null == uaidb){
+			String nickName = info.getNickName();
+			int accusationType = vo.getAccusationType();
+			Date accusationTime = new Date();
+			UserAccusationInfo uai = new UserAccusationInfo();
+			uai.setUserId(userId);
+			uai.setToUserId(toUserId);
+			uai.setNickName(nickName);
+			uai.setAccusationType(accusationType);
+			uai.setAccusationDesc(accusationDesc);
+			uai.setAccusationTime(accusationTime);
+			uai.setProceStatus(0);
 			dao.insertAccusationInfo(uai);
 			// 对举报图片进行入库处理
 			long aiId = uai.getId();

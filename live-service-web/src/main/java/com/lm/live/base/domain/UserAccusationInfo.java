@@ -21,7 +21,7 @@ public class UserAccusationInfo extends BaseVo {
 	private String nickName;
 	
 	/** 举报选项：1政治敏感，2辱骂骚扰，3色情欺诈，4虚假广告，5虚假中奖信息，6其他 */
-	private String accusationType;
+	private int accusationType;
 	
 	/** 举报详细描述  */
 	private String accusationDesc;
@@ -67,11 +67,11 @@ public class UserAccusationInfo extends BaseVo {
 		this.nickName = nickName;
 	}
 
-	public String getAccusationType() {
+	public int getAccusationType() {
 		return accusationType;
 	}
 
-	public void setAccusationType(String accusationType) {
+	public void setAccusationType(int accusationType) {
 		this.accusationType = accusationType;
 	}
 

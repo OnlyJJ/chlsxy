@@ -12,7 +12,6 @@
 		<result property="shareTime" column="shareTime"/>
 		<result property="ip" column="ip"/>
 		<result property="content" column="content"/>
-		<result property="sharePosition" column="sharePosition"/>
 	</resultMap>
 
 	<select id="getObjectById"  resultMap="vo">
@@ -27,16 +26,14 @@
 			shareType,
 			shareTime,
 			ip,
-			content,
-			sharePosition
+			content
 			) VALUES (
 			#{userId,jdbcType=VARCHAR},
 			#{roomId,jdbcType=VARCHAR},
 			#{shareType,jdbcType=VARCHAR},
 			#{shareTime,jdbcType=VARCHAR},
 			#{ip,jdbcType=VARCHAR},
-			#{content,jdbcType=VARCHAR},
-			#{sharePosition,jdbcType=TINYINT}
+			#{content,jdbcType=VARCHAR}
 		)	
 		]]>
 	  </insert>
