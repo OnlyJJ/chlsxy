@@ -25,17 +25,14 @@ public class OnlineUserInfo extends JsonParseInterface implements Serializable {
 	private static final String o_level = "d";
 	private static final String o_type = "e";
 	private static final String o_roomId = "f";
-	private static final String o_diamond = "g";
+	private static final String o_gold = "g";
 	private static final String o_totalGold = "h";
 	private static final String o_freeGiftUserSum = "i";
 	private static final String o_freeGiftAnchorSum = "j";
-	private static final String o_ifOfficialUser = "k";
-	private static final String o_isForbidSpeak = "l";
-	private static final String o_isForceOut = "m";
-	private static final String o_badgeImgUrl = "n";
-	private static final String o_isBan = "o";
+	private static final String o_forbidSpeak = "k";
+	private static final String o_forceOut = "l";
+	private static final String o_blackFlag = "m";
 
-	
 	
 	
 	private String userId;
@@ -46,7 +43,7 @@ public class OnlineUserInfo extends JsonParseInterface implements Serializable {
 	
 	private int level;
 	
-	private String type;
+	private int type;
 	
 	private int userPoint;
 	
@@ -64,35 +61,19 @@ public class OnlineUserInfo extends JsonParseInterface implements Serializable {
 	/**免费礼物主播角色总量*/
 	private int freeGiftAnchorSum;
 	
-	/** 是否官方人员,默认false  */
-	private boolean ifOfficialUser = false;
-	
 	/** 进入房间的时间 */
 	private Date inRoomTime;
 	
-	/** 是否被禁言 */
-	private String isForbidSpeak;
+	/** 是否被禁言，0-否，1-是 */
+	private int forbidSpeak;
 	
-	/** 是否被踢出  */
-	private String isForceOut;
+	/** 是否被踢出，0-否，1-是  */
+	private int forceOut;
 	
-	/**是否拉黑*/
-	private String isBan;
+	/**是否拉黑，0-否，1是*/
+	private int blackFlag;
 
 
-	public String getAvatar() {
-		return avatar;
-	}
-
-	public int getLevel() {
-		return level;
-	}
-
-	public String getType() {
-		return type;
-	}
-	
-	
 	@Override
 	public JSONObject buildJson() {
 		JSONObject json = new JSONObject();
@@ -101,16 +82,15 @@ public class OnlineUserInfo extends JsonParseInterface implements Serializable {
 			setString(json, o_nickName, nickName);
 			setString(json, o_avatar, avatar);
 			setInt(json, o_level, level);
-			setString(json, o_type, type);
+			setInt(json, o_type, type);
 			setString(json, o_roomId, roomId);
-			setLong(json, o_diamond, gold);
+			setLong(json, o_gold, gold);
 			setLong(json, o_totalGold, totalGold);
 			setLong(json, o_freeGiftUserSum, freeGiftUserSum);
 			setLong(json, o_freeGiftAnchorSum, freeGiftAnchorSum);
-			setBoolean(json, o_ifOfficialUser, ifOfficialUser);
-			setString(json, o_isForbidSpeak, isForbidSpeak);
-			setString(json, o_isForceOut, isForceOut);
-			setString(json, o_isBan, isBan);
+			setInt(json, o_forbidSpeak, forbidSpeak);
+			setInt(json, o_forceOut, forceOut);
+			setInt(json, o_blackFlag, blackFlag);
 			return json;
 		} catch (Exception e) {
 			LogUtil.log.error(e.getMessage(),e);
@@ -127,13 +107,12 @@ public class OnlineUserInfo extends JsonParseInterface implements Serializable {
 			nickName = getString(json, o_nickName);
 			avatar = getString(json, o_avatar);
 			level = getInt(json, o_level);
-			type = getString(json, o_type);
+			type = getInt(json, o_type);
 			roomId = getString(json, o_roomId);
-			gold  = getLong(json, o_diamond);
+			gold  = getLong(json, o_gold);
 			totalGold  = getLong(json, o_totalGold);
 			freeGiftUserSum  = getInt(json, o_freeGiftUserSum);
 			freeGiftAnchorSum  = getInt(json, o_freeGiftAnchorSum);
-			ifOfficialUser = getBoolean(json, o_ifOfficialUser);
 		} catch (Exception e) {
 			LogUtil.log.error(e.getMessage(),e);
 		}
@@ -160,6 +139,30 @@ public class OnlineUserInfo extends JsonParseInterface implements Serializable {
 
 	public void setNickName(String nickName) {
 		this.nickName = nickName;
+	}
+
+	public String getAvatar() {
+		return avatar;
+	}
+
+	public void setAvatar(String avatar) {
+		this.avatar = avatar;
+	}
+
+	public int getLevel() {
+		return level;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
 	}
 
 	public int getUserPoint() {
@@ -210,14 +213,6 @@ public class OnlineUserInfo extends JsonParseInterface implements Serializable {
 		this.freeGiftAnchorSum = freeGiftAnchorSum;
 	}
 
-	public boolean isIfOfficialUser() {
-		return ifOfficialUser;
-	}
-
-	public void setIfOfficialUser(boolean ifOfficialUser) {
-		this.ifOfficialUser = ifOfficialUser;
-	}
-
 	public Date getInRoomTime() {
 		return inRoomTime;
 	}
@@ -226,41 +221,28 @@ public class OnlineUserInfo extends JsonParseInterface implements Serializable {
 		this.inRoomTime = inRoomTime;
 	}
 
-	public String getIsForbidSpeak() {
-		return isForbidSpeak;
+	public int getForbidSpeak() {
+		return forbidSpeak;
 	}
 
-	public void setIsForbidSpeak(String isForbidSpeak) {
-		this.isForbidSpeak = isForbidSpeak;
+	public void setForbidSpeak(int forbidSpeak) {
+		this.forbidSpeak = forbidSpeak;
 	}
 
-	public String getIsForceOut() {
-		return isForceOut;
+	public int getForceOut() {
+		return forceOut;
 	}
 
-	public void setIsForceOut(String isForceOut) {
-		this.isForceOut = isForceOut;
+	public void setForceOut(int forceOut) {
+		this.forceOut = forceOut;
 	}
 
-	public String getIsBan() {
-		return isBan;
+	public int getBlackFlag() {
+		return blackFlag;
 	}
 
-	public void setIsBan(String isBan) {
-		this.isBan = isBan;
+	public void setBlackFlag(int blackFlag) {
+		this.blackFlag = blackFlag;
 	}
 
-	public void setAvatar(String avatar) {
-		this.avatar = avatar;
-	}
-
-	public void setLevel(int level) {
-		this.level = level;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	
 }

@@ -16,15 +16,22 @@ import org.springframework.util.StringUtils;
 
 /**
  * 字符工具类
- * @author huangzp
- * @date 2015-4-7
+ * @author shao.xiang
+ * @date 2018-4-7
  */
 public class StrUtil {
 	public final static String UTF8 = "utf-8";
 
+	/**
+	 * 判断是否为空，空字符或者换行、tab、空格等等都视为空字符串
+	 *@param str
+	 *@return
+	 *@author shao.xiang
+	 *@data 2018年4月18日
+	 */
 	public static boolean isNullOrEmpty(String str){
 		boolean result = false;
-		if(null == str || "".equals(str)){
+		if(null == str || "".equals(str) || "".equals(replaceBlank(str))) {
 			result = true;
 		}
 		return result;

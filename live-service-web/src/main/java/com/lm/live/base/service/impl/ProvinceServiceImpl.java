@@ -11,13 +11,13 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.base.constant.Constants;
-import com.lm.live.base.constant.MCPrefix;
 import com.lm.live.base.dao.ProvinceMapper;
 import com.lm.live.base.domain.Province;
 import com.lm.live.base.enums.ErrorCode;
 import com.lm.live.base.exception.BaseBizException;
 import com.lm.live.base.service.IProvinceService;
-import com.lm.live.common.constant.MCTimeoutConstants;
+import com.lm.live.cache.constants.CacheKey;
+import com.lm.live.cache.constants.CacheTimeout;
 import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.service.impl.CommonServiceImpl;
 import com.lm.live.common.utils.IpUtils;
@@ -42,7 +42,7 @@ public class ProvinceServiceImpl extends CommonServiceImpl<ProvinceMapper,Provin
 	@Override
 	public void getProvinceSetCache() {
 		LogUtil.log.info("###getProvinceSetCache 开始设置省市缓存 start...");
-		String loadCacheKey = MCPrefix.PROVINCE_TIME_CACHE;
+		String loadCacheKey = CacheKey.PROVINCE_TIME_CACHE;
 		String obj = RedisUtil.get(loadCacheKey);
 		if (!StringUtils.isEmpty(obj)) {
 			LogUtil.log.info("###getProvinceSetCache 加载省市记录过于频繁，请求间隔为24h");
@@ -51,12 +51,12 @@ public class ProvinceServiceImpl extends CommonServiceImpl<ProvinceMapper,Provin
 			List<Province> list = dao.getListByAll();
 			if (list!=null&&list.size()>0) {
 				for (Province vo : list) {
-					RedisUtil.set(MCPrefix.PROVINCE_CODE_CACHE + vo.getCode(), vo);
+					RedisUtil.set(CacheKey.PROVINCE_CODE_CACHE + vo.getCode(), vo);
 				}
 			}else {
 				LogUtil.log.info("###getProvinceSetCache select db list is null");
 			}
-			RedisUtil.set(loadCacheKey, 1, MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
+			RedisUtil.set(loadCacheKey, 1, CacheTimeout.DEFAULT_TIMEOUT_24H);
 		}
 		LogUtil.log.info("###getProvinceSetCache 设置省市缓存结束 end...");
 	}
@@ -69,7 +69,7 @@ public class ProvinceServiceImpl extends CommonServiceImpl<ProvinceMapper,Provin
 			if (code != null) {
 				LogUtil.log.info(String.format("###从缓存获取省份信息,cache code=%s,ip:%s",code,ip));
 				code = code.substring(0, 2)+"0000";//获取省级
-				String codeKey = MCPrefix.PROVINCE_CODE_CACHE+code;
+				String codeKey = CacheKey.PROVINCE_CODE_CACHE+code;
 				Object regionObj = RedisUtil.get(codeKey);
 				LogUtil.log.info(String.format("######从缓存获取省份信息, cache cacheCodeKey=%s,regionObj=%s,ip:%s",codeKey,regionObj,ip));
 				if (regionObj!=null) {
@@ -121,7 +121,7 @@ public class ProvinceServiceImpl extends CommonServiceImpl<ProvinceMapper,Provin
 			throw new BaseBizException(ErrorCode.ERROR_101);
 		}
 		Province returnValue=null;
-		String codeKey = MCPrefix.PROVINCE_CODE_CACHE+code;
+		String codeKey = CacheKey.PROVINCE_CODE_CACHE+code;
 		Province regionObj = RedisUtil.getJavaBean(codeKey, Province.class);
 		if(regionObj != null) {
 			returnValue= regionObj;

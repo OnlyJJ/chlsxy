@@ -1,6 +1,5 @@
 package com.lm.live.user.service.impl;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -12,13 +11,13 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.lm.live.common.constant.MCTimeoutConstants;
+import com.lm.live.cache.constants.CacheKey;
+import com.lm.live.cache.constants.CacheTimeout;
 import com.lm.live.common.enums.IMBusinessEnum;
 import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.utils.DateUntil;
 import com.lm.live.common.utils.IMutils;
 import com.lm.live.common.utils.LogUtil;
-import com.lm.live.common.utils.MemcachedUtil;
 import com.lm.live.common.utils.SensitiveWordUtil;
 import com.lm.live.common.utils.StrUtil;
 import com.lm.live.common.vo.Page;
@@ -32,7 +31,6 @@ import com.lm.live.others.push.thread.AttentionMsgThread;
 import com.lm.live.pet.service.IUserPetService;
 import com.lm.live.pet.vo.PetVo;
 import com.lm.live.user.constant.Constants;
-import com.lm.live.user.constant.MCPrefix;
 import com.lm.live.user.dao.UserInfoMapper;
 import com.lm.live.user.enums.ErrorCode;
 import com.lm.live.user.exception.UserBizException;
@@ -115,7 +113,7 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 			throw new UserBizException(ErrorCode.ERROR_101);
 		}
 		JSONObject ret = new JSONObject();
-		String key = MCPrefix.USER_ATTENTION_CACHE + userId;
+		String key = CacheKey.USER_ATTENTION_CACHE + userId;
 		String obj = RedisUtil.get(key);
 		if(!StringUtils.isEmpty(obj)) {
 			ret = JSON.parseObject(obj);
@@ -132,7 +130,7 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 				ret.put(Constants.DATA_BODY, array.toString());
 			}
 		}
-		RedisUtil.set(key, ret, MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
+		RedisUtil.set(key, ret, CacheTimeout.DEFAULT_TIMEOUT_24H);
 		return ret;
 	}
 	
@@ -159,10 +157,10 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 			}
 			userAttentionService.removeById(attention.getId());
 			// 操作成功，则删除缓存
-			String key = MCPrefix.USER_ATTENTION_CACHE + userId;
+			String key = CacheKey.USER_ATTENTION_CACHE + userId;
 			RedisUtil.del(key);
 			// 删除被关注用户粉丝列表缓存
-			String fansKey = MCPrefix.USER_FANS_CACHE + toUserId;
+			String fansKey = CacheKey.USER_FANS_CACHE + toUserId;
 			RedisUtil.del(fansKey);
 			
 			if(isAnchor) {
@@ -193,10 +191,10 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 			userAttentionService.insert(vo);
 				
 			// 操作成功，则删除缓存
-			String key = MCPrefix.USER_ATTENTION_CACHE + userId;
+			String key = CacheKey.USER_ATTENTION_CACHE + userId;
 			RedisUtil.del(key);
 			// 删除被关注用户粉丝列表缓存
-			String fansKey = MCPrefix.USER_FANS_CACHE + toUserId;
+			String fansKey = CacheKey.USER_FANS_CACHE + toUserId;
 			RedisUtil.del(fansKey);
 			
 			// 处理主播相关业务
@@ -272,14 +270,14 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 		}
 		JSONObject ret = new JSONObject();
 		List<UserBaseInfo> list = null;
-		String key = MCPrefix.USER_FANS_CACHE + userId;
+		String key = CacheKey.USER_FANS_CACHE + userId;
 		List<UserBaseInfo> che = RedisUtil.getList(key, UserBaseInfo.class);
 		if(che != null) {
 			list = che;
 			LogUtil.log.error("### listAttentions-获取用户关注列表，从缓存中获取数据。。。userId="+userId);
 		} else {
 			list = dao.listFans(userId);
-			RedisUtil.set(key, list, MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
+			RedisUtil.set(key, list, CacheTimeout.DEFAULT_TIMEOUT_24H);
 		}
 		if(list != null) {
 			JSONArray array = new JSONArray();
@@ -413,11 +411,11 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 		}
 		boolean flag = false;
 		//游客用户userId前缀
-		String visitorUserIdPreStr = Constants.PSEUDO_LOGIN_SESSION_KEY;
+		String visitorUserIdPreStr = Constants.PSEUDO_PREFIX;
 		if(userId.indexOf(visitorUserIdPreStr) != -1 ){//游客
 			flag = false;
 		}else{
-			String cache = RedisUtil.get(MCPrefix.MC_TOKEN_PREFIX+ userId);
+			String cache = RedisUtil.get(CacheKey.MC_TOKEN_PREFIX+ userId);
 			if(!StringUtils.isEmpty(cache) && cache.equals(sessionId)) {
 				flag = true;
 			}else {

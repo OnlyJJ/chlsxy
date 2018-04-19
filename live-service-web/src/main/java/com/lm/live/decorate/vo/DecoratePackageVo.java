@@ -53,14 +53,14 @@ public class DecoratePackageVo extends JsonParseInterface implements Serializabl
 			setString(json,d_name,name);
 			if( lightenImg != null) {
 				if(lightenImg.indexOf(BaseConstants.DECORATE_IMG_FILE_URL) == -1) {
-					setString(json,d_lightenImg,BaseConstants.cdnPath+File.separator+BaseConstants.DECORATE_IMG_FILE_URL+File.separator+lightenImg);
+					setString(json,d_lightenImg,BaseConstants.cdnPath + BaseConstants.DECORATE_IMG_FILE_URL+File.separator+lightenImg);
 				} else {
 					setString(json,d_lightenImg,lightenImg);
 				}
 			}
 			if(grayImg != null) {
 				if(grayImg.indexOf(BaseConstants.DECORATE_IMG_FILE_URL) == -1) {
-					setString(json,d_grayImg,BaseConstants.cdnPath+File.separator+BaseConstants.DECORATE_IMG_FILE_URL+File.separator+grayImg);
+					setString(json,d_grayImg,BaseConstants.cdnPath+BaseConstants.DECORATE_IMG_FILE_URL+File.separator+grayImg);
 				} else {
 					setString(json,d_grayImg,grayImg);
 				}

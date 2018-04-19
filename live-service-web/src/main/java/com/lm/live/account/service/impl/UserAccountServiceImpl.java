@@ -1,18 +1,24 @@
 package com.lm.live.account.service.impl;
 
+import java.util.Date;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.lm.live.account.dao.LevelHisAnchorMapper;
+import com.lm.live.account.dao.LevelHisUserMapper;
 import com.lm.live.account.dao.UserAccountBookMapper;
 import com.lm.live.account.dao.UserAccountMapper;
+import com.lm.live.account.domain.LevelHisUser;
 import com.lm.live.account.domain.UserAccount;
 import com.lm.live.account.domain.UserAccountBook;
 import com.lm.live.account.enums.ErrorCode;
 import com.lm.live.account.exceptions.UserAccountBizException;
 import com.lm.live.account.service.IUserAccountService;
 import com.lm.live.common.service.impl.CommonServiceImpl;
+import com.lm.live.common.utils.LogUtil;
 
 /**
  * 账户服务
@@ -45,10 +51,12 @@ public class UserAccountServiceImpl extends CommonServiceImpl<UserAccountMapper,
 		if(StringUtils.isEmpty(userId) || gold < 0) {
 			throw new UserAccountBizException(ErrorCode.ERROR_101);
 		}
+		dao.addGold(userId, gold);
 		if(book != null) {
+			UserAccount uc = getByUserId(userId);
+			book.setTotalGold(uc.getGold());
 			userAccountBookMapper.insert(book);
 		}
-		dao.addGold(userId, gold);
 	}
 
 	@Override
@@ -57,10 +65,12 @@ public class UserAccountServiceImpl extends CommonServiceImpl<UserAccountMapper,
 		if(StringUtils.isEmpty(userId) || gold < 0) {
 			throw new UserAccountBizException(ErrorCode.ERROR_101);
 		}
+		dao.subtractGold(userId, gold);
 		if(book != null) {
+			UserAccount uc = getByUserId(userId);
+			book.setTotalGold(uc.getGold());
 			userAccountBookMapper.insert(book);
 		}
-		dao.subtractGold(userId, gold);
 	}
 
 	@Override
@@ -104,5 +114,4 @@ public class UserAccountServiceImpl extends CommonServiceImpl<UserAccountMapper,
 		dao.updateAnchorLevel(userId, newAnchorLevel);
 	}
 
-	
 }

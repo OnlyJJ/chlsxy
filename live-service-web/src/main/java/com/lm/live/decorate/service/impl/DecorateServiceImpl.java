@@ -8,10 +8,10 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.lm.live.common.constant.MCTimeoutConstants;
+import com.lm.live.cache.constants.CacheKey;
+import com.lm.live.cache.constants.CacheTimeout;
 import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.service.impl.CommonServiceImpl;
-import com.lm.live.decorate.contants.MCPrefix;
 import com.lm.live.decorate.dao.DecorateMapper;
 import com.lm.live.decorate.domain.Decorate;
 import com.lm.live.decorate.enums.DecorateTableEnum;
@@ -39,7 +39,7 @@ public class DecorateServiceImpl extends CommonServiceImpl<DecorateMapper, Decor
 		if(StringUtils.isEmpty(userId)) {
 			throw new DecorateBizException(ErrorCode.ERROR_101);
 		}
-		String key = MCPrefix.DECORATE_USER_CACHE + userId;
+		String key = CacheKey.DECORATE_USER_CACHE + userId;
 		List<Decorate> list = RedisUtil.getList(key, Decorate.class);
 		if(list != null) {
 			return list;
@@ -49,7 +49,7 @@ public class DecorateServiceImpl extends CommonServiceImpl<DecorateMapper, Decor
 		if(list == null) {
 			list = new ArrayList<Decorate>();
 		}
-		RedisUtil.set(key, list, MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
+		RedisUtil.set(key, list, CacheTimeout.DEFAULT_TIMEOUT_24H);
 		return list;
 	}
 

@@ -6,10 +6,11 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.lm.live.common.constant.MCTimeoutConstants;
+import com.lm.live.cache.constants.CacheKey;
+import com.lm.live.cache.constants.CacheTimeout;
+import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.service.impl.CommonServiceImpl;
 import com.lm.live.common.utils.MemcachedUtil;
-import com.lm.live.userbase.constant.MCPrefix;
 import com.lm.live.userbase.dao.UserBaseMapper;
 import com.lm.live.userbase.domain.UserInfoDo;
 import com.lm.live.userbase.enums.ErrorCode;
@@ -70,14 +71,14 @@ public class UserBaseServiceImpl extends CommonServiceImpl<UserBaseMapper, UserI
 			throw new UserBaseBizException(ErrorCode.ERROR_101);
 		}
 		UserInfoDo vo = null;
-		String cacheKey = MCPrefix.USER_INFODO_CACHE + userId;
-		Object cacheObj = MemcachedUtil.get(cacheKey);
-		if(cacheObj != null){
-			vo = (UserInfoDo) cacheObj;
+		String cacheKey = CacheKey.USER_INFODO_CACHE + userId;
+		UserInfoDo cacheObj = RedisUtil.getJavaBean(cacheKey, UserInfoDo.class);
+		if(cacheObj != null) {
+			vo = cacheObj;
 		}else{
 			vo = dao.getUserByUserId(userId);
 			if(vo != null){
-				MemcachedUtil.set(cacheKey, vo, MCTimeoutConstants.DEFAULT_TIMEOUT_5M);
+				RedisUtil.set(cacheKey, vo, CacheTimeout.DEFAULT_TIMEOUT_2H);
 			}
 		}
 		return vo;

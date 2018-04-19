@@ -24,8 +24,9 @@ import com.lm.live.base.domain.ThirdpartyConf;
 import com.lm.live.base.enums.ThirdpartyType;
 import com.lm.live.base.service.IProvinceService;
 import com.lm.live.base.service.IThirdpartyConfService;
+import com.lm.live.cache.constants.CacheKey;
+import com.lm.live.cache.constants.CacheTimeout;
 import com.lm.live.common.constant.LockKey;
-import com.lm.live.common.constant.MCTimeoutConstants;
 import com.lm.live.common.redis.RdLock;
 import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.utils.DateUntil;
@@ -42,7 +43,6 @@ import com.lm.live.common.vo.Session;
 import com.lm.live.common.vo.UserBaseInfo;
 import com.lm.live.framework.service.ServiceResult;
 import com.lm.live.login.constant.Constants;
-import com.lm.live.login.constant.MCPrefix;
 import com.lm.live.login.dao.UserRegistAutoMapper;
 import com.lm.live.login.dao.WechatOauth2TokenRefreshMapper;
 import com.lm.live.login.dao.WechatUserMapper;
@@ -169,7 +169,7 @@ public class LoginServiceImpl implements ILoginService {
 			// 根据ip获取省份
 			String clientProvince = provinceService.getProviceBy(clientIp);
 			// 随机获取昵称
-			String[] strArr = Constants.DEFAULT_AUTOREGIST_NAME.split(Constants.SEPARATOR);
+			String[] strArr = Constants.DEFAULT_AUTOREGIST_NAME.split(Constants.SEPARATOR_COMMA);
 			int strLength = strArr.length;
 			Random rnd = new Random();
 			int getNickNameIndex = rnd.nextInt(strLength - 1);
@@ -225,9 +225,9 @@ public class LoginServiceImpl implements ILoginService {
 			account.setUserId(userId);
 			userAccountService.insert(account);
 
-			String cacheKeyOfAppAutoRegistEachIp = MCPrefix.AUTO_REGIST_LIMIT_CACHE + clientIp;
+			String cacheKeyOfAppAutoRegistEachIp = CacheKey.AUTO_REGIST_LIMIT_CACHE + clientIp;
 			String dateStr = DateUntil.getFormatDate(Constants.DATEFORMAT_YMD, nowDate);
-			String cacheKeyOfAppAutoRegistEveryDay = MCPrefix.AUTO_REGIST_LIMIT_DAY_CACHE + dateStr;
+			String cacheKeyOfAppAutoRegistEveryDay = CacheKey.AUTO_REGIST_LIMIT_DAY_CACHE + dateStr;
 
 			int eachIpAutoRegistNum = 0;
 			int eachDayAutoRegistNum = 0;
@@ -243,8 +243,8 @@ public class LoginServiceImpl implements ILoginService {
 
 			eachIpAutoRegistNum++;
 			eachDayAutoRegistNum++;
-			RedisUtil.set(cacheKeyOfAppAutoRegistEachIp, eachIpAutoRegistNum, MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
-			RedisUtil.set(cacheKeyOfAppAutoRegistEveryDay, eachDayAutoRegistNum, MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
+			RedisUtil.set(cacheKeyOfAppAutoRegistEachIp, eachIpAutoRegistNum, CacheTimeout.DEFAULT_TIMEOUT_24H);
+			RedisUtil.set(cacheKeyOfAppAutoRegistEveryDay, eachDayAutoRegistNum, CacheTimeout.DEFAULT_TIMEOUT_24H);
 
 		} else {
 			LogUtil.log.info(String.format("###自动注册,此设备已登录过,uuid:%s,devInfo；%s", uuid,
@@ -958,8 +958,8 @@ public class LoginServiceImpl implements ILoginService {
 	public void setMemcacheToSessionId(Session session, String userId) {
 		long time = System.currentTimeMillis();
 		String sessionid = MD5Util.serverEncode(userId + time);
-		RedisUtil.set(MCPrefix.MC_TOKEN_PREFIX + userId, sessionid,
-				MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
+		RedisUtil.set(CacheKey.MC_TOKEN_PREFIX + userId, sessionid,
+				CacheTimeout.DEFAULT_TIMEOUT_24H);
 		session.setTime(time);
 		session.setSessionid(sessionid);
 	}
@@ -975,7 +975,7 @@ public class LoginServiceImpl implements ILoginService {
 			throw new LoginBizException(ErrorCode.ERROR_101);
 		}
 		// 每个ip可注册的总数量
-		String cacheKeyOfAppAutoRegistEachIp = MCPrefix.AUTO_REGIST_LIMIT_CACHE
+		String cacheKeyOfAppAutoRegistEachIp = CacheKey.AUTO_REGIST_LIMIT_CACHE
 				+ clientIp;
 		int eachIpAutoRegistNum = 0;
 		Object total = MemcachedUtil.get(cacheKeyOfAppAutoRegistEachIp);
@@ -993,7 +993,7 @@ public class LoginServiceImpl implements ILoginService {
 		Date nowDate = new Date();
 		String dateStr = DateUntil.getFormatDate(Constants.DATEFORMAT_YMD,
 				nowDate);
-		String cacheKeyOfAppAutoRegistEveryDay = MCPrefix.AUTO_REGIST_LIMIT_DAY_CACHE
+		String cacheKeyOfAppAutoRegistEveryDay = CacheKey.AUTO_REGIST_LIMIT_DAY_CACHE
 				+ dateStr;
 		int eachDayAutoRegistNum = 0;
 		Object cacheObj = MemcachedUtil.get(cacheKeyOfAppAutoRegistEveryDay);
@@ -1022,7 +1022,7 @@ public class LoginServiceImpl implements ILoginService {
 		try {
 			RdLock.lock(lockname);
 			List<CodeRandom> list = null;
-			String cachekey = MCPrefix.LOGIN_USERCODE_RONDOM_CACHE;
+			String cachekey = CacheKey.LOGIN_USERCODE_RONDOM_CACHE;
 			List<CodeRandom> obj = RedisUtil.getList(cachekey, CodeRandom.class);
 			if(obj != null) {
 				list = obj;

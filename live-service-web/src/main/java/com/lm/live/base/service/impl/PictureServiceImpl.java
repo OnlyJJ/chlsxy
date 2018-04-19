@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 import com.lm.live.base.constant.Constants;
 import com.lm.live.base.domain.UserAccusationImg;
 import com.lm.live.base.service.IUserAccusationImgService;
-import com.lm.live.base.service.ImageHelper;
+import com.lm.live.base.service.IPictureService;
 import com.lm.live.common.utils.DateUntil;
 import com.lm.live.common.utils.FileTypeUtils;
 import com.lm.live.common.utils.LogUtil;
@@ -37,8 +37,8 @@ import com.lm.live.common.utils.SpringContextListener;
  * @since 2017/03/22
  * 
  */
-@Service("imageHelper")
-public class ImageHelperImpl implements ImageHelper{
+@Service("pictureService")
+public class PictureServiceImpl implements IPictureService{
 	
 	@Resource
 	private IUserAccusationImgService userAccusationImgService;

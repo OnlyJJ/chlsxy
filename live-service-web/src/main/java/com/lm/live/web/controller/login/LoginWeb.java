@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.alibaba.fastjson.JSONObject;
-import com.lm.live.common.constant.MCTimeoutConstants;
+import com.lm.live.cache.constants.CacheKey;
+import com.lm.live.cache.constants.CacheTimeout;
 import com.lm.live.common.controller.BaseController;
+import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.utils.RequestUtil;
 import com.lm.live.appclient.enums.AppType;
 import com.lm.live.appclient.service.IAppInstallChannelService;
@@ -30,7 +32,6 @@ import com.lm.live.common.vo.Result;
 import com.lm.live.common.vo.Session;
 import com.lm.live.common.vo.UserBaseInfo;
 import com.lm.live.login.constant.Constants;
-import com.lm.live.login.constant.MCPrefix;
 import com.lm.live.login.enums.ErrorCode;
 import com.lm.live.login.enums.LoginType;
 import com.lm.live.login.exceptions.LoginBizException;
@@ -331,7 +332,7 @@ public class LoginWeb extends BaseController {
 			long time = System.currentTimeMillis(); 
 			String sessionId =  Constants.PSEUDO_LOGIN_SESSION_KEY+ MD5Util.serverEncode(data.getRequest().getSession().getId() + time);
 			String uid = Constants.PSEUDO_LOGIN_SESSION_KEY+MD5Util.md5(data.getRequest().getSession().getId()+time);
-			MemcachedUtil.set(MCPrefix.MC_TOKEN_PREFIX+uid, sessionId, MCTimeoutConstants.DEFAULT_TIMEOUT_10M);//秒
+			RedisUtil.set(CacheKey.MC_TOKEN_PREFIX+uid, sessionId, CacheTimeout.DEFAULT_TIMEOUT_10M);//秒
 			//客户端ip
 			DeviceProperties deviceProperties = new DeviceProperties();
 			deviceProperties.parseJson(data.getData().getJSONObject(deviceProperties.getShortName()));

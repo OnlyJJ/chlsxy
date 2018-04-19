@@ -8,7 +8,7 @@ import com.alibaba.fastjson.JSONObject;
  * @since 2017-06-2
  * 
  */
-public interface ImageHelper {
+public interface IPictureService {
 	
 	/**
 	 * 图片处理

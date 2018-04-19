@@ -36,7 +36,7 @@
 	<!-- 用户详细信息 -->
 	<select id="getUserDetailInfo" resultType="com.lm.live.user.vo.UserInfo">
 		SELECT   					
-			a.userId AS userId, a.nickName AS nickname, a.remark remark, a.sex sex, a.brithday brithday,
+			a.userId AS userId, a.nickName AS nickName, a.remark remark, a.sex sex, a.brithday brithday,
 			a.address address, a.icon icon,
 			b.gold AS gold, b.anchorLevel AS anchorLevel, b.userLevel AS userLevel,
 			b.userPoint AS userPoint, b.anchorPoint AS anchorPoint ,  
@@ -78,13 +78,48 @@
 	<!-- 根据roomId获取主播信息 -->
 	<select id="getUserByRoomId" resultType="com.lm.live.user.vo.UserInfo">
 		SELECT   					
-			a.userId AS userId, a.nickName AS nickname, a.icon icon,
+			a.userId AS userId, a.nickName AS nickName, a.icon icon,
 			b.gold AS gold, b.anchorLevel AS anchorLevel, b.userLevel AS userLevel,
 			d.roomId AS roomId
 		FROM t_user_info  a   
 		INNER JOIN t_user_account b ON (a.userId = b.userId)    
 		INNER JOIN t_user_anchor d ON (a.userId=d.userId)    
 		WHERE d.roomId = #{roomId} 
+		LIMIT 1
+	</select>
+	
+	
+	<!-- 获取用户基本信息 -->
+	<select id="getUserBaseChe" resultType="com.lm.live.user.vo.UserCache">
+		SELECT   					
+			a.userId AS userId, a.nickName AS nickName, a.sex sex,
+			a.address address, a.icon icon,
+			b.anchorLevel AS anchorLevel, b.userLevel AS userLevel,
+			b.userPoint AS userPoint, b.anchorPoint AS anchorPoint,
+			CASE WHEN ISNULL(d.userId) THEN 0 ELSE 1 END identity,
+			IFNULL(d.roomId, NULL) AS roomId
+		FROM t_user_info  a   
+		INNER JOIN t_user_account b ON a.userId = b.userId   
+		LEFT JOIN t_user_anchor d ON a.userId=d.userId   
+		WHERE a.userId = #{userId} 
+		LIMIT 1
+	</select>
+	
+	<!-- 获取用户在房间在基本信息 -->
+	<select id="getUserInRoomChe" resultType="com.lm.live.user.vo.UserCache">
+		SELECT   					
+			a.userId AS userId, a.nickName AS nickName, a.sex sex,
+			a.address address, a.icon icon,
+			b.anchorLevel AS anchorLevel, b.userLevel AS userLevel,
+			b.userPoint AS userPoint, b.anchorPoint AS anchorPoint,
+			CASE WHEN ISNULL(d.userId) THEN 0 ELSE 1 END identity,
+			IFNULL(r.roleType,0) AS roomIdentity,
+			IFNULL(d.roomId, NULL) AS roomId
+		FROM t_user_info  a   
+		INNER JOIN t_user_account b ON a.userId = b.userId   
+		LEFT JOIN t_user_anchor d ON a.userId=d.userId   
+		LEFT JOIN t_user_room_member r ON a.userId = r.userId AND r.roomId = #{roomId}
+		WHERE a.userId = #{userId} 
 		LIMIT 1
 	</select>
 	

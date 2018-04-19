@@ -1,13 +1,14 @@
-package com.lm.live.common.constant;
+package com.lm.live.cache.constants;
 
 /**
- * memcache 
- * 超时常量配置，此常量维护的是常用的，如需详细设置，则各个业务自行维护
+ * 缓存过期时间管理
  * @author shao.xiang
  * @date 2018年3月10日
  *
  */
-public class MCTimeoutConstants {
+public class CacheTimeout {
+	
+	private CacheTimeout() {}
 	
 	/**
 	 * 默认缓存时间,3main
@@ -30,9 +31,19 @@ public class MCTimeoutConstants {
 	public final static int DEFAULT_TIMEOUT_30M = 60 * 30;
 	
 	/**
+	 * 默认缓存时间,1H
+	 */
+	public final static int DEFAULT_TIMEOUT_1H = 60 * 60;
+	
+	/**
 	 * 默认缓存时间, 2H
 	 */
 	public final static int DEFAULT_TIMEOUT_2H = 60 * 60 * 2;
+	
+	/**
+	 * 默认缓存时间, 5H
+	 */
+	public final static int DEFAULT_TIMEOUT_5H = 60 * 60 * 5;
 	
 	/**
 	 * 默认缓存时间, 8H
@@ -43,6 +54,5 @@ public class MCTimeoutConstants {
 	 * 默认缓存时间, 24H
 	 */
 	public final static int DEFAULT_TIMEOUT_24H = 60 * 60 * 24;
-	
 	
 }

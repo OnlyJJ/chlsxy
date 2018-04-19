@@ -25,11 +25,15 @@ public class PayGiftOut extends BaseVo {
 	/** 礼物数量 */
 	private int number;
 	/** 收到礼物对应的金币价格 */
-	private int srystal;
+	private int price;
 	/** 送礼物时间 */
 	private Date resultTime;
 	/**来源类型,默认0:礼物,1:守护 */
 	private int sourceType;
+	private String remark;
+	/** 对应的主播水晶值 */
+	private int crystal;
+	
 	public int getId() {
 		return id;
 	}
@@ -66,12 +70,6 @@ public class PayGiftOut extends BaseVo {
 	public void setNumber(int number) {
 		this.number = number;
 	}
-	public int getSrystal() {
-		return srystal;
-	}
-	public void setSrystal(int srystal) {
-		this.srystal = srystal;
-	}
 	public Date getResultTime() {
 		return resultTime;
 	}
@@ -83,6 +81,24 @@ public class PayGiftOut extends BaseVo {
 	}
 	public void setSourceType(int sourceType) {
 		this.sourceType = sourceType;
+	}
+	public int getPrice() {
+		return price;
+	}
+	public void setPrice(int price) {
+		this.price = price;
+	}
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+	public int getCrystal() {
+		return crystal;
+	}
+	public void setCrystal(int crystal) {
+		this.crystal = crystal;
 	}
 
 

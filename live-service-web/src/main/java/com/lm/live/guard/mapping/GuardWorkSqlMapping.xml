@@ -59,7 +59,7 @@
 	]]>
  	</select>
  	
- 	<select id="getGuardWorkListByRoom"  resultMap="guardWorkVo">
+ 	<select id="listRoomGuardData"  resultMap="guardWorkVo">
 	<![CDATA[
 		select * from t_guard_work where roomId=#{roomId} AND (isPeriod = 0 OR (isPeriod = 1 AND endTime >= NOW())) 
 	]]>

@@ -1,4 +1,4 @@
-package com.lm.live.room.vo;
+package com.lm.live.base.vo;
 
 import java.io.Serializable;
 

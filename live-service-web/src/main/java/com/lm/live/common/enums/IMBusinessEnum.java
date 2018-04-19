@@ -227,7 +227,10 @@ public class IMBusinessEnum {
 		IM_1001_PRIVATE_CHAT_FAIL(52),
 		
 		/** 用户分享IM消息 */
-		IM_1001_USER_SHARE(53);
+		IM_1001_USER_SHARE(53),
+		
+		/** 私聊通知：给主播房间在线用户发私聊消息*/
+		IM_11001_Private_MSG(61);
 		
 		private final int value;
 		

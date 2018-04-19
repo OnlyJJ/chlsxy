@@ -69,8 +69,8 @@ public class GuardVo extends JsonParseInterface implements Serializable {
 	 */
 	private long time;
 	
-	/** 分给主播的钻石*/
-	private int diamond;
+	/** 分给主播的水晶*/
+	private int crystal;
 	
 	/** 开始时间 */
 	private String beginTime;
@@ -98,7 +98,7 @@ public class GuardVo extends JsonParseInterface implements Serializable {
 	private String g_price = "l";
 	private String g_timerDown = "m";
 	private String g_time = "n";
-	private String g_diamond = "o";
+	private String g_crystal = "o";
 	private String g_beginTime = "p";
 	private String g_endTime = "q";
 	private String g_roomId="r";
@@ -121,7 +121,7 @@ public class GuardVo extends JsonParseInterface implements Serializable {
 			setString(json,g_avatar,avatar);
 			setInt(json,g_price,price);
 			setString(json,g_timerDown,timerDown);
-			setInt(json,g_diamond,diamond);
+			setInt(json,g_crystal,crystal);
 			setString(json,g_beginTime,beginTime);
 			setLong(json,g_time,time);
 			setString(json,g_endTime,endTime);
@@ -269,12 +269,12 @@ public class GuardVo extends JsonParseInterface implements Serializable {
 		this.time = time;
 	}
 
-	public int getDiamond() {
-		return diamond;
+	public int getCrystal() {
+		return crystal;
 	}
 
-	public void setDiamond(int diamond) {
-		this.diamond = diamond;
+	public void setCrystal(int crystal) {
+		this.crystal = crystal;
 	}
 
 	public String getBeginTime() {

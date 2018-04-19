@@ -5,8 +5,13 @@ import java.util.List;
 
 
 
+
+
+import org.apache.ibatis.annotations.Param;
+
 import com.lm.live.common.vo.UserBaseInfo;
 import com.lm.live.user.vo.AnchorInfoVo;
+import com.lm.live.user.vo.UserCache;
 import com.lm.live.user.vo.UserInfo;
 
 /**
@@ -48,5 +53,25 @@ public interface UserInfoMapper {
 	 * @return
 	 */
 	List<UserBaseInfo> listFans(String toUserId);
+	
+	
+	/**
+	 * 获取用户基本信息，用于缓存
+	 *@param userId
+	 *@return
+	 *@author shao.xiang
+	 *@data 2018年4月18日
+	 */
+	UserCache getUserBaseChe(String userId);
+	
+	/**
+	 * 获取用户在房间的基本信息，用于缓存
+	 *@param userId
+	 *@param roomId
+	 *@return
+	 *@author shao.xiang
+	 *@data 2018年4月18日
+	 */
+	UserCache getUserInRoomChe(@Param("userId") String userId, @Param("roomId") String roomId);
 	
 }

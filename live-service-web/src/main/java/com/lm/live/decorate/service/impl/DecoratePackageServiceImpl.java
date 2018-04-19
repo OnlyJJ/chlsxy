@@ -10,12 +10,12 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.lm.live.common.constant.MCTimeoutConstants;
+import com.lm.live.cache.constants.CacheKey;
+import com.lm.live.cache.constants.CacheTimeout;
 import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.service.impl.CommonServiceImpl;
 import com.lm.live.common.utils.MemcachedUtil;
 import com.lm.live.decorate.contants.Constants;
-import com.lm.live.decorate.contants.MCPrefix;
 import com.lm.live.decorate.dao.DecoratePackageMapper;
 import com.lm.live.decorate.domain.DecoratePackage;
 import com.lm.live.decorate.enums.DecorateTableEnum;
@@ -46,7 +46,7 @@ public class DecoratePackageServiceImpl extends CommonServiceImpl<DecoratePackag
 		}
 		JSONObject ret = new JSONObject();
 		int category = DecorateTableEnum.Category.USER.getValue();
-		String cacheKey = MCPrefix.DECORATEPACKAGE_USER_CACHE + userId;
+		String cacheKey = CacheKey.DECORATEPACKAGE_USER_CACHE + userId;
 		String cacheObj = RedisUtil.get(cacheKey);
 		if(!StringUtils.isEmpty(cacheObj)){
 			ret = JSON.parseObject(cacheObj);
@@ -59,7 +59,7 @@ public class DecoratePackageServiceImpl extends CommonServiceImpl<DecoratePackag
 				}
 				ret.put(Constants.DATA_BODY, array.toString());
 			}
-			RedisUtil.set(cacheKey, ret, MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
+			RedisUtil.set(cacheKey, ret, CacheTimeout.DEFAULT_TIMEOUT_24H);
 		}
 		return ret;
 	}
@@ -71,7 +71,7 @@ public class DecoratePackageServiceImpl extends CommonServiceImpl<DecoratePackag
 		}
 		JSONObject ret = new JSONObject();
 		int category = DecorateTableEnum.Category.ANCHOR.getValue();
-		String cacheKey = MCPrefix.DECORATE_ROOM_CACHE + anchorId;
+		String cacheKey = CacheKey.DECORATE_ROOM_CACHE + anchorId;
 		String cacheObj = RedisUtil.get(cacheKey);
 		if(!StringUtils.isEmpty(cacheObj)){
 			ret = JSON.parseObject(cacheObj);
@@ -84,7 +84,7 @@ public class DecoratePackageServiceImpl extends CommonServiceImpl<DecoratePackag
 				}
 				ret.put(Constants.DATA_BODY, array.toString());
 			}
-			RedisUtil.set(cacheKey, ret, MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
+			RedisUtil.set(cacheKey, ret, CacheTimeout.DEFAULT_TIMEOUT_24H);
 		}
 		return ret;
 	}
@@ -96,7 +96,7 @@ public class DecoratePackageServiceImpl extends CommonServiceImpl<DecoratePackag
 		}
 		dao.updateStatus(userId, decorateId, status);
 		// 完成之后，更新缓存
-		String cacheKey = MCPrefix.DECORATEPACKAGE_USER_CACHE + userId;
+		String cacheKey = CacheKey.DECORATEPACKAGE_USER_CACHE + userId;
 		RedisUtil.del(cacheKey);
 	}
 

@@ -11,20 +11,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.alibaba.fastjson.JSONObject;
+import com.lm.live.account.domain.UserAccount;
 import com.lm.live.base.service.IUserAccusationInfoService;
 import com.lm.live.base.vo.AccusationVo;
+import com.lm.live.base.vo.ShareInfo;
 import com.lm.live.common.controller.BaseController;
 import com.lm.live.common.utils.HttpUtils;
 import com.lm.live.common.utils.LogUtil;
 import com.lm.live.common.utils.RequestUtil;
+import com.lm.live.common.utils.StrUtil;
 import com.lm.live.common.vo.DeviceProperties;
 import com.lm.live.common.vo.Page;
 import com.lm.live.common.vo.RequestVo;
 import com.lm.live.common.vo.Result;
 import com.lm.live.decorate.service.IDecoratePackageService;
 import com.lm.live.guard.service.IGuardService;
+import com.lm.live.guard.vo.GuardVo;
 import com.lm.live.room.service.IRoomService;
-import com.lm.live.room.vo.ShareInfo;
 import com.lm.live.user.enums.ErrorCode;
 import com.lm.live.user.exception.UserBizException;
 import com.lm.live.web.vo.DataRequest;
@@ -383,12 +386,29 @@ public class RoomWeb  extends BaseController{
 		JSONObject jsonRes = new JSONObject();
 		try {
 			if(data==null  
-					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())
+					|| !data.getData().containsKey(GuardVo .class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
 				throw new UserBizException(ErrorCode.ERROR_101);
 			}
+			GuardVo vo = new GuardVo();
+			vo.parseJson(data.getData().getJSONObject(vo.getShortName()));
+			int guardType = vo.getGuardType();
+			int priceType = vo.getPriceType();
+			int workId = vo.getWorkId();
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
+			String userId = req.getUserId();
+			String anchorId = req.getTargetId();
+			String roomId = req.getRoomId();
+			if(StrUtil.isNullOrEmpty(userId) || StrUtil.isNullOrEmpty(roomId)
+					|| StrUtil.isNullOrEmpty(anchorId)) {
+				throw new UserBizException(ErrorCode.ERROR_101);
+			}
+			// my-todo
+			// 同步处理，是否需要改为分布式锁来处理。
+			synchronized(UserAccount.class) {
+				roomService.buyGuard(userId, anchorId, roomId, workId, guardType, priceType);
+			}
 		} catch(UserBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());

@@ -10,7 +10,7 @@ import com.lm.live.common.vo.BaseVo;
  * @date 2017-03-16 14:10:32
  * @author test2
  */
-public class LevelHistUser extends BaseVo {
+public class LevelHisUser extends BaseVo {
 	private static final long serialVersionUID = 1L;
 	/** id */
 	private int id;

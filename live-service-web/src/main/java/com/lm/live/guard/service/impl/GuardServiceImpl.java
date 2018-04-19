@@ -9,23 +9,43 @@ import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.lm.live.common.constant.MCTimeoutConstants;
+import com.lm.live.account.domain.UserAccount;
+import com.lm.live.account.domain.UserAccountBook;
+import com.lm.live.account.service.IUserAccountService;
+import com.lm.live.cache.constants.CacheKey;
+import com.lm.live.cache.constants.CacheTimeout;
+import com.lm.live.common.enums.IMBusinessEnum.ImTypeEnum;
 import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.utils.DateUntil;
+import com.lm.live.common.utils.IMutils;
 import com.lm.live.common.utils.LogUtil;
+import com.lm.live.common.utils.StrUtil;
 import com.lm.live.common.vo.Page;
 import com.lm.live.guard.constant.Constants;
-import com.lm.live.guard.constant.MCPrefix;
+import com.lm.live.guard.dao.GuardConfMapper;
+import com.lm.live.guard.dao.GuardPayHisMapper;
+import com.lm.live.guard.dao.GuardWorkConfMapper;
 import com.lm.live.guard.dao.GuardWorkMapper;
+import com.lm.live.guard.domain.GuardConf;
+import com.lm.live.guard.domain.GuardPayHis;
+import com.lm.live.guard.domain.GuardWork;
+import com.lm.live.guard.domain.GuardWorkConf;
+import com.lm.live.guard.enums.ErrorCode;
+import com.lm.live.guard.enums.GuardTableEnum;
+import com.lm.live.guard.exception.GuardBizException;
 import com.lm.live.guard.service.IGuardService;
 import com.lm.live.guard.vo.GuardVo;
 import com.lm.live.user.service.IUserCacheInfoService;
 import com.lm.live.user.vo.UserInfo;
+import com.lm.live.user.vo.UserInfoVo;
+import com.lm.live.userbase.domain.UserAnchor;
 import com.lm.live.userbase.domain.UserInfoDo;
+import com.lm.live.userbase.service.IUserAnchorService;
 import com.lm.live.userbase.service.IUserBaseService;
 
 @Service("guardService")
@@ -35,16 +55,29 @@ public class GuardServiceImpl implements IGuardService {
 	private GuardWorkMapper gwMapper;
 	
 	@Resource
+	private GuardConfMapper gcMapper;
+	
+	@Resource
+	private GuardWorkConfMapper gwcMapper;
+	
+	@Resource
+	private GuardPayHisMapper gphMapper;
+	
+	@Resource
 	private IUserCacheInfoService userCacheInfoService;
 	
 	@Resource
 	private IUserBaseService userBaseService;
+	
+	@Resource
+	private IUserAccountService userAccountService;
+	
 
 	@Override
 	public JSONObject getGuardData(String userId, Page page) throws Exception {
 		JSONObject json = new JSONObject();
 		List<GuardVo> guardList = null;
-		String key = MCPrefix.GUARD_USER_CACHE + userId;
+		String key = CacheKey.GUARD_USER_CACHE + userId;
 		List<GuardVo> cache = RedisUtil.getList(key, GuardVo.class);
 		if(cache != null) {
 			guardList = cache;
@@ -53,7 +86,7 @@ public class GuardServiceImpl implements IGuardService {
 			if(guardList == null ){
 				guardList = new ArrayList<GuardVo>();
 			}
-			RedisUtil.set(key, guardList, MCTimeoutConstants.DEFAULT_TIMEOUT_10M);
+			RedisUtil.set(key, guardList, CacheTimeout.DEFAULT_TIMEOUT_10M);
 		}
 		JSONArray jsonArray = new JSONArray();
 		JSONArray resultArray = new JSONArray();
@@ -118,10 +151,10 @@ public class GuardServiceImpl implements IGuardService {
 		// 从缓存中查询当前用户是否是该房间的守护
 		List<Map> guardList = getUserGuardInfoByRoomCache(userId, roomId);
 		if(guardList == null || guardList.size() == 0) { // 非守护和游客的缓存
-			key = MCPrefix.ROOM_GUARD_COMMON_CACHE + roomId ;
+			key = CacheKey.ROOM_GUARD_COMMON_CACHE + roomId ;
 		} else { // 守护个人缓存
 			isGuard = true;
-			key = MCPrefix.ROOM_GUARD_VIP_CACHE + roomId + userId;
+			key = CacheKey.ROOM_GUARD_VIP_CACHE + roomId + userId;
 		}
 		String obj = RedisUtil.get(key);
 		if(!StringUtils.isEmpty(obj)) {
@@ -227,7 +260,7 @@ public class GuardServiceImpl implements IGuardService {
 				array.add(vo.buildJson());
 			}
 			// 放入缓存
-			RedisUtil.set(key, array, MCTimeoutConstants.DEFAULT_TIMEOUT_30M);
+			RedisUtil.set(key, array, CacheTimeout.DEFAULT_TIMEOUT_30M);
 			LogUtil.log.info("### mydebug,从db中查询守护列表,end，key="+key);
 		} 
 		if(array != null && array.size() >0) {
@@ -236,23 +269,145 @@ public class GuardServiceImpl implements IGuardService {
 		return ret;
 	}
 	
-	public List<Map> getUserGuardInfoByRoomCache(String userId,
+	
+	@Override
+	public GuardConf getGuardConfData(int guardType, int priceType)
+			throws Exception {
+		return gcMapper.getGuardConfData(guardType,priceType);
+	}
+	
+	@Override
+	public GuardWork getGuardWork(int workId) throws Exception {
+		return gwMapper.getObjectById(workId);
+	}
+	
+	@Override
+	public List<GuardWork> listRoomGuardData(String roomId) throws Exception {
+		if(StrUtil.isNullOrEmpty(roomId)) {
+			return null;
+		}
+		return gwMapper.listRoomGuardData(roomId);
+	}
+	
+	@Override
+	public GuardWorkConf getGuardWorkConfData(String roomId) throws Exception {
+		if(StrUtil.isNullOrEmpty(roomId)) {
+			return null;
+		}
+		return gwcMapper.getGuardWorkConfData(roomId);
+	}
+	
+	/**
+	 * 更新有效的守护
+	 *@return
+	 *@throws Exception
+	 *@author shao.xiang
+	 *@data 2018年4月16日
+	 */
+	@Override
+	public GuardWork addOrUpdateWorkHis(String userId, String roomId, int workId, int guardId,
+			int isPeriod, int validate, boolean isContinue) throws Exception {
+		boolean isPeriodDB = true; // 是否有时间限制,默认有
+		if(isPeriod == 0) {
+			isPeriodDB = false;
+		}
+		// 续期
+		if(isContinue) {
+			GuardWork gkHis = gwMapper.getObjectById(workId);
+			if(!isPeriodDB) { // 没有时间限制的，设置结束时间为null
+				gkHis.setIsperiod(isPeriod);
+				gkHis.setEndtime(null);
+			} else {
+				Date oldTime = gkHis.getEndtime();
+				Date newTime = DateUntil.addDatyDatetime(oldTime, validate);
+				gkHis.setEndtime(newTime);
+			}
+			gwMapper.update(gkHis);
+			return gkHis;
+		} else {
+			// 没有记录，则新增一条
+			GuardWork vo = new GuardWork();
+			vo.setGuardid(guardId);
+			vo.setUserid(userId);
+			vo.setRoomid(roomId);
+			vo.setIsperiod(isPeriod);
+			vo.setEndtime(DateUntil.addDatyDatetime(new Date(), validate));
+			gwMapper.insert(vo);
+			return vo;
+		}
+	}
+	
+	/**
+	 * 增加购买历史
+	 *@return
+	 *@throws Exception
+	 *@author shao.xiang
+	 *@data 2018年4月16日
+	 */
+	@Override
+	public GuardPayHis addPayHis(String userId, String roomId, int workId, int guardId,
+			int validate, Date time,int price,int diamond,String toUserId,String remark) throws Exception {
+		Date now = new Date();
+		GuardPayHis his = new GuardPayHis();
+		his.setWorkId(workId);
+		his.setGuardid(guardId);
+		his.setUserid(userId);
+		his.setRoomid(roomId);
+		his.setBegintime(now);
+		his.setValidate(validate);
+		his.setPrice(price);
+		his.setDiamond(diamond);
+		his.setToUserId(toUserId);
+		his.setRemark(remark);
+		gphMapper.insert(his);
+		return his;
+	}
+	
+	/**
+	 * 清理守护相关缓存
+	 *@param userId
+	 *@param roomId
+	 *@throws Exception
+	 *@author shao.xiang
+	 *@data 2018年4月16日
+	 */
+	@Override
+	public void clean(String userId, String roomId) throws Exception {
+		//1 清除游客和非守护缓存
+		String youkeKey = CacheKey.ROOM_GUARD_COMMON_CACHE +roomId;
+		RedisUtil.del(youkeKey);
+		//2，清除房间内所有守护缓存
+		List<GuardWork> listWork = gwMapper.listRoomGuardData(roomId);
+		if(listWork != null && listWork.size() >0) {
+			for(GuardWork vo : listWork) {
+				String userId2 = vo.getUserid();
+				String userKey = CacheKey.ROOM_GUARD_VIP_CACHE + roomId + userId2;
+				RedisUtil.del(userKey);
+			}
+		}
+		String userKey = CacheKey.ROOM_GUARD_VIP_CACHE + roomId + userId;
+		RedisUtil.del(userKey);
+
+		
+	}
+	
+	private List<Map> getUserGuardInfoByRoomCache(String userId,
 			String roomId) throws Exception {
 		if(StringUtils.isEmpty(userId) || StringUtils.isEmpty(roomId)) {
 			return null;
 		}
 		List<Map> list = null;
-		String key = MCPrefix.ROOM_GUARD_VIP_CACHE + roomId + userId;
+		String key = CacheKey.ROOM_GUARD_VIP_CACHE + roomId + userId;
 		List<Map> obj = RedisUtil.getList(key, Map.class);
 		if(obj != null) {
 			list = obj;
 		} else {
-			list = gwMapper.getGuardWorkData(userId, roomId);
+			list = gwMapper.getUserGuardRoomData(userId, roomId);
 			if(list != null) {
 				RedisUtil.set(key, list);
 			}
 		}
 		return list;
 	}
-
+	
 }

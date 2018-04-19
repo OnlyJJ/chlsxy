@@ -15,11 +15,11 @@ import com.lm.live.base.constant.Constants;
 import com.lm.live.base.dao.ServiceLogMapper;
 import com.lm.live.base.domain.ServiceLog;
 import com.lm.live.base.service.IIpStoreService;
-import com.lm.live.common.constant.MCPrefix;
+import com.lm.live.cache.constants.CacheKey;
+import com.lm.live.cache.util.CacheUtil;
 import com.lm.live.common.utils.HttpUtils;
 import com.lm.live.common.utils.JsonUtil;
 import com.lm.live.common.utils.LogUtil;
-import com.lm.live.common.utils.MemcachedUtil;
 import com.lm.live.common.vo.DeviceProperties;
 import com.lm.live.framework.service.ServiceResult;
 import com.lm.live.pay.dao.PayChargeOrderMapper;
@@ -28,6 +28,7 @@ import com.lm.live.pay.enums.ErrorCode;
 import com.lm.live.pay.enums.TradeTypeEnum;
 import com.lm.live.pay.exception.PayBizException;
 import com.lm.live.pay.service.IChargeCommonService;
+import com.lm.live.user.service.IUserCacheInfoService;
 import com.lm.live.userbase.service.IUserBaseService;
 
 @Service("chargeCommonService")
@@ -47,6 +48,9 @@ public class ChargeCommonServiceImpl implements IChargeCommonService{
 	
 	@Resource
 	private IUserBaseService userBaseService;
+	
+	@Resource 
+	private IUserCacheInfoService userCacheInfoService;
 	
 	@Transactional(rollbackFor=Exception.class)
 	@Override
@@ -131,10 +135,10 @@ public class ChargeCommonServiceImpl implements IChargeCommonService{
 		// 账户明细
 		UserAccountBook userAccountBook = new UserAccountBook();
 		userAccountBook.setUserId(userId);
-		userAccountBook.setChangeGolds(golds);
+		userAccountBook.setChangeGold(golds);
 		userAccountBook.setSourceId(orderId);
 		userAccountBook.setSourceDesc("sourceId为t_pay_charge_order订单id");
-		userAccountBook.setContent("充值，增加金币");
+		userAccountBook.setRemark("充值，增加金币");
 		userAccountBook.setRecordTime(new Date());
 		
 		userAccountService.addGolds(userId, golds,userAccountBook);
@@ -168,8 +172,7 @@ public class ChargeCommonServiceImpl implements IChargeCommonService{
 		try {
 			// m-todo，这个缓存有时间要重新设计一下
 			// 充值成功，清空一下用户缓存
-			String userCacheKey = MCPrefix.USERCACHEINFO_PREKEY + userId;
-			MemcachedUtil.delete(userCacheKey);
+			CacheUtil.clean(CacheKey.USER_INFO_CACHE + userId);
 		} catch (Exception e) {
 			LogUtil.log.error(e.getMessage() ,e);
 		}

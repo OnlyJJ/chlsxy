@@ -11,7 +11,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.lm.live.base.dao.UserAccusationInfoMapper;
 import com.lm.live.base.domain.UserAccusationInfo;
 import com.lm.live.base.service.IUserAccusationInfoService;
-import com.lm.live.base.service.ImageHelper;
+import com.lm.live.base.service.IPictureService;
 import com.lm.live.base.vo.AccusationVo;
 import com.lm.live.common.service.impl.CommonServiceImpl;
 import com.lm.live.common.utils.LogUtil;
@@ -37,7 +37,7 @@ public class UserAccusationInfoServiceImpl extends CommonServiceImpl<UserAccusat
 	private IUserBaseService userBaseService;
 	
 	@Resource
-	private ImageHelper imageHelper;
+	private IPictureService pictureService;
 	
 	@Override
 	public void recordAccusationInfo(String userId, String toUserId, AccusationVo vo) throws Exception {
@@ -77,7 +77,7 @@ public class UserAccusationInfoServiceImpl extends CommonServiceImpl<UserAccusat
 				for(int i=0; i<imageList.size(); i++){
 					JSONObject json = imageList.getJSONObject(i);
 					String tempImg = json.getString("img");
-					this.imageHelper.accusationImgDispose(userId, aiId, ratioIndex, tempImg);
+					pictureService.accusationImgDispose(userId, aiId, ratioIndex, tempImg);
 					ratioIndex++;
 				}
 			}
@@ -87,7 +87,7 @@ public class UserAccusationInfoServiceImpl extends CommonServiceImpl<UserAccusat
 				for(int i=0; i<imageList.size(); i++){
 					JSONObject json = imageList.getJSONObject(i);
 					String tempImg = json.getString("img");
-					this.imageHelper.deleteAccusationImg(tempImg);
+					pictureService.deleteAccusationImg(tempImg);
 				}
 			}
 		}

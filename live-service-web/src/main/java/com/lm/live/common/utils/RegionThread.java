@@ -1,6 +1,7 @@
 package com.lm.live.common.utils;
 
-import com.lm.live.common.constant.MCPrefix;
+import com.lm.live.cache.constants.CacheKey;
+
 
 /**
  * 根据ip加载归属地
@@ -18,7 +19,7 @@ public class RegionThread extends Thread {
 			if (!StrUtil.isNullOrEmpty(code)) {
 				String[] ip_split = ip.split("\\.");
 				String shortIp = ip_split[0] + "." + ip_split[1] + "." + ip_split[2];//取前三段ip缓存
-				String ipKey = MCPrefix.USER_IP_REGION_CACHE+shortIp;
+				String ipKey = CacheKey.USER_IP_REGION_CACHE+shortIp;
 				MemcachedUtil.set(ipKey, code);
 				LogUtil.log.info(String.format("###RegionThread select code=%s,cacheKey=%s",code,ipKey));
 			}

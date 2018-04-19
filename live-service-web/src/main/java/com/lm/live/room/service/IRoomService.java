@@ -55,4 +55,19 @@ public interface IRoomService {
 	 * @data 2018年4月15日
 	 */
 	void recordRoomOnlineMember(String userId, String roomId, int type) throws Exception;
+	
+	/**
+	 * 购买守护
+	 *@param userId 购买者
+	 *@param anchorId 守护的主播
+	 *@param roomId 守护的房间
+	 *@param workId 续期时传递的参数，首次购买为0
+	 *@param guardType 守护类型
+	 *@param priceType 守护价格
+	 *@throws Exception
+	 *@author shao.xiang
+	 *@data 2018年4月16日
+	 */
+	void buyGuard(String userId, String anchorId, String roomId,int workId, int guardType, int priceType) throws Exception;
+	
 }

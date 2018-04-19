@@ -41,7 +41,7 @@ public class BaseConstants {
 	
 	public static final String cdnPath = SpringContextListener.getContextProValue("cdnPath", "http://192.168.1.70:8616/upload/");
 	
-	public static final String SENDUSER_DEFAULT = "system"; //默认系统赠送
+	public static final String SENDUSER_DEFAULT = "system";
 	
 	/**  与IM之间约定的指定为系统身份的userId */
 	public static final String 	SYSTEM_USERID_OF_IM = SpringContextListener.getContextProValue("system.user.userId", "100000");
@@ -61,7 +61,11 @@ public class BaseConstants {
 	
 	/** 需要屏蔽掉的用户 ，多个账号以逗号隔开*/
 	public static final String HIDE_USER = "100000";
-	
+	/** 未获取到ip归属地时，统一使用的用户昵称前缀 */
+	public static String DEFAULT_VISITOR_NAME = "异次元";
+	/** 官方账号,多个以逗号隔开 */
+	public static String OFFICIAL_USER = "100000";
+	public static String OFFICIAL_NAME = "系统公告";
 	/** 游客用户前缀 */
 	public static final String PSEUDO_PREFIX = "pesudo_";
 	/** 机器人用户前缀 */
@@ -78,7 +82,13 @@ public class BaseConstants {
 	/** 状态（int），1-是 */
 	public static final int STATUS_1 = 1;
 	/** 逗号分隔符 */
-	public static final String SEPARATOR = ",";
+	public static final String SEPARATOR_COMMA = ",";
+	/** 冒号分隔符 */
+	public static final String SEPARATOR_COLON = ":";
+	/** 反斜线 */
+	public static final String SEPARATOR_SLASH = "/";
+	
+	
 	/** 日期格式，yyyy-MM-dd */
 	public static String DATEFORMAT_YMD = "yyyy-MM-dd";
 	/** 日期格式，yyyyMMdd */

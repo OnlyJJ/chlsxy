@@ -8,11 +8,11 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.lm.live.common.constant.MCTimeoutConstants;
+import com.lm.live.cache.constants.CacheKey;
+import com.lm.live.cache.constants.CacheTimeout;
 import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.service.impl.CommonServiceImpl;
 import com.lm.live.common.vo.Page;
-import com.lm.live.userbase.constant.MCPrefix;
 import com.lm.live.userbase.dao.UserAnchorMapper;
 import com.lm.live.userbase.domain.UserAnchor;
 import com.lm.live.userbase.enums.ErrorCode;
@@ -40,13 +40,13 @@ public class UserAnchorServiceImpl extends CommonServiceImpl<UserAnchorMapper, U
 		if(StringUtils.isEmpty(userId)) {
 			throw new UserBaseBizException(ErrorCode.ERROR_101);
 		}
-		String key = MCPrefix.ANCHOR_BASE_CACHE + userId;
+		String key = CacheKey.ANCHOR_BASE_CACHE + userId;
 		UserAnchor ua = RedisUtil.getJavaBean(key, UserAnchor.class);
 		if(ua != null) {
 			return ua;
 		}
 		ua = dao.getAnchorById(userId);
-		RedisUtil.set(key, ua, MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
+		RedisUtil.set(key, ua, CacheTimeout.DEFAULT_TIMEOUT_24H);
 		return ua;
 	}
 
@@ -73,11 +73,11 @@ public class UserAnchorServiceImpl extends CommonServiceImpl<UserAnchorMapper, U
 		// 更新db
 		dao.modifyAnchorFansCount(anchorId, num);
 		// 更新缓存
-		String key = MCPrefix.ANCHOR_FANSCOUNT_CACHE + anchorId;
+		String key = CacheKey.ANCHOR_FANSCOUNT_CACHE + anchorId;
 		String fans = RedisUtil.get(key);
 		if(!StringUtils.isEmpty(fans)) {
 			int count = Integer.parseInt(fans);
-			RedisUtil.set(key, count, MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
+			RedisUtil.set(key, count, CacheTimeout.DEFAULT_TIMEOUT_24H);
 		}
 	}
 
@@ -87,14 +87,14 @@ public class UserAnchorServiceImpl extends CommonServiceImpl<UserAnchorMapper, U
 			return 0;
 		}
 		int count = 0;
-		String key = MCPrefix.ANCHOR_FANSCOUNT_CACHE + anchorId;
+		String key = CacheKey.ANCHOR_FANSCOUNT_CACHE + anchorId;
 		String fans = RedisUtil.get(key);
 		if(!StringUtils.isEmpty(fans)) {
 			count = Integer.parseInt(fans);
 		} else {
 			count = dao.getAnchorFansCount(anchorId);
 		}
-		RedisUtil.set(key, count, MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
+		RedisUtil.set(key, count, CacheTimeout.DEFAULT_TIMEOUT_24H);
 		return count;
 	}
 

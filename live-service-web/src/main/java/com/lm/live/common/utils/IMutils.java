@@ -7,8 +7,8 @@ import java.util.Map;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
-import com.lm.live.common.constant.MCPrefix;
-import com.lm.live.common.constant.MCTimeoutConstants;
+import com.lm.live.cache.constants.CacheKey;
+import com.lm.live.cache.constants.CacheTimeout;
 import com.lm.live.common.enums.ErrorCode;
 import com.lm.live.common.exception.SystemDefinitionException;
 import com.lm.live.common.redis.RedisUtil;
@@ -155,8 +155,8 @@ public class IMutils {
 	 */
 	private static String getImtoken(String userId) {
 		String imToken = Md5CommonUtils.getMD5String(userId);
-		String cacheKey = MCPrefix.IM_MC_SESSION_+imToken;
-		int timeoutSecond = MCTimeoutConstants.DEFAULT_TIMEOUT_5M;
+		String cacheKey = CacheKey.IM_MC_SESSION_+imToken;
+		int timeoutSecond = CacheTimeout.DEFAULT_TIMEOUT_5M;
 		RedisUtil.set(cacheKey, userId, timeoutSecond);
 		return imToken;
 	}

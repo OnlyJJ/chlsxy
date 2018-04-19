@@ -9,14 +9,19 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.lm.live.cache.constants.CacheKey;
 import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.utils.HttpUtils;
 import com.lm.live.common.vo.Page;
-import com.lm.live.decorate.contants.MCPrefix;
 import com.lm.live.decorate.service.IDecoratePackageService;
 import com.lm.live.guard.service.IGuardService;
+import com.lm.live.room.service.IRoomService;
+import com.lm.live.user.constant.Constants;
+import com.lm.live.user.service.IUserCacheInfoService;
 import com.lm.live.user.service.IUserInfoService;
+import com.lm.live.user.vo.UserCache;
 import com.lm.live.user.vo.UserInfo;
+import com.lm.live.user.vo.UserInfoVo;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -31,28 +36,60 @@ public class ServiceTest {
 	
 	@Resource
 	private IGuardService guardService;
+	
+	@Resource
+	private IRoomService roomService;
+	
+	@Resource
+	private IUserCacheInfoService userCacheInfoService;
 
 	@Test
 	public void test() {
 		String userId = "100357";
+		String roomId = "102692";
+		String anchorId = "102029";
 		try {
 //			UserInfo vo = userInfoService.getUserInfo(userId);
 			Page page = new Page();
 			page.setCount(0);
 			page.setPageNum(1);
 			page.setPagelimit(36);
+			UserInfo vo = new UserInfo();
+			vo.setSex("m");
+			vo.setNickName("渣渣辉");
+			vo.setRemark("你是个渣渣呀");
+			vo.setUserId(userId);
+//			userInfoService.modifyUserBase(vo);
 //			userInfoService.userAttention(userId, "102029", 0);
 //			JSONObject jsonRes = userInfoService.listFans(userId, page);
 //			decoratePackageService.updateStatus(userId, 1, 1);;
 //			String cacheKey = MCPrefix.DECORATEPACKAGE_USER_CACHE + userId;
 //			RedisUtil.del(cacheKey);
 //			JSONObject jsonRes = decoratePackageService.getUserDecorateData(userId);
-			JSONObject jsonRes =  guardService.getGuardData(userId, page);
+//			JSONObject jsonRes =  guardService.getGuardData(userId, page);
+//			JSONObject jsonRes = decoratePackageService.getRoomDecorateData(anchorId);
+//			roomService.recordRoomOnlineMember(userId, roomId, 1);
+			String key = CacheKey.USER_ROOM_INFO_CACHE + userId + Constants.SEPARATOR_COLON + roomId;
+			RedisUtil.del(key);
+			roomService.recordRoomOnlineMember(userId, roomId, 1);
+			JSONObject jsonRes = roomService.getRoomOnlineData(roomId, page);
+//			roomService.buyGuard(userId, anchorId, roomId, 0, 1, 1);
+//			JSONObject jsonRes = guardService.getRoomGuardData(userId, roomId);
 			if(jsonRes != null) {
 				System.err.println(jsonRes.toString());
 			} else {
 				System.err.println("null ....");
 			}
+//			UserCache info = userCacheInfoService.getUserByChe(userId);
+//			UserCache info = userCacheInfoService.getUserInRoomChe(userId, roomId);
+//			UserInfoVo info = userCacheInfoService.getUserFromCache(userId, roomId);
+//			String name = userCacheInfoService.getAndSetPesudoUserName(userId, null);
+//			if(info != null) {
+//				System.err.println(JSON.toJSON(info));
+//			} else {
+//				System.err.println("null ....");
+//			}
+//			System.err.println("name =" + name);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

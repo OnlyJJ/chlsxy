@@ -12,15 +12,14 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.lm.live.common.constant.MCTimeoutConstants;
+import com.lm.live.cache.constants.CacheKey;
+import com.lm.live.cache.constants.CacheTimeout;
 import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.utils.DateUntil;
 import com.lm.live.common.utils.JsonUtil;
 import com.lm.live.common.utils.LogUtil;
-import com.lm.live.common.utils.MemcachedUtil;
 import com.lm.live.common.vo.Page;
 import com.lm.live.home.contant.Constants;
-import com.lm.live.home.contant.MCPrefix;
 import com.lm.live.home.dao.HomePageMapper;
 import com.lm.live.home.enums.ErrorCode;
 import com.lm.live.home.enums.HomePageEnum;
@@ -75,13 +74,13 @@ public class HomePageServiceImpl implements IHomePageService {
 		int pageNum = page.getPageNum();
 		int pageLimit = page.getPagelimit();
 		// 1、从一级缓存中取
-		String oneKey = MCPrefix.HOMEPAGE_RANK_ONE_CACHE + pageNum;
+		String oneKey = CacheKey.HOMEPAGE_RANK_ONE_CACHE + pageNum;
 		String oneChe = RedisUtil.get(oneKey);
 		if(!StringUtils.isEmpty(oneChe)) {
 			ret = JSON.parseObject(oneChe);
 		} else {
 			// 一级缓存失效，从二级缓存取
-			String twoKey = MCPrefix.HOMEPAGE_RANK_TWO_CACHE + pageNum;
+			String twoKey = CacheKey.HOMEPAGE_RANK_TWO_CACHE + pageNum;
 			String twoChe = RedisUtil.get(twoKey);
 			if(!StringUtils.isEmpty(twoChe)) {
 				ret = JSON.parseObject(twoChe);
@@ -162,13 +161,13 @@ public class HomePageServiceImpl implements IHomePageService {
 		int pageNum = page.getPageNum();
 		int pageLimit = page.getPagelimit();
 		// 先从缓存中取-一级缓存
-		String oneDataKey = MCPrefix.HOMEPAGE_ANCHOR_ONE_CACHE + pageNum;
+		String oneDataKey = CacheKey.HOMEPAGE_ANCHOR_ONE_CACHE + pageNum;
 		String oneData = RedisUtil.get(oneDataKey);
 		if(!StringUtils.isEmpty(oneData)) {
 			ret = JsonUtil.strToJsonObject(oneData);
 		} else {
 			// 一级缓存失效，从二级缓存中取
-			String twoDataKey = MCPrefix.HOMEPAGE_ANCHOR_TWO_CACHE + pageNum;
+			String twoDataKey = CacheKey.HOMEPAGE_ANCHOR_TWO_CACHE + pageNum;
 			String twoData = RedisUtil.get(twoDataKey);
 			if(!StringUtils.isEmpty(twoData)) {
 				ret = JsonUtil.strToJsonObject(twoData);
@@ -191,7 +190,7 @@ public class HomePageServiceImpl implements IHomePageService {
 				StringBuilder userIdList = new StringBuilder();
 				userIdList.append("(");
 				if(!StringUtils.isEmpty(Constants.HIDE_USER)) {
-					String[] ids = Constants.HIDE_USER.split(Constants.SEPARATOR);
+					String[] ids = Constants.HIDE_USER.split(Constants.SEPARATOR_COMMA);
 					for(String uid: ids) {
 						userIdList.append("'").append(uid).append("'");
 					}
@@ -263,8 +262,8 @@ public class HomePageServiceImpl implements IHomePageService {
 				ret.put(page.getShortName(), page.buildJson());
 				
 				// 放入缓存
-				RedisUtil.set(oneDataKey, ret, MCTimeoutConstants.DEFAULT_TIMEOUT_3M);
-				RedisUtil.set(twoDataKey, ret, MCTimeoutConstants.DEFAULT_TIMEOUT_10M);
+				RedisUtil.set(oneDataKey, ret, CacheTimeout.DEFAULT_TIMEOUT_3M);
+				RedisUtil.set(twoDataKey, ret, CacheTimeout.DEFAULT_TIMEOUT_10M);
 			} catch(Exception e) {
 				LogUtil.log.error(e.getMessage(), e);
 				throw new HomeBizException(ErrorCode.ERROR_100);

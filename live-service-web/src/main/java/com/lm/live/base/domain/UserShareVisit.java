@@ -1,4 +1,4 @@
-package com.lm.live.room.domain;
+package com.lm.live.base.domain;
 
 import java.util.Date;
 

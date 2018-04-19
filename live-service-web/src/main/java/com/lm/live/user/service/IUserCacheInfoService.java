@@ -1,6 +1,6 @@
 package com.lm.live.user.service;
 
-import com.lm.live.user.vo.UserCacheInfo;
+import com.lm.live.user.vo.UserCache;
 import com.lm.live.user.vo.UserInfo;
 import com.lm.live.user.vo.UserInfoVo;
 
@@ -13,6 +13,26 @@ import com.lm.live.user.vo.UserInfoVo;
 public interface IUserCacheInfoService {
 	
 	/**
+	 * 获取用户基础信息</br>
+	 * 使用时应该校验是否为空
+	 *@param userId 用户
+	 *@return
+	 *@author shao.xiang
+	 *@data 2018年4月18日
+	 */
+	UserCache getUserByChe(String userId);
+	
+	/**
+	 * 获取用户在房间的基本信息
+	 *@param userId 用户
+	 *@param roomId 房间
+	 *@return
+	 *@author shao.xiang
+	 *@data 2018年4月18日
+	 */
+	UserCache getUserInRoomChe(String userId, String roomId);
+	
+	/**
 	 * 通过房间查找主播（基本信息，缓存）
 	 *@param roomId
 	 *@return
@@ -22,21 +42,21 @@ public interface IUserCacheInfoService {
 	UserInfo getAnchorByRoomId(String roomId);
 	
 	/**
-	 * 从cache中获取用户在房间内的信息
-	 * @param uid 用户id
-	 * @param roomId 房间id(依据roomId判断用户身份:主播、房管、普通用户),参数为空则返回标示为普通用户
-	 * @return
-	 * @throws Exception
+	 * 获取用户信息，用于交互IM，其他业务请使用UserCache
+	 *@param userId 用户
+	 *@param roomId 房间
+	 *@return
+	 *@author shao.xiang
+	 *@data 2018年4月18日
 	 */
-	public UserInfoVo getInfoFromCache(String uid,String roomId) throws Exception;
-	
+	UserInfoVo getUserFromCache(String userId, String roomId) throws Exception ;
 	
 	/**
 	 * 删除用户的缓存信息
 	 * @param userId
 	 * @throws Exception
 	 */
-	public void removeUserCacheInfo(String userId) throws Exception;
+	void removeUserCacheInfo(String userId) throws Exception;
 	
 	/**
 	 * 获取/设置游客的昵称
@@ -44,6 +64,6 @@ public interface IUserCacheInfoService {
 	 * @param ip 客户端ip
 	 * @throws Exception
 	 */
-	public String getAndSetPesudoUserName(String userId,String ip) throws Exception;
-
+	String getAndSetPesudoUserName(String userId,String ip);
+	
 }

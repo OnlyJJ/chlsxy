@@ -14,12 +14,12 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.lm.live.common.constant.MCTimeoutConstants;
+import com.lm.live.cache.constants.CacheKey;
+import com.lm.live.cache.constants.CacheTimeout;
 import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.service.impl.CommonServiceImpl;
 import com.lm.live.common.utils.LogUtil;
 import com.lm.live.common.utils.SpringContextListener;
-import com.lm.live.others.push.constant.MCPrefix;
 import com.lm.live.others.push.dao.PushDevMapper;
 import com.lm.live.others.push.dao.PushUserSetMapper;
 import com.lm.live.others.push.domain.PushConfig;
@@ -331,13 +331,13 @@ public class PushDevServiceImpl extends CommonServiceImpl<PushDevMapper, PushDev
 			throw new PushBizException(ErrorCode.ERROR_101);
 		}
 		PushDev vo = null;
-		String key = MCPrefix.XINGE_PUSH_CACHE + token;
+		String key = CacheKey.XINGE_PUSH_CACHE + token;
 		PushDev obj = RedisUtil.getJavaBean(key, PushDev.class);
 		if(obj == null) {
 			vo = (PushDev) obj;
 			vo = this.dao.getPushDev(userId, token);
 			if(vo != null) {
-				RedisUtil.set(key, vo, MCTimeoutConstants.DEFAULT_TIMEOUT_24H);
+				RedisUtil.set(key, vo, CacheTimeout.DEFAULT_TIMEOUT_24H);
 			}
 		} 
 		return vo;

@@ -21,8 +21,8 @@ import com.lm.live.others.push.enums.ErrorCode;
 import com.lm.live.others.push.exception.PushBizException;
 import com.lm.live.others.push.service.IPushUserSetService;
 import com.lm.live.others.push.vo.PushSetVo;
-import com.lm.live.user.service.IUserCacheInfoService;
-import com.lm.live.user.vo.UserInfoVo;
+import com.lm.live.userbase.domain.UserInfoDo;
+import com.lm.live.userbase.service.IUserBaseService;
 
 
 
@@ -41,7 +41,7 @@ public class PushUserSetServiceImpl extends CommonServiceImpl<PushUserSetMapper,
 	private PushUserSetAttentionMapper attentionnMapper;
 	
 	@Resource
-	private IUserCacheInfoService userCacheInfoService;
+	private IUserBaseService userBaseService;
 
 	@Override
 	public void savePushUserSet(String userId, PushSetVo vo) throws Exception {
@@ -94,10 +94,10 @@ public class PushUserSetServiceImpl extends CommonServiceImpl<PushUserSetMapper,
 					String anchorId = pusa.getTouserid();
 					String name = "";
 					String icon = "";
-					UserInfoVo user = this.userCacheInfoService.getInfoFromCache(anchorId, null);
+					UserInfoDo user = userBaseService.getUserInfoFromCache(anchorId);
 					if(user != null) {
-						name = user.getNickname();
-						icon = user.getAvatar();
+						name = user.getNickName();
+						icon = user.getIcon();
 					}
 					Map<String, Object> m = new HashMap<String, Object>(128);
 					m.put(PushSetVo.p_anchorId, anchorId);

@@ -11,7 +11,6 @@ import java.util.Map;
  *
  */
 public enum ErrorCode {
-	
 	/** 参数错误 */
 	ERROR_101(101, "参数错误"),
 	/** 不需要重新请求，只提示错误（未知的异常应该统一使用此信息返回客户端）  */
