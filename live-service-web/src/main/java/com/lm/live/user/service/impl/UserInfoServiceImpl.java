@@ -330,11 +330,10 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 	}
 
 	@Override
-	public void modifyUserBase(UserInfo user) throws Exception {
+	public void modifyUserBase(String userId, UserInfo user) throws Exception {
 		if(null == user) {
 			throw new UserBizException(ErrorCode.ERROR_101);
 		}
-		String userId = user.getUserId();
 		if(StringUtils.isEmpty(userId)) {
 			throw new UserBizException(ErrorCode.ERROR_101);
 		}

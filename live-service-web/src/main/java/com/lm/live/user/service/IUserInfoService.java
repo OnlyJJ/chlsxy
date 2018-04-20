@@ -69,7 +69,7 @@ public interface IUserInfoService  {
 	 *@author shao.xiang
 	 *@data 2018年3月20日
 	 */
-	void modifyUserBase(UserInfo user) throws Exception;
+	void modifyUserBase(String userId, UserInfo user) throws Exception;
 	
 	/**
 	 * 校验是否登录

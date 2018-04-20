@@ -479,12 +479,16 @@ public class UserWeb extends BaseController {
 		JSONObject jsonRes = new JSONObject();
 		try {
 			if(data==null  
+					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(UserInfo.class.getSimpleName().toLowerCase())) {
 				throw new UserBizException(ErrorCode.ERROR_101);
 			}
+			RequestVo req = new RequestVo();
+			req.parseJson(data.getData().getJSONObject(req.getShortName()));
+			String userId = req.getUserId();
 			UserInfo info = new UserInfo();
 			info.parseJson(data.getData().getJSONObject(info.getShortName()));
-			userInfoService.modifyUserBase(info);
+			userInfoService.modifyUserBase(userId, info);
 		} catch(UserBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
