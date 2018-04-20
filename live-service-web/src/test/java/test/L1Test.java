@@ -104,15 +104,22 @@ public class L1Test {
 	@Test
 	public void test2() {
 		 String url=  "";
-		 url=  "http://192.168.1.70:8616/R4/0/";
+		 url=  "http://127.0.0.1:8088/service_8616/U11/0/";
 		 JSONObject  json = new JSONObject();
-		 JSONObject  bannervo = new JSONObject();
+		 JSONObject  userinfo = new JSONObject();
+		 JSONObject  requestvo = new JSONObject();
 		 JSONObject  deviceproperties = new JSONObject();
+		 requestvo.put("a", "100357");
+		 userinfo.put("b3", "cococ2");
+		 userinfo.put("b6", "w");
+		 userinfo.put("g", "甘霖娘aaaaaa");
+		 
 		 deviceproperties.put("a", "M5 Note");
 		 deviceproperties.put("b", "F18A7B3C-7756-4E4B-B072-C6F3ABC0F034"); 
 		 deviceproperties.put("i", 1);
 		 json.put("deviceproperties", deviceproperties);
-		  
+		 json.put("userinfo", userinfo);
+		 json.put("requestvo", requestvo);
 		  System.out.println("#####str:"+json.toString());
 		 try {
 			String strRes = HttpUtils.post(url, json.toString());

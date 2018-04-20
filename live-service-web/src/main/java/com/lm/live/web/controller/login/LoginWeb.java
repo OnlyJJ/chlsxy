@@ -316,17 +316,13 @@ public class LoginWeb extends BaseController {
 		try {
 			if(data == null
 					|| !data.getData().containsKey(DeviceProperties.class.getSimpleName().toLowerCase())
-					|| !data.getData().containsKey(Code.class.getSimpleName().toLowerCase())
-					|| !data.getData().containsKey(UserBaseInfo.class.getSimpleName().toLowerCase())) {
+					|| !data.getData().containsKey(Code.class.getSimpleName().toLowerCase())) {
 				throw new LoginBizException(ErrorCode.ERROR_101);
 			}
-			UserBaseInfo userinfo = new UserBaseInfo();
-			userinfo.parseJson(data.getData().getJSONObject(userinfo.getShortName()));
-			
 			Code code = new Code();
 			code.parseJson(data.getData().getJSONObject(code.getShortName()));
 			if(code.getCode() != null
-					&& code.getCode().equals(Constants.CHECK_MD5CODE)) {
+					&& !code.getCode().equals(Constants.CHECK_MD5CODE)) {
 				throw new LoginBizException(ErrorCode.ERROR_100);
 			}
 			long time = System.currentTimeMillis(); 

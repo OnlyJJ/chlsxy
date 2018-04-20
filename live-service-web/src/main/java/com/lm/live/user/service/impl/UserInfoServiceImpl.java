@@ -356,9 +356,6 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 				throw new UserBizException(ErrorCode.ERROR_1002);
 			}
 			
-			if(newNickName.equals(dbUserInfo.getNickName())) { 
-				return;
-			}
 			newNickName = StrUtil.replaceSqlspecial(newNickName);
 			UserInfoDo userinfo = userBaseService.getUserByNickname(newNickName);
 			if(userinfo !=null && userinfo.getUserId() != userId){
