@@ -1,6 +1,7 @@
 package com.lm.live.appclient.vo;
 
 import java.io.Serializable;
+import java.util.List;
 
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.common.utils.JsonParseInterface;
@@ -17,7 +18,7 @@ public class AppStartupPageVo extends JsonParseInterface implements Serializable
 	/** 主题类型，0单张图片没动画 */
 	private int themeType;
 	/** 图片地址 */
-	private String imgUrl;
+	private List<String> imgUrl;
 	/** 0:不跳转;1:URL跳转*/
 	private int jumpType;
 	/** 跳转目标(根据jumpType而定,url地址) */
@@ -28,7 +29,7 @@ public class AppStartupPageVo extends JsonParseInterface implements Serializable
 		JSONObject json = new JSONObject();
 		try {
 			setInt(json,a_themeType,themeType);
-			setString(json,a_imgUrl,imgUrl);
+			setList(json,a_imgUrl,imgUrl);
 			setInt(json,a_jumpType,jumpType);
 			setString(json,a_jumpTarget,jumpTarget);
 		} catch (Exception e) {
@@ -62,14 +63,12 @@ public class AppStartupPageVo extends JsonParseInterface implements Serializable
 	}
 
 
-
-
-	public String getImgUrl() {
+	public List<String> getImgUrl() {
 		return imgUrl;
 	}
 
 
-	public void setImgUrl(String imgUrl) {
+	public void setImgUrl(List<String> imgUrl) {
 		this.imgUrl = imgUrl;
 	}
 

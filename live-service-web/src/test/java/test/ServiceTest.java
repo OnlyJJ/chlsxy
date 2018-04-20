@@ -8,14 +8,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.alibaba.fastjson.JSONObject;
+import com.lm.live.appclient.service.IAppStartupPageService;
+import com.lm.live.appclient.vo.AppStartupPageVo;
 import com.lm.live.base.service.IUserAccusationInfoService;
-import com.lm.live.cache.constants.CacheKey;
-import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.vo.Page;
 import com.lm.live.decorate.service.IDecoratePackageService;
 import com.lm.live.guard.service.IGuardService;
 import com.lm.live.home.service.IGwFilesService;
-import com.lm.live.home.vo.BannerVo;
 import com.lm.live.room.service.IRoomService;
 import com.lm.live.tools.service.IGiftService;
 import com.lm.live.tools.service.IUserPackageService;
@@ -54,6 +53,9 @@ public class ServiceTest {
 	
 	@Resource
 	private IGwFilesService gwFilesService;
+	
+	@Resource
+	private IAppStartupPageService appStartupPageService;
 
 	@Test
 	public void test() {
@@ -90,7 +92,7 @@ public class ServiceTest {
 //			String key = CacheKey.TOOL_GIFT_ALL_CACHE;
 //			RedisUtil.del(key);
 //			roomService.sendGift(userId, roomId, anchorId, 1, 1, 0);
-			JSONObject jsonRes =  giftService.qryGiftData();
+			AppStartupPageVo avo =  appStartupPageService.getAppStartupPage();
 //			AccusationVo av = new  AccusationVo();
 //			av.setAccusationType(1);
 //			av.setAccusationDesc("不开车，没意思");
@@ -99,8 +101,8 @@ public class ServiceTest {
 //			JSONObject jsonRes = guardService.getRoomGuardData(userId, roomId);
 //			JSONObject jsonRes = giftService.qryGiftData();
 //			JSONObject jsonRes =  userPackageService.listUserBagData(userId);
-			if(jsonRes != null) {
-				System.err.println(jsonRes.toString());
+			if(avo != null) {
+				System.err.println(avo.buildJson().toString());
 			} else {
 				System.err.println("null ....");
 			}
