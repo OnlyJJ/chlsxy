@@ -100,4 +100,25 @@ public class L1Test {
 			e.printStackTrace();
 		}
 	}
+	
+	@Test
+	public void test2() {
+		 String url=  "";
+		 url=  "http://192.168.1.70:8616/R4/0/";
+		 JSONObject  json = new JSONObject();
+		 JSONObject  bannervo = new JSONObject();
+		 JSONObject  deviceproperties = new JSONObject();
+		 deviceproperties.put("a", "M5 Note");
+		 deviceproperties.put("b", "F18A7B3C-7756-4E4B-B072-C6F3ABC0F034"); 
+		 deviceproperties.put("i", 1);
+		 json.put("deviceproperties", deviceproperties);
+		  
+		  System.out.println("#####str:"+json.toString());
+		 try {
+			String strRes = HttpUtils.post(url, json.toString());
+			System.out.println("#####strRes:"+strRes);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }

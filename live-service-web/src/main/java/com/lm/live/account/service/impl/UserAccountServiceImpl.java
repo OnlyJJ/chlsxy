@@ -17,6 +17,9 @@ import com.lm.live.account.domain.UserAccountBook;
 import com.lm.live.account.enums.ErrorCode;
 import com.lm.live.account.exceptions.UserAccountBizException;
 import com.lm.live.account.service.IUserAccountService;
+import com.lm.live.cache.constants.CacheKey;
+import com.lm.live.cache.constants.CacheTimeout;
+import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.service.impl.CommonServiceImpl;
 import com.lm.live.common.utils.LogUtil;
 
@@ -43,6 +46,22 @@ public class UserAccountServiceImpl extends CommonServiceImpl<UserAccountMapper,
 			throw new UserAccountBizException(ErrorCode.ERROR_101);
 		}
 		return dao.getByUserId(userId);
+	}
+	
+	@Override
+	public UserAccount getFromCache(String userId) throws Exception {
+		if(StringUtils.isEmpty(userId)) {
+			throw new UserAccountBizException(ErrorCode.ERROR_101);
+		}
+		String key = CacheKey.ACCOUNT_BASE_CACHE + userId;
+		UserAccount ua = RedisUtil.getJavaBean(key, UserAccount.class);
+		if(ua == null) {
+			ua = dao.getByUserId(userId);
+			if(ua != null) {
+				RedisUtil.set(key, ua, CacheTimeout.DEFAULT_TIMEOUT_24H);
+			}
+		}
+		return ua;
 	}
 
 	@Override

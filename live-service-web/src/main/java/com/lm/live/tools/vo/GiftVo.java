@@ -27,6 +27,7 @@ public class GiftVo extends JsonParseInterface implements Serializable{
 	private static final String g_markImg = "k";
 	private static final String g_sendSource = "l";
 	private static final String g_markImgWeb = "m";
+	private static final String g_showMark = "n";
 	
 	private int giftId;
 	private int num;
@@ -40,7 +41,7 @@ public class GiftVo extends JsonParseInterface implements Serializable{
 	private long remainGold;
 	/** 礼物角标，0-无 */
 	private int markType;
-	/** 礼物是否显示,0:不显示,1:显示 (默认显示) */
+	/** 礼物是否显示,0:不显示,1:显示 (默认不显示) */
 	private int showFlag = Constants.STATUS_0;
 	/** 礼物角标图片地址 */
 	private String markImg;
@@ -48,6 +49,8 @@ public class GiftVo extends JsonParseInterface implements Serializable{
 	private int sendSource ;
 	/** web角标使用 */
 	private String markImgWeb;
+	/** 角标是否显示,0:不显示,1:显示  */
+	private int showMark;
 	
 	@Override
 	public JSONObject buildJson() {
@@ -75,6 +78,7 @@ public class GiftVo extends JsonParseInterface implements Serializable{
 			if(!StrUtil.isNullOrEmpty(markImgWeb)) {
 				setString(json, g_markImgWeb, Constants.cdnPath+Constants.GIFT_IMG_FILE_URI+File.separator+ markImgWeb);
 			}
+			setInt(json, g_showMark, showMark);
 		} catch (Exception e) {
 			LogUtil.log.error(e.getMessage(),e);
 		}
@@ -196,6 +200,14 @@ public class GiftVo extends JsonParseInterface implements Serializable{
 
 	public void setMarkImgWeb(String markImgWeb) {
 		this.markImgWeb = markImgWeb;
+	}
+
+	public int getShowMark() {
+		return showMark;
+	}
+
+	public void setShowMark(int showMark) {
+		this.showMark = showMark;
 	}
 
 }

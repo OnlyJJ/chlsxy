@@ -17,6 +17,7 @@ import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.service.impl.CommonServiceImpl;
 import com.lm.live.common.utils.DateUntil;
 import com.lm.live.common.utils.JsonUtil;
+import com.lm.live.common.utils.LogUtil;
 import com.lm.live.home.contant.Constants;
 import com.lm.live.home.dao.GwFilesMapper;
 import com.lm.live.home.domain.GwFiles;
@@ -75,7 +76,7 @@ public class GwFilesServiceImpl extends CommonServiceImpl<GwFilesMapper, GwFiles
 				list.add(vo.buildJson());
 			}
 		}
-		ret.put("data", JsonUtil.arrayToJsonString(list));
+		ret.put(Constants.DATA_BODY, JsonUtil.toJSON(list));
 		return ret;
 	}
 

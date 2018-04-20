@@ -30,6 +30,7 @@ import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.utils.DateUntil;
 import com.lm.live.common.utils.HttpUtils;
 import com.lm.live.common.utils.IMutils;
+import com.lm.live.common.utils.JsonUtil;
 import com.lm.live.common.utils.LogUtil;
 import com.lm.live.common.utils.StrUtil;
 import com.lm.live.common.vo.Page;
@@ -42,25 +43,27 @@ import com.lm.live.guard.service.IGuardService;
 import com.lm.live.room.constant.Constants;
 import com.lm.live.room.enums.ErrorCode;
 import com.lm.live.room.enums.Locker;
+import com.lm.live.room.enums.RoomEnum.SourceType;
 import com.lm.live.room.exception.RoomBizException;
 import com.lm.live.room.service.IRoomService;
 import com.lm.live.room.vo.OnlineUserInfo;
 import com.lm.live.tools.domain.Gift;
 import com.lm.live.tools.domain.PayGiftOut;
 import com.lm.live.tools.domain.UserPackage;
-import com.lm.live.tools.enums.PayGiftOutEnum;
+import com.lm.live.tools.domain.UserPackageHis;
 import com.lm.live.tools.enums.ToolsEnum;
+import com.lm.live.tools.enums.ToolsEnum.ToolType;
 import com.lm.live.tools.service.IGiftService;
 import com.lm.live.tools.service.IPayGiftOutService;
+import com.lm.live.tools.service.IUserPackageHisService;
 import com.lm.live.tools.service.IUserPackageService;
+import com.lm.live.tools.vo.GiftVo;
 import com.lm.live.user.enums.UserInfoVoEnum;
 import com.lm.live.user.service.IUserCacheInfoService;
 import com.lm.live.user.vo.UserCache;
 import com.lm.live.user.vo.UserInfoVo;
 import com.lm.live.userbase.domain.UserAnchor;
-import com.lm.live.userbase.domain.UserInfoDo;
 import com.lm.live.userbase.service.IUserAnchorService;
-import com.lm.live.userbase.service.IUserBaseService;
 
 @Service("roomService")
 public class RoomServiceImpl implements IRoomService {
@@ -95,9 +98,13 @@ public class RoomServiceImpl implements IRoomService {
 	@Resource
 	private ISendMsgService sendMsgService;
 	
+	@Resource
+	private IUserPackageHisService userPackageHisService;
+	
 
+	@Transactional(rollbackFor=Exception.class)
 	@Override
-	public void sendGift(String userId, String roomId, String anchorId,
+	public JSONObject sendGift(String userId, String roomId, String anchorId,
 			int giftId, int giftNum, int fromType) throws Exception {
 		if(StringUtils.isEmpty(userId) || StringUtils.isEmpty(roomId)
 				|| StringUtils.isEmpty(anchorId) || giftNum <0) {
@@ -114,11 +121,18 @@ public class RoomServiceImpl implements IRoomService {
 		if(gift == null) {
 			throw new RoomBizException(ErrorCode.ERROR_8001);
 		}
+		JSONObject ret = new JSONObject();
+		GiftVo retVo = new GiftVo();
 		int gold = gift.getPrice() * giftNum;
 		int userPoint = gift.getUserPoint() * giftNum;
 		int anchorPoint = gift.getAnchorPoint() * giftNum;
 		int crystal = gift.getCrystal() * giftNum;
+		String giftName = gift.getName();
 		String sourceId = StrUtil.getOrderId();
+		String remark = null;
+		boolean status = false; // 送礼状态，
+		boolean isOnGiftRunwayChoice = gift.getOnRunway() == 0 ? false : true;
+		Date now = new Date();
 		// 扣金币 or 扣背包
 		if(fromType == ToolsEnum.GiftFormType.COMMON.getValue()) {
 			// 扣金币
@@ -129,26 +143,18 @@ public class RoomServiceImpl implements IRoomService {
 			if(account.getGold() < gold) {
 				throw new RoomBizException(ErrorCode.ERROR_8003);
 			}
+			long remainGold = account.getGold() - gold;
+			retVo.setRemainGold(remainGold);
+			remark = Constants.SENDGIFT_REMAK;
 			// 扣金币，加流水记录
 			UserAccountBook book = new UserAccountBook();
 			book.setUserId(userId);
 			book.setChangeGold(gold);
-			book.setSourceDesc(Constants.SENDGIFT_REMAK);
+			book.setSourceDesc(remark);
 			book.setSourceId(sourceId);
+			book.setRecordTime(now);
 			userAccountService.subtractGolds(userId, gold, book);
-			
-			// 加用户经验
-			userAccountService.addUserPoint(userId, userPoint);
-			// 加主播经验
-			userAccountService.addAnchorPoint(userId, anchorPoint);
-			// 加主播水晶
-			userAccountService.addCrystal(userId, crystal);
-			// 发送送礼消息
-			
-			
-			// 处理等级，送礼前vs送礼后，等级是否发生变化？这个放在最后
-			
-			
+			status = true;
 		} else if(fromType == ToolsEnum.GiftFormType.BAG.getValue()) {
 			// 扣背包
 			// 查询背包是否存在此礼物，并且数量足够，不足的直接返回
@@ -159,9 +165,212 @@ public class RoomServiceImpl implements IRoomService {
 			if(pck.getNumber() < giftNum) {
 				throw new RoomBizException(ErrorCode.ERROR_8004);
 			}
+			if(pck.getStatus() == Constants.STATUS_0) {
+				throw new RoomBizException(ErrorCode.ERROR_8001);
+			}
+			if(pck.getValidity() == Constants.STATUS_1) {
+				if(now.after(pck.getEndTime())) {
+					throw new RoomBizException(ErrorCode.ERROR_8001);
+				}
+			}
+			int num = pck.getNumber() - giftNum;
+			retVo.setNum(num);
+			remark = Constants.SENDGIFT_BYBAG_REMARK;
 			// 扣背包，加背包流水记录（此处再设计一个背包流水）
-			
+			UserPackageHis his = new UserPackageHis();
+			his.setUserId(userId);
+			his.setNum(-giftNum);
+			his.setRecordTime(now);
+			his.setType(ToolType.GIFT.getValue());
+			his.setToolId(giftId);
+			his.setRefDesc(remark);
+			userPackageHisService.insert(his);
+			status = true;
 		}
+		
+		// 送礼成功后，需要处理的，加经验，水晶，送礼记录，发消息，等级提升，活动等
+		if(status) {
+			String orderId = StrUtil.getOrderId();
+			int befUserLevel = 0;
+			int befAnchorLevel = 0;
+			UserAccount befUser = userAccountService.getFromCache(userId);
+			if(befUser != null) {
+				befUserLevel = befUser.getUserLevel();
+			}
+			UserAccount befAnchor = userAccountService.getFromCache(anchorId);
+			if(befAnchor != null) {
+				befAnchorLevel = befAnchor.getAnchorLevel();
+			}
+			// 加用户经验
+			userAccountService.addUserPoint(userId, userPoint);
+			// 加主播经验
+			userAccountService.addAnchorPoint(userId, anchorPoint);
+			// 加主播水晶
+			userAccountService.addCrystal(userId, crystal);
+			
+			// 加送礼记录t_pay_gift_out
+			PayGiftOut pgo = new PayGiftOut();
+			pgo.setGiftId(giftId);
+			pgo.setNumber(giftNum);
+			pgo.setUserId(userId);
+			pgo.setToUserId(anchorId);
+			pgo.setOrderId(orderId);
+			pgo.setResultTime(now);
+			pgo.setCrystal(crystal);
+			pgo.setPrice(gold);
+			pgo.setSourceType(SourceType.GIFT.getType());
+			pgo.setRemark(remark);
+			payGiftOutService.insert(pgo);
+			
+			// 发送送礼消息
+			// 处理等级，送礼前vs送礼后，等级是否发生变化？这个放在最后
+			
+			// 礼物跑道消息
+			boolean flagOnGiftRunwayCondition = false;
+			JSONObject onGiftRunwayImData = null;  //上礼物跑道的im内容
+			if(isOnGiftRunwayChoice) { 
+				int onGiftRunwayNeedGold = 52000;
+				if(gold >= onGiftRunwayNeedGold) { 
+					flagOnGiftRunwayCondition = true;
+				}
+			}
+			if(flagOnGiftRunwayCondition) { //达到上礼物跑道的条件
+				StringBuilder msg = new StringBuilder();
+				String headMsg = null;
+				String msgColor = "#000000";// 非守护礼物默认黑色()
+				UserCache vo = userCacheInfoService.getUserByChe(userId);
+				UserCache anchorUserInfo = userCacheInfoService.getUserByChe(anchorId);
+				if(anchorUserInfo != null && vo != null) {
+					if(vo.getNickName() != null) {
+						msg.append(vo.getNickName()).append("在");
+					} 
+					if(anchorUserInfo.getNickName() != null) {
+						msg.append(anchorUserInfo.getNickName()).append("房间");
+					}
+					msg.append("送出");
+					msg.append(gift.getName());
+					headMsg = msg.toString();//设置头信息
+					msg.append("x").append(giftNum);
+				} 
+				
+				onGiftRunwayImData = new JSONObject();
+				JSONObject shouhuContent = new JSONObject();
+				// 与IM之间约定的全站通知时所用特殊房间号 
+				String wholeSiteNoticeRoomId = Constants.WHOLE_SITE_NOTICE_ROOMID;
+				shouhuContent.put("msg", msg.toString());
+				shouhuContent.put("msgColor", msgColor);
+				shouhuContent.put("headMsg", headMsg);
+				shouhuContent.put("giftId", giftId);
+				shouhuContent.put("giftNum", giftNum);
+				shouhuContent.put("roomId", roomId);
+				shouhuContent.put("giftImg", Constants.cdnPath + Constants.GIFT_IMG_FILE_URI + "/" + gift.getImage());
+				shouhuContent.put("golds", gold);
+				
+				//增加主播信息
+				if(anchorUserInfo != null){
+					shouhuContent.put("anchorLevel", anchorUserInfo.getAnchorLevel());
+					shouhuContent.put("anchorName", anchorUserInfo.getNickName());
+					shouhuContent.put("giftName", giftName);
+				}
+				onGiftRunwayImData.put("msgtype", 2);
+				onGiftRunwayImData.put("targetid", wholeSiteNoticeRoomId);
+				onGiftRunwayImData.put("type", ImTypeEnum.IM_11001_hanhuasmg.getValue());
+				onGiftRunwayImData.put("content", shouhuContent);
+			}else{
+				onGiftRunwayImData = null;
+			}
+			
+			int funID = 11001; 
+			int seqID = 1; 
+			// 礼物跑道消息
+			try {
+				if(onGiftRunwayImData != null) {
+					LogUtil.log.info(String.format("####　begin推送礼物跑道的im消息:发消息begin..,onGiftRunwayImData:%s",JsonUtil.beanToJsonString(onGiftRunwayImData)));
+					IMutils.sendMsg2IM(funID, seqID, onGiftRunwayImData,userId);
+					LogUtil.log.info(String.format("####　end推送礼物跑道的im消息:发消息end..,onGiftRunwayImData:%s",JsonUtil.beanToJsonString(onGiftRunwayImData)));
+				}
+			} catch(Exception e) {
+				LogUtil.log.info(String.format("####　礼物跑道的im消息,senderUserId:%s,shouhuImData:%s",userId,JsonUtil.beanToJsonString(onGiftRunwayImData)));
+				LogUtil.log.error(e.getMessage(),e);
+			}
+			
+			// 普通礼物消息
+			// 礼物消息体
+			JSONObject giftMsgAllDataBodyJson = new JSONObject();
+			giftMsgAllDataBodyJson.put("funID", funID);
+			giftMsgAllDataBodyJson.put("seqID", seqID);
+			JSONObject giftImMsgJsonData = new JSONObject() ;
+			giftImMsgJsonData.put("msgtype", 2);
+			giftImMsgJsonData.put("targetid", roomId);
+			giftImMsgJsonData.put("type", ImTypeEnum.IM_11001_liwu.getValue());
+			JSONObject content = new JSONObject() ;
+			content.put("id", giftId);
+			content.put("num", giftNum);
+			content.put("type", 1);
+			content.put("sumGolds", gold);
+			content.put("giftImg", Constants.cdnPath + Constants.GIFT_IMG_FILE_URI + "/" + gift.getImage());//礼物图片地址
+			content.put("giftType", gift.getGiftType());
+			content.put("giftName", gift.getName());
+			giftImMsgJsonData.put(Constants.IM_CONTENT, content);
+			giftMsgAllDataBodyJson.put(Constants.DATA_BODY, giftImMsgJsonData);
+			//发IM消息
+			try {
+				LogUtil.log.info(String.format("###begin,sendGift_sendMsg2IM_begin,senderUserId:%s,sendGiftId:%s,sendGiftNum:%s,imNotifyRoomId:%s,receiveAnchorUserId:%s",userId,giftNum,giftId,roomId,anchorId));
+				IMutils.sendMsg2IM(giftMsgAllDataBodyJson, userId);
+				LogUtil.log.info(String.format("###end,sendGift_sendMsg2IM_end,senderUserId:%s,sendGiftId:%s,sendGiftNum:%s,imNotifyRoomId:%s,receiveAnchorUserId:%s",userId,giftId,giftNum,roomId,anchorId));
+			} catch (Exception e) {
+				String nowDateStr = DateUntil.getFormatDate("yyyy-MM-dd", new Date());
+				// 羞羞的茄子经验
+				String key = CacheKey.ROOM_EGGPLANT_CACHE + nowDateStr + roomId;
+				RedisUtil.del(key);
+				LogUtil.log.error(String.format("###sendGift_sendMsg2IM_SystemDefinitionException,senderUserId:%s,imAllDataBodyJson:%s",userId,JsonUtil.beanToJsonString(giftMsgAllDataBodyJson)));
+				throw new RoomBizException(ErrorCode.ERROR_100);
+			}
+			
+			try {
+				//用户等级提升IM消息
+				UserAccount user = userAccountService.getByUserId(userId);
+				if (user != null) {
+					int endLevel = user.getUserLevel();
+					LogUtil.log.info("### sendGift-送礼前用户等级 = " + befUserLevel + ",送礼后登记 = " + endLevel);
+					//用户升级，保存升级记录
+					if(endLevel > befUserLevel) {
+						int sortLevel = userLevelService.saveLevelHis(anchorId, befUserLevel, endLevel, false);
+						// 发送消息
+						sendMsg(userId, roomId, befUserLevel, endLevel, sortLevel, false);
+					}
+				}
+				//主播等级提升IM消息
+				UserAccount anchor = userAccountService.getByUserId(anchorId);
+				if (anchor != null) {
+					int anchorEndLevel = anchor.getAnchorLevel();
+					LogUtil.log.info("### sendGift-送礼前主播等级 = " + befAnchorLevel + ",送礼后登记 = " + anchorEndLevel);
+					//主播守护后等级
+					if(anchorEndLevel > befAnchorLevel) {
+						//主播升级
+						userLevelService.saveLevelHis(anchorId, befAnchorLevel, anchorEndLevel, true);
+						// 升级消息推送
+						sendMsg(userId, roomId, befAnchorLevel, anchorEndLevel, 0, true);
+					}
+				}
+			} catch(Exception e) {
+				LogUtil.log.error(e.getMessage(),e);
+			}
+			
+			// 发蜜桃成熟通知必须放在最后面，避免由于事务，导致客户端更新不及时的问题
+//			try {
+//				if(peachVo != null && Constants.PEACH_RIPE_FLAG.equals(peachVo.getIsRipe())) {
+//					int peachRipeLevel = peachVo.getLevel();
+//					sendImMsgForPeachRipe(anchorId, roomId,peachRipeLevel);
+//				}
+//			} catch(Exception e) {
+//				LogUtil.log.error("###sendImMsgForPeachRipe-发送蜜桃成熟消息通知失败，roomId=" + roomId);
+//				LogUtil.log.error(e.getMessage(), e);
+//			}
+//			LogUtil.log.info(String.format("###end-doSendGiftBusiness,sendGiftBusinessId:%s,senderUserId:%s,imNotifyRoomId:%s,receiveAnchorUserId:%s,sendGiftId:%s,sendGiftNum:%s",orderId, userId,roomId,anchorId,giftId,giftNum));
+		}
+		ret.put(retVo.getShortName(), retVo.buildJson());
+		return ret;
 	}
 
 	@Override
@@ -187,7 +396,7 @@ public class RoomServiceImpl implements IRoomService {
 				totalViewNum = cacheMembers.size() ;
 			}
 			page.setCount(totalViewNum);
-			JSONArray array = new JSONArray();
+			List<JSONObject> array = new ArrayList<JSONObject>();
 			for(OnlineUserInfo info:retList){
 				OnlineUserInfo vo = new OnlineUserInfo();
 				vo.setUserId(info.getUserId());
@@ -202,7 +411,7 @@ public class RoomServiceImpl implements IRoomService {
 				array.add(vo.buildJson());
 			}
 			if(array != null && array.size() >0) {
-				ret.put(Constants.DATA_BODY, array.toString());
+				ret.put(Constants.DATA_BODY, array);
 				page.setPagelimit(array.size());
 			}
 		} else {
@@ -419,7 +628,7 @@ public class RoomServiceImpl implements IRoomService {
 		
 			int strLevel = userAccount.getUserLevel();//购买守护前等级
 			//主播账户信息
-			UserAccount anchorUserAccount = userAccountService.getByUserId(anchorId);
+			UserAccount anchorUserAccount = userAccountService.getFromCache(anchorId);
 			int anchorStrLevel = anchorUserAccount.getAnchorLevel();
 			Date now = new Date();
 			int newWorkId = 0;
@@ -472,7 +681,7 @@ public class RoomServiceImpl implements IRoomService {
 			Date nowDateTime = new Date();
 			String remark = Constants.BUYGUARD_REMARK + guardId;
 			giftOut.setNumber(1);
-			int giftSourceType = PayGiftOutEnum.SourceType.guard.getValue();
+			int giftSourceType = SourceType.GUARD.getType();
 			giftOut.setSourceType(giftSourceType);
 			giftOut.setUserId(userId);
 			giftOut.setToUserId(anchorUserId);
@@ -518,7 +727,7 @@ public class RoomServiceImpl implements IRoomService {
 				imData.put("msgtype", 2);
 				imData.put("targetid", allRoom);
 				imData.put("type", ImTypeEnum.IM_11001_specialForSH.getValue());
-				imData.put("content", content);
+				imData.put(Constants.IM_CONTENT, content);
 				int funID = 11001;//21007.系统通知(没有字数限制)
 				int seqID = 1;//一般默认为1
 				try {
@@ -532,28 +741,30 @@ public class RoomServiceImpl implements IRoomService {
 			
 			try {
 				//用户等级提升IM消息
-				userAccount = userAccountService.getByUserId(userId);
-				LogUtil.log.info("###购买守护后userAccount:"+userAccount);
-				if (userAccount!=null) {
+				UserAccount user = userAccountService.getByUserId(userId);
+				if (user != null) {
 					//购买守护后等级
-					int endLevel = userAccount.getUserLevel();
+					int endLevel = user.getUserLevel();
 					LogUtil.log.info(String.format("###购买守护前等级%s,购买后等级%s",strLevel,endLevel));
 					//用户升级，保存升级记录
-					int sortLevel = userLevelService.saveLevelHis(anchorUserId, strLevel, endLevel, false);
-					// 发送消息
-					sendMsg(userId, roomId, strLevel, endLevel, sortLevel, false);
+					if(endLevel > strLevel) {
+						int sortLevel = userLevelService.saveLevelHis(anchorUserId, strLevel, endLevel, false);
+						// 发送消息
+						sendMsg(userId, roomId, strLevel, endLevel, sortLevel, false);
+					}
 				}
 				//主播等级提升IM消息
-				userAccount = userAccountService.getByUserId(anchorId);
-				LogUtil.log.info("###主播守护后userAccount:"+userAccount);
-				if (userAccount!=null) {
+				UserAccount anchor = userAccountService.getByUserId(anchorId);
+				if (anchor != null) {
 					//主播守护后等级
-					int anchorEndLevel = userAccount.getAnchorLevel();
+					int anchorEndLevel = anchor.getAnchorLevel();
 					LogUtil.log.info(String.format("###主播守护前等级%s,购买后等级%s",anchorStrLevel,anchorEndLevel));
 					//主播升级
-					userLevelService.saveLevelHis(anchorUserId, anchorStrLevel, anchorEndLevel, true);
-					// 升级消息推送
-					sendMsg(anchorUserId, roomId, anchorStrLevel, anchorEndLevel, 0, true);
+					if(anchorEndLevel > anchorStrLevel) {
+						userLevelService.saveLevelHis(anchorUserId, anchorStrLevel, anchorEndLevel, true);
+						// 升级消息推送
+						sendMsg(anchorUserId, roomId, anchorStrLevel, anchorEndLevel, 0, true);
+					}
 				}
 			} catch(Exception e) {
 				LogUtil.log.error(e.getMessage(),e);

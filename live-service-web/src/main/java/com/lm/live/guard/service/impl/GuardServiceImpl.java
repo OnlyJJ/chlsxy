@@ -88,8 +88,8 @@ public class GuardServiceImpl implements IGuardService {
 			}
 			RedisUtil.set(key, guardList, CacheTimeout.DEFAULT_TIMEOUT_10M);
 		}
-		JSONArray jsonArray = new JSONArray();
-		JSONArray resultArray = new JSONArray();
+		List<JSONObject> jsonArray = new ArrayList<JSONObject>();
+		List<JSONObject> resultArray = new ArrayList<JSONObject>();
 		if(guardList != null && guardList.size()>0){
 			for (GuardVo guardVo : guardList) {
 				jsonArray.add(guardVo.buildJson());
@@ -168,7 +168,7 @@ public class GuardServiceImpl implements IGuardService {
 	
 	private JSONObject getGuardWorkDataCache(String userId, String roomId, String key, boolean isGuard) throws Exception {
 		JSONObject ret = new JSONObject();
-		JSONArray array = new JSONArray();
+		List<JSONObject> array = new ArrayList<JSONObject>();
 		RedisUtil.del(key);
 		// 房间所有守护放入缓存，当有人在该房间购买守护时，再删除缓存
 		List<Map> listWork = gwMapper.getGuardWorkDataByRoom(roomId);
@@ -264,7 +264,7 @@ public class GuardServiceImpl implements IGuardService {
 			LogUtil.log.info("### mydebug,从db中查询守护列表,end，key="+key);
 		} 
 		if(array != null && array.size() >0) {
-			ret.put(Constants.DATA_BODY, array.toString());
+			ret.put(Constants.DATA_BODY, array);
 		}
 		return ret;
 	}

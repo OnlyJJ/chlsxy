@@ -22,7 +22,7 @@ public class RequestVo extends JsonParseInterface implements Serializable {
 	private String targetId;
 	/** 房间号**/
 	private String roomId;
-	/** 操作类型，1:订阅(正)，2:取消订阅(反) */
+	/** 操作类型，1:订阅(正)，0:取消订阅(反) */
 	private int handleType;
 	
 	

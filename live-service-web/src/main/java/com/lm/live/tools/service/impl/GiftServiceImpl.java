@@ -1,5 +1,6 @@
 package com.lm.live.tools.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -38,7 +39,7 @@ public class GiftServiceImpl extends CommonServiceImpl<GiftMapper, Gift> impleme
 		}
 		gift = dao.getGift(giftId);
 		if(gift != null) {
-			RedisUtil.set(key, gift, CacheTimeout.DEFAULT_TIMEOUT_8H);
+			RedisUtil.set(key, gift, CacheTimeout.DEFAULT_TIMEOUT_1H);
 		}
 		return gift;
 	}
@@ -53,7 +54,7 @@ public class GiftServiceImpl extends CommonServiceImpl<GiftMapper, Gift> impleme
 			ret = JSON.parseObject(cache);
 		} else {
 			ret = new JSONObject();
-			JSONArray array = new JSONArray();
+			List<JSONObject> res = new ArrayList<JSONObject>();
 			List<Gift> dbList = dao.listGift();
 			if(dbList != null && dbList.size() > 0) {
 				for(Gift gift : dbList) {
@@ -68,9 +69,10 @@ public class GiftServiceImpl extends CommonServiceImpl<GiftMapper, Gift> impleme
 					vo.setMarkImgWeb(gift.getMarkImgWeb());
 					vo.setShowFlag(gift.getShowGift());
 					vo.setMarkType(gift.getMarkType());
-					array.add(vo.buildJson());
+					vo.setShowMark(gift.getShowMark());
+					res.add(vo.buildJson());
 				}
-				ret.put(Constants.DATA_BODY, array.toString());
+				ret.put(Constants.DATA_BODY, res);
 				RedisUtil.set(key, ret, CacheTimeout.DEFAULT_TIMEOUT_1H);
 			}
 		}

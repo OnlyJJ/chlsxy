@@ -1,5 +1,6 @@
 package com.lm.live.user.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -119,7 +120,7 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 			ret = JSON.parseObject(obj);
 			LogUtil.log.error("### listAttentions-获取用户关注列表，从缓存中获取数据。。。userId="+userId);
 		} else {
-			JSONArray array = new JSONArray();
+			List<JSONObject> array = new ArrayList<JSONObject>();
 			List<AnchorInfoVo> list = dao.listAttention(userId);
 			if(list != null && list.size() > 0) {
 				for(AnchorInfoVo vo : list) {
@@ -127,7 +128,7 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 				}
 				page.setCount(list.size());
 				ret.put(page.getShortName(), page.buildJson());
-				ret.put(Constants.DATA_BODY, array.toString());
+				ret.put(Constants.DATA_BODY, array);
 			}
 		}
 		RedisUtil.set(key, ret, CacheTimeout.DEFAULT_TIMEOUT_24H);
@@ -280,7 +281,7 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 			RedisUtil.set(key, list, CacheTimeout.DEFAULT_TIMEOUT_24H);
 		}
 		if(list != null) {
-			JSONArray array = new JSONArray();
+			List<JSONObject> array = new ArrayList<JSONObject>();
 			int pageNum = page.getPageNum(); // 页码
 			int pageSize = page.getPagelimit(); // 单页容量
 			if(list != null && list.size() > 0) {
@@ -322,7 +323,7 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 				}
 				page.setCount(list.size());
 				ret.put(page.getShortName(), page.buildJson());
-				ret.put(Constants.DATA_BODY, array.toString());
+				ret.put(Constants.DATA_BODY, array);
 			}
 		}
 		return ret;

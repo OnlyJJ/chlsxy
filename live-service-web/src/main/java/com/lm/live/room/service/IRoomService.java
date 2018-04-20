@@ -22,7 +22,7 @@ public interface IRoomService {
 	 * @author shao.xiang
 	 * @data 2018年4月1日
 	 */
-	void sendGift(String userId, String roomId, String anchorId, int giftId, int giftNum, int fromType) throws Exception;
+	JSONObject sendGift(String userId, String roomId, String anchorId, int giftId, int giftNum, int fromType) throws Exception;
 	
 	/**
 	 * 获取房间在线成员

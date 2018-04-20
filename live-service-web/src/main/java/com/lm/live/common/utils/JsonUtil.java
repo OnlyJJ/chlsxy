@@ -47,6 +47,19 @@ public class JsonUtil {
 		return obj;
 	}
 	
+	public static Object toJSON(Object o) {
+		Object json = null;
+		try{
+			if(null != o){
+				json = JSONObject.toJSON(o);
+			}
+		}catch(Exception e){
+			LogUtil.log.error(e.getMessage());
+		}
+		
+		return json;
+	}
+	
 	/**
 	 * Java bean对象转为json字符串
 	 * @param obj
@@ -59,12 +72,8 @@ public class JsonUtil {
 				json = JSON.toJSONString(obj);
 			}
 		}catch(Exception e){
-			try {
-				json = JSONArray.toJSONString(obj);
-			} catch (Exception e2) {
-				LogUtil.log.error("###obj:"+obj.toString());
-				LogUtil.log.error(e.getMessage(),e);
-			}
+			LogUtil.log.error("###obj:"+obj.toString());
+			LogUtil.log.error(e.getMessage(),e);
 		}
 		
 		return json;

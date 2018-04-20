@@ -55,7 +55,12 @@ public class BaseConstants {
 	/** app版本xxx后，采用aac视频格式的 */
 	public static final int AppVersionOfAac = 999999999;
 	
+	/** 响应结果包装头 */
 	public static final String DATA_BODY = "data";
+	
+	/** IM通信消息体头 */
+	public static final String IM_CONTENT = "content";
+	
 	
 	public static final String REQ_ATTR_DATA = "request_attribute_data";
 	

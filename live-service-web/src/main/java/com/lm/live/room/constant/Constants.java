@@ -15,6 +15,8 @@ public class Constants extends BaseConstants {
 	
 	/** 用户送礼-账户流水描述 */
 	public static final String SENDGIFT_REMAK = "用户送礼，扣除金币";
+	/** 用户送礼，扣背包 */
+	public static final String SENDGIFT_BYBAG_REMARK = "用户送礼，扣除背包";
 	
 	/**  每个ip 每天可分享次数 */
 	public static final int SHARE_TIMES_FOR_EVERYIP = 1000;

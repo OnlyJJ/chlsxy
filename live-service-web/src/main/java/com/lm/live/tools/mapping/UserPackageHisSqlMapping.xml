@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.lm.live.tools.dao.UserPackageHisMapper">
+	<resultMap type="com.lm.live.tools.domain.UserPackageHis" id="vo">
+		<result property="id" column="id" />
+		<result property="userId" column="userId" />
+		<result property="toolId" column="toolId" />
+		<result property="num" column="num" />
+		<result property="recordTime" column="recordTime" />
+		<result property="refId" column="refId" />
+		<result property="refDesc" column="refDesc" />
+		<result property="type" column="type" />
+	</resultMap>
+
+	<select id="getObjectById" parameterType="java.lang.Integer"
+		resultMap="vo">
+		select * from t_user_package_his where id=#{id}
+	</select>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+	  <![CDATA[
+	  INSERT INTO t_user_package_his(
+			userId,
+			toolId,
+			num,
+			type,
+			refDesc,
+			recordTime,
+			refId
+			) VALUES (
+			#{userId,jdbcType=VARCHAR},
+			#{toolId,jdbcType=VARCHAR},
+			#{num,jdbcType=VARCHAR},
+			#{type,jdbcType=VARCHAR},
+			#{refDesc,jdbcType=VARCHAR},
+			#{recordTime,jdbcType=VARCHAR},
+			#{refId,jdbcType=TINYINT}
+		)	
+		]]>
+	</insert>
+
+
+</mapper>

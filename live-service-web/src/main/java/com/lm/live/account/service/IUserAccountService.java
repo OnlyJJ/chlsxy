@@ -22,6 +22,17 @@ public interface IUserAccountService extends ICommonService<UserAccount>{
 	UserAccount getByUserId(String userId) throws Exception;
 	
 	/**
+	 * 从缓存中获取用户账户</br>
+	 * 说明：主要缓存的是用户等级，因为等级提升并不频繁，所以每次升级后再处理这个缓存，获取其他信息不要使用此方法
+	 *@param userId
+	 *@return
+	 *@throws Exception
+	 *@author shao.xiang
+	 *@data 2018年4月20日
+	 */
+	UserAccount getFromCache(String userId) throws Exception;
+	
+	/**
 	 * 给用户账户加金币
 	 * @param userId
 	 * @param golds 必须是正数

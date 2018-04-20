@@ -1,5 +1,6 @@
 package com.lm.live.decorate.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -53,11 +54,11 @@ public class DecoratePackageServiceImpl extends CommonServiceImpl<DecoratePackag
 		}else{
 			List<DecoratePackageVo> list = dao.findValidDecorate(userId,category);
 			if(list != null && list.size() >0) {
-				JSONArray array = new JSONArray();
+				List<JSONObject> array = new ArrayList<JSONObject>();
 				for(DecoratePackageVo vo : list) {
 					array.add(vo.buildJson());
 				}
-				ret.put(Constants.DATA_BODY, array.toString());
+				ret.put(Constants.DATA_BODY, array);
 			}
 			RedisUtil.set(cacheKey, ret, CacheTimeout.DEFAULT_TIMEOUT_24H);
 		}
@@ -78,11 +79,11 @@ public class DecoratePackageServiceImpl extends CommonServiceImpl<DecoratePackag
 		}else{
 			List<DecoratePackageVo> list = dao.findValidDecorate(anchorId,category);
 			if(list != null && list.size() >0) {
-				JSONArray array = new JSONArray();
+				List<JSONObject> res = new ArrayList<JSONObject>();
 				for(DecoratePackageVo vo : list) {
-					array.add(vo.buildJson());
+					res.add(vo.buildJson());
 				}
-				ret.put(Constants.DATA_BODY, array.toString());
+				ret.put(Constants.DATA_BODY, res);
 			}
 			RedisUtil.set(cacheKey, ret, CacheTimeout.DEFAULT_TIMEOUT_24H);
 		}

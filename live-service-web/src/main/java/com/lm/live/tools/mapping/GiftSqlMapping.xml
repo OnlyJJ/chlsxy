@@ -25,6 +25,8 @@
 		<result property="markImgWeb" column="markImgWeb" />
 		<result property="showMark" column="showMark" />
 		<result property="showGift" column="showGift" />
+		<result property="onRunway" column="onRunway" />
+		
 	</resultMap>
 
 	<select id="getObjectById" parameterType="java.lang.Integer"

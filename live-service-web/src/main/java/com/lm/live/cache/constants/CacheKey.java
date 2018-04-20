@@ -23,6 +23,11 @@ public class CacheKey {
 	public static final String USER_IP_REGION_CACHE = "ip:region:";
 	
 	
+	// 账户模块
+	/** 账户基本信息缓存，只缓存等级等基本信息，升级后需要处理此缓存 */
+	public static final String ACCOUNT_BASE_CACHE = "account:base:";
+	
+	
 	// 勋章模块
 	/** 用户所有有效勋章缓存，注意：每次增加勋章时，需要同步删除此缓存  */
 	public static final String DECORATEPACKAGE_USER_CACHE = "decorate:pck:user:";
@@ -77,6 +82,8 @@ public class CacheKey {
 	public final static String ROOM_SHARE_CACHE = "room:share:num:";
 	/** 房间及角色信息缓存 */
 	public final static String ROOM_ROLE_CACHE = "room:role:";
+	/** 房间茄子数据缓存，送礼时处理 */
+	public final static String ROOM_EGGPLANT_CACHE = "room:eggplant:";
 	
 	
 	// 用户信息

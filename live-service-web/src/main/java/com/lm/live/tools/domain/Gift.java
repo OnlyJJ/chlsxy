@@ -53,6 +53,8 @@ public class Gift extends BaseVo {
 	private int showMark;
 	/** 是否显示礼物，0-不显示，1-显示 */
 	private int showGift;
+	/** 是否上礼物跑道，0-否，1-是 */
+	private int onRunway;
 	
 	public int getId() {
 		return id;
@@ -173,6 +175,12 @@ public class Gift extends BaseVo {
 	}
 	public void setShowGift(int showGift) {
 		this.showGift = showGift;
+	}
+	public int getOnRunway() {
+		return onRunway;
+	}
+	public void setOnRunway(int onRunway) {
+		this.onRunway = onRunway;
 	}
 	
 }

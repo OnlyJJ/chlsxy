@@ -7,7 +7,7 @@
 	<resultMap type="com.lm.live.tools.domain.UserPackage" id="vo">
 		<result property="id" column="id" />
 		<result property="userId" column="userId" />
-		<result property="giftId" column="giftId" />
+		<result property="toolId" column="toolId" />
 		<result property="number" column="number" />
 		<result property="validity" column="validity" />
 		<result property="endTime" column="endTime" />
@@ -21,10 +21,9 @@
 		select * from t_user_package where id=#{id}
 	</select>
 
-	<select id="getByUserId" parameterType="java.lang.Integer"
-		resultMap="vo">
+	<select id="getUserPackage"  resultMap="vo">
 		select * from t_user_package where userId=#{userId} and
-		giftId=#{giftId} and validity = #{validity}
+		toolId=#{toolId} and type = #{type}
 	</select>
 	
 	<select id="listUserPackage" resultMap="vo">

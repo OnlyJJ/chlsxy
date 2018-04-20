@@ -9,9 +9,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.base.service.IUserAccusationInfoService;
+import com.lm.live.cache.constants.CacheKey;
+import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.vo.Page;
 import com.lm.live.decorate.service.IDecoratePackageService;
 import com.lm.live.guard.service.IGuardService;
+import com.lm.live.home.service.IGwFilesService;
+import com.lm.live.home.vo.BannerVo;
 import com.lm.live.room.service.IRoomService;
 import com.lm.live.tools.service.IGiftService;
 import com.lm.live.tools.service.IUserPackageService;
@@ -47,6 +51,9 @@ public class ServiceTest {
 	
 	@Resource
 	private IUserPackageService userPackageService;
+	
+	@Resource
+	private IGwFilesService gwFilesService;
 
 	@Test
 	public void test() {
@@ -79,20 +86,28 @@ public class ServiceTest {
 //			RedisUtil.del(key);
 //			roomService.recordRoomOnlineMember(userId, roomId, 1);
 //			roomService.shareApp(userId, roomId, 1, "192.168.1.70");
+//			roomService.buyGuard(userId, anchorId, roomId, 1, 1, 1);
+//			String key = CacheKey.TOOL_GIFT_ALL_CACHE;
+//			RedisUtil.del(key);
+//			roomService.sendGift(userId, roomId, anchorId, 1, 1, 0);
+			JSONObject jsonRes =  giftService.qryGiftData();
 //			AccusationVo av = new  AccusationVo();
 //			av.setAccusationType(1);
 //			av.setAccusationDesc("不开车，没意思");
 //			userAccusationInfoService.recordAccusationInfo(userId, toUserId, av);
 //			JSONObject jsonRes = roomService.getRoomOnlineData(roomId, page);
-//			roomService.buyGuard(userId, anchorId, roomId, 0, 1, 1);
 //			JSONObject jsonRes = guardService.getRoomGuardData(userId, roomId);
 //			JSONObject jsonRes = giftService.qryGiftData();
-			JSONObject jsonRes =  userPackageService.listUserBagData(userId);
+//			JSONObject jsonRes =  userPackageService.listUserBagData(userId);
 			if(jsonRes != null) {
 				System.err.println(jsonRes.toString());
 			} else {
 				System.err.println("null ....");
 			}
+//			BannerVo vo1 = new BannerVo();
+//			vo1.setShowPage(0);
+//			vo1.setBannerType(1);
+//			gwFilesService.getIndexPageBanner(vo1);
 //			UserCache info = userCacheInfoService.getUserByChe(userId);
 //			UserCache info = userCacheInfoService.getUserInRoomChe(userId, roomId);
 //			UserInfoVo info = userCacheInfoService.getUserFromCache(userId, roomId);

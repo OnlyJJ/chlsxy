@@ -1,5 +1,6 @@
 package com.lm.live.tools.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -47,7 +48,10 @@ public class UserPackageServiceImpl extends CommonServiceImpl<UserPackageMapper,
 	@Override
 	public UserPackage getUserPackage(String userId, int toolId, int type)
 			throws Exception {
-		return null;
+		if(StrUtil.isNullOrEmpty(userId)) {
+			throw new ToolBizException(ErrorCode.ERROR_101);
+		}
+		return dao.getUserPackage(userId, toolId, type);
 	}
 
 	@Override
@@ -62,7 +66,7 @@ public class UserPackageServiceImpl extends CommonServiceImpl<UserPackageMapper,
 			ret = JsonUtil.strToJsonObject(cache);
 		} else {
 			ret = new JSONObject();
-			JSONArray array = new JSONArray();
+			List<JSONObject> array = new ArrayList<JSONObject>();
 			List<UserPackage> list = dao.listUserPackage(userId);
 			if(list != null && list.size() > 0) {
 				for(UserPackage up : list) {
@@ -101,7 +105,7 @@ public class UserPackageServiceImpl extends CommonServiceImpl<UserPackageMapper,
 					
 					array.add(vo.buildJson());
 				}
-				ret.put(Constants.DATA_BODY, array.toString());
+				ret.put(Constants.DATA_BODY, array);
 				RedisUtil.set(key, ret, CacheTimeout.DEFAULT_TIMEOUT_8H);
 			}
 		}

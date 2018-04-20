@@ -31,6 +31,7 @@ import com.lm.live.room.service.IRoomService;
 import com.lm.live.tools.service.IGiftService;
 import com.lm.live.tools.service.IUserPackageService;
 import com.lm.live.tools.service.impl.GiftServiceImpl;
+import com.lm.live.tools.vo.GiftVo;
 import com.lm.live.user.enums.ErrorCode;
 import com.lm.live.user.exception.UserBizException;
 import com.lm.live.web.vo.DataRequest;
@@ -360,11 +361,23 @@ public class RoomWeb  extends BaseController{
 		try {
 			if(data==null  
 					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())
+					|| !data.getData().containsKey(GiftVo.class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
 				throw new UserBizException(ErrorCode.ERROR_101);
 			}
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
+			String userId = req.getUserId();
+			String anchorId = req.getTargetId();
+			String roomId = req.getRoomId();
+			GiftVo gift = new GiftVo();
+			gift.parseJson(data.getData().getJSONObject(gift.getShortName()));
+			int giftId = gift.getGiftId();
+			int num = gift.getNum();
+			int sourceType = gift.getSendSource();
+			synchronized(UserAccount.class) {
+				jsonRes = roomService.sendGift(userId, roomId, anchorId, giftId, num, sourceType);
+			}
 		} catch(UserBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
@@ -708,6 +721,10 @@ public class RoomWeb  extends BaseController{
 			}
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
+			String userId = req.getUserId();
+			String roomId = req.getRoomId();
+			int type = req.getHandleType();
+			roomService.recordRoomOnlineMember(userId, roomId, type);
 		} catch(UserBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
