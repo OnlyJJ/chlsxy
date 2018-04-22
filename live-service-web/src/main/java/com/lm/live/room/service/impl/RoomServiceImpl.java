@@ -47,6 +47,8 @@ import com.lm.live.room.enums.RoomEnum.SourceType;
 import com.lm.live.room.exception.RoomBizException;
 import com.lm.live.room.service.IRoomService;
 import com.lm.live.room.vo.OnlineUserInfo;
+import com.lm.live.room.vo.RoomBannedOperationVo;
+import com.lm.live.room.vo.RoomOnlineInfo;
 import com.lm.live.tools.domain.Gift;
 import com.lm.live.tools.domain.PayGiftOut;
 import com.lm.live.tools.domain.UserPackage;
@@ -62,7 +64,10 @@ import com.lm.live.user.enums.UserInfoVoEnum;
 import com.lm.live.user.service.IUserCacheInfoService;
 import com.lm.live.user.vo.UserCache;
 import com.lm.live.user.vo.UserInfoVo;
+import com.lm.live.userbase.domain.RoomBannedOperation;
 import com.lm.live.userbase.domain.UserAnchor;
+import com.lm.live.userbase.enums.RoomBannedOperateEnum;
+import com.lm.live.userbase.service.IRoomBannedOperationService;
 import com.lm.live.userbase.service.IUserAnchorService;
 
 @Service("roomService")
@@ -101,6 +106,8 @@ public class RoomServiceImpl implements IRoomService {
 	@Resource
 	private IUserPackageHisService userPackageHisService;
 	
+	@Resource
+	private IRoomBannedOperationService roomBannedOperationService;
 
 	@Transactional(rollbackFor=Exception.class)
 	@Override
@@ -1085,4 +1092,232 @@ public class RoomServiceImpl implements IRoomService {
 		return flag;
 	}
 
+	@Override
+	public void forbidSpeak(String fromUserId, RoomBannedOperationVo roomBannedOperationVo) throws Exception {
+		if(roomBannedOperationVo==null
+				||StringUtils.isEmpty(roomBannedOperationVo.getUserId())
+				||StringUtils.isEmpty(roomBannedOperationVo.getRoomid())
+				||StringUtils.isEmpty(roomBannedOperationVo.getToken())) {
+			throw new RoomBizException(ErrorCode.ERROR_101);
+		}
+		String roomId = roomBannedOperationVo.getRoomid();
+		String toBeBannedUserId = roomBannedOperationVo.getUserId(); //  被操作者
+		boolean isForbidSpeak = roomBannedOperationService.checkShutUp(toBeBannedUserId, roomId);
+		if(isForbidSpeak) {
+			return;
+		}
+		// my-to-do
+		//被操作者
+		// 这里改造之后，再来修改
+		UserInfoVo toBeBannedUser = userCacheInfoService.getUserFromCache(toBeBannedUserId, roomId);
+		
+		//向IM发送消息
+		JSONObject imReqmsg = new JSONObject();
+		JSONObject imData = new JSONObject();
+		imData.put("token", roomBannedOperationVo.getToken());
+		imData.put("msgtype", 2);
+		imData.put("targetid", roomId);
+		imData.put("type", ImTypeEnum.IM_11001_forbidSpeak.getValue());
+		//imData.put("user", JsonUtil.beanToJsonString(fromUserVo));
+		imData.put("to", toBeBannedUserId);
+		imData.put(Constants.IM_CONTENT, new StringBuffer().append("用户:").append(roomBannedOperationVo.getUserId()).append("被").append(fromUserId).append("禁言").append(roomBannedOperationVo.getHours()).append("小时").toString());
+		imReqmsg.put("length", 102);
+		imReqmsg.put(Constants.DATA_BODY, imData.toString());
+		
+		IMutils.sendMsg2IM(imReqmsg,fromUserId);
+		
+		//保存数据库记录
+		int type = RoomBannedOperateEnum.RoomBehavior.ShutUp.getValue();
+		Date now = new Date();
+		Date endTime = DateUntil.addMinute(now, 60);
+		RoomBannedOperation rbo = roomBannedOperationService.getRoomBannedOperation(toBeBannedUserId, roomId, type);
+		if(rbo != null) { // 更新
+			rbo.setBeginTime(now);
+			rbo.setEndTime(endTime);
+			rbo.setFromUserId(fromUserId);
+			rbo.setStatus(Constants.STATUS_1);
+		} else { // 插入
+			RoomBannedOperation roomBannedOperation = new RoomBannedOperation();
+			roomBannedOperation.setBeginTime(now);
+			roomBannedOperation.setEndTime(endTime);
+			roomBannedOperation.setFromUserId(fromUserId);
+			roomBannedOperation.setUserId(toBeBannedUserId);
+			roomBannedOperation.setRoomId(roomId);
+			roomBannedOperation.setType(type);
+			roomBannedOperation.setStatus(Constants.STATUS_1);
+		}
+		//刷新房间在线成员的列表信息
+		refreshRoomOnlineUserInfo(toBeBannedUserId, roomId);
+	}
+
+	@Override
+	public void forceOut(String fromUserId,
+			RoomBannedOperationVo roomBannedOperationVo) throws Exception {
+		if(roomBannedOperationVo==null
+				||StringUtils.isEmpty(roomBannedOperationVo.getUserId())
+				||StringUtils.isEmpty(roomBannedOperationVo.getRoomid())
+				||StringUtils.isEmpty(roomBannedOperationVo.getToken())) {
+			throw new RoomBizException(ErrorCode.ERROR_101);
+		}
+		String roomId = roomBannedOperationVo.getRoomid();
+		String toBeBannedUserId = roomBannedOperationVo.getUserId(); //  被操作者
+		boolean isForceOut  = roomBannedOperationService.checkOut(toBeBannedUserId, roomId);
+		if(isForceOut) {
+			return;
+		}
+		// my-to-do
+		//被操作者
+		// 这里改造之后，再来修改
+		UserInfoVo toBeBannedUser = userCacheInfoService.getUserFromCache(toBeBannedUserId, roomId);
+		
+		//向IM发送消息
+		JSONObject imReqmsg = new JSONObject();
+		JSONObject imData = new JSONObject();
+		imData.put("token", roomBannedOperationVo.getToken());
+		imData.put("msgtype", 2);
+		imData.put("targetid", roomId);
+		imData.put("type", ImTypeEnum.IM_11001_forceOUt.getValue());
+		//imData.put("user", JsonUtil.beanToJsonString(fromUserVo));
+		imData.put("to", toBeBannedUserId);
+		imData.put(Constants.IM_CONTENT, new StringBuffer().append("用户:").append(roomBannedOperationVo.getUserId()).append("被").append(fromUserId).append("踢出房间"));
+		imReqmsg.put("length", 102);
+		imReqmsg.put(Constants.DATA_BODY, imData.toString());
+		
+		IMutils.sendMsg2IM(imReqmsg,fromUserId);
+		
+		//保存数据库记录
+		int type = RoomBannedOperateEnum.RoomBehavior.Out.getValue();
+		Date now = new Date();
+		Date endTime = DateUntil.addMinute(now, 60);
+		RoomBannedOperation rbo = roomBannedOperationService.getRoomBannedOperation(toBeBannedUserId, roomId, type);
+		if(rbo != null) { // 更新
+			rbo.setBeginTime(now);
+			rbo.setEndTime(endTime);
+			rbo.setFromUserId(fromUserId);
+			rbo.setStatus(Constants.STATUS_1);
+			// my-to-do
+			// update
+		} else { // 插入
+			RoomBannedOperation roomBannedOperation = new RoomBannedOperation();
+			roomBannedOperation.setBeginTime(now);
+			roomBannedOperation.setEndTime(endTime);
+			roomBannedOperation.setFromUserId(fromUserId);
+			roomBannedOperation.setUserId(toBeBannedUserId);
+			roomBannedOperation.setRoomId(roomId);
+			roomBannedOperation.setType(type);
+			roomBannedOperation.setStatus(Constants.STATUS_1);
+			roomBannedOperationService.insert(roomBannedOperation);
+		}
+		//刷新房间在线成员的列表信息
+		userCacheInfoService.removeUserCacheInfo(toBeBannedUserId);
+		if(validateIfInRoom(toBeBannedUserId, roomId)) {
+			recordRoomOnlineMember(toBeBannedUserId, roomId, 2);
+		}
+	}
+
+	@Override
+	public void unForbidSpeak(String fromUserId,
+			RoomBannedOperationVo roomBannedOperationVo) throws Exception {
+		if(roomBannedOperationVo==null
+				||StringUtils.isEmpty(roomBannedOperationVo.getUserId())
+				||StringUtils.isEmpty(roomBannedOperationVo.getRoomid())) {
+			throw new RoomBizException(ErrorCode.ERROR_101);
+		}
+		String roomId = roomBannedOperationVo.getRoomid();
+		String toBeBannedUserId = roomBannedOperationVo.getUserId(); //  被操作者
+		boolean isForbidSpeak = roomBannedOperationService.checkShutUp(toBeBannedUserId, roomId);
+		if(!isForbidSpeak) {
+			return;
+		}
+		// my-to-do
+		//被操作者
+		// 这里改造之后，再来修改
+		UserInfoVo toBeBannedUser = userCacheInfoService.getUserFromCache(toBeBannedUserId, roomId);
+		
+		//向IM发送消息
+		JSONObject imReqmsg = new JSONObject();
+		JSONObject imData = new JSONObject();
+		imData.put("token", roomBannedOperationVo.getToken());
+		imData.put("msgtype", 2);
+		imData.put("targetid", roomId);
+		imData.put("type", ImTypeEnum.IM_11001_unForbidSpeak.getValue());
+		//imData.put("user", JsonUtil.beanToJsonString(fromUserVo));
+		imData.put("to", toBeBannedUserId);
+		imData.put(Constants.IM_CONTENT, new StringBuffer().append("用户:").append(roomBannedOperationVo.getUserId()).append("被").append(fromUserId).append("解除禁言"));
+		imReqmsg.put("length", 102);
+		imReqmsg.put(Constants.DATA_BODY, imData.toString());
+		
+		IMutils.sendMsg2IM(imReqmsg,fromUserId);
+		
+		//保存数据库记录
+		int type = RoomBannedOperateEnum.RoomBehavior.ShutUp.getValue();
+		Date now = new Date();
+		RoomBannedOperation rbo = roomBannedOperationService.getRoomBannedOperation(toBeBannedUserId, roomId, type);
+		if(rbo != null) { // 更新
+			rbo.setBeginTime(now);
+			rbo.setEndTime(now);
+			rbo.setFromUserId(fromUserId);
+			rbo.setStatus(Constants.STATUS_0);
+		} 
+		//刷新房间在线成员的列表信息
+		refreshRoomOnlineUserInfo(toBeBannedUserId, roomId);
+	}
+
+	/**
+	 * 刷新用户在房间状态（被踢，被禁）
+	 * @param userId
+	 * @param roomId
+	 * @throws Exception
+	 * @author shao.xiang
+	 * @data 2018年4月22日
+	 */
+	private void refreshRoomOnlineUserInfo(String userId, String roomId) {
+		if(StrUtil.isNullOrEmpty(userId) || StrUtil.isNullOrEmpty(roomId)){
+			return;
+		}
+		try {
+			// 删除用户缓存信息
+			userCacheInfoService.removeUserCacheInfo(userId);
+			if(validateIfInRoom(userId, roomId)) {
+				recordRoomOnlineMember(userId, roomId, 2);
+				recordRoomOnlineMember(userId, roomId, 1);
+			}
+		} catch (Exception e) {
+			LogUtil.log.error(e.getMessage(), e);
+		}
+	}
+	
+	/**
+	 * 校验用户是否在房间内
+	 * @param userId
+	 * @param roomId
+	 * @return
+	 * @author shao.xiang
+	 * @data 2018年4月22日
+	 */
+	public boolean validateIfInRoom(String userId, String roomId) {
+		boolean flag = false;
+		if(StringUtils.isEmpty(userId)||StringUtils.isEmpty(roomId)){
+			return flag ;
+		}
+		//获取房间在线成员
+		List<OnlineUserInfo> sortMembers = null;
+		String key = CacheKey.ROOM_USER_CACHE + roomId;
+		List<OnlineUserInfo> cacheObj = RedisUtil.getList(key, OnlineUserInfo.class);
+		if(cacheObj != null){
+			sortMembers = cacheObj;
+		}
+		if(sortMembers == null || sortMembers.size()<=0){
+			return flag;
+		}else{
+			for(int i=0;i<sortMembers.size();i++){
+				OnlineUserInfo u = sortMembers.get(i);
+				if(u!=null&&userId.equals(u.getUserId())){
+					flag = true; 
+					break;
+				}
+			}
+		}
+		return flag;
+	}
 }

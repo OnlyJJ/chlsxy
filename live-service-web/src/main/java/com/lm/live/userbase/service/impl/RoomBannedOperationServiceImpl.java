@@ -50,6 +50,13 @@ public class RoomBannedOperationServiceImpl extends CommonServiceImpl<RoomBanned
 		return check(rbo);
 	}
 
+	/**
+	 * 校验是否有效
+	 * @param rbo
+	 * @return
+	 * @author shao.xiang
+	 * @data 2018年4月22日
+	 */
 	private boolean check(RoomBannedOperation rbo) {
 		if(rbo != null) {
 			int status = rbo.getStatus();

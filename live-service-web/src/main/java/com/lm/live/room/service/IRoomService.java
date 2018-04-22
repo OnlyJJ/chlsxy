@@ -2,6 +2,7 @@ package com.lm.live.room.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.common.vo.Page;
+import com.lm.live.room.vo.RoomBannedOperationVo;
 
 /**
  * 房间业务服务
@@ -69,5 +70,29 @@ public interface IRoomService {
 	 *@data 2018年4月16日
 	 */
 	void buyGuard(String userId, String anchorId, String roomId,int workId, int guardType, int priceType) throws Exception;
+	
+	/**
+	 * 禁言/解禁(hours=0表示解禁)
+	 * @param fromUserId
+	 * @param roomBannedOperationVo
+	 * @throws Exception
+	 */
+	public void forbidSpeak(String fromUserId,RoomBannedOperationVo roomBannedOperationVo)  throws Exception;
+	
+	/**
+	 * 踢出房间
+	 * @param fromUserId
+	 * @param roomBannedOperationVo
+	 * @throws Exception
+	 */
+	public void forceOut(String fromUserId,RoomBannedOperationVo roomBannedOperationVo)  throws Exception;
+	
+	/**
+	 *  解除禁言
+	 * @param fromUserId
+	 * @param roomBannedOperationVo
+	 * @throws Exception
+	 */
+	public void unForbidSpeak(String fromUserId,RoomBannedOperationVo roomBannedOperationVo) throws Exception;
 	
 }
