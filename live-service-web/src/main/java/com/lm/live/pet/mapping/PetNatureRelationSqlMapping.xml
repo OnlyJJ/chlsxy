@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.lm.live.pet.dao.PetNatureRelationMapper">
+	<resultMap type="com.lm.live.pet.domain.PetNatureRelation"  id="vo">
+		<id property="id" column="id" />
+		<result property="petId" column="petId" />
+		<result property="level" column="level" />
+		<result property="natureId" column="natureId" />
+	</resultMap>
+
+	<!-- 定义可重用的SQL代码段，可以包含在其他语句中 -->
+	<sql id="base_column">
+		 id
+		 ,petId
+		 ,level
+		 ,natureId
+	</sql>
+	
+	<select id="getObjectById" parameterType="java.lang.Long" resultMap="vo">
+		SELECT	<include refid="base_column" />
+		FROM t_pet_conf
+		WHERE id= #{id}
+	</select>	
+	
+	<select id="listPetNatureRelation" resultMap="vo">
+		SELECT	<include refid="base_column" />
+		FROM t_pet_nature_relation
+		WHERE petId= #{petId}
+		AND level= #{level}
+	</select>
+	
+</mapper> 
