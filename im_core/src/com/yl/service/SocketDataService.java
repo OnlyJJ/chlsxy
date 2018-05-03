@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -146,25 +147,6 @@ public class SocketDataService {
 			Map<String, Object> returnData = new HashMap<String, Object>();
 			try
 			{
-				if(cToken.startsWith(Constant.GUEST_TOKEN_KEY))//游客
-				{
-					long curTime=System.currentTimeMillis();
-					Long pub_lastmsgsendtime=0l;
-					if(sic!=null)
-					{
-						pub_lastmsgsendtime=sic.get(Constant.PUB_LASTSENDMSGTIME);
-					}
-					else if(st!=null)
-					{
-						pub_lastmsgsendtime=st.getLastMsgTime();
-					}
-					if(pub_lastmsgsendtime==null)
-						pub_lastmsgsendtime=0l;
-					if(curTime-pub_lastmsgsendtime<20*1000)
-						throw new ServiceException(ErrorCode.ERROR_5005);
-				}
-
-				
 				//LogUtil.log.info(String.format("Socket接收到数据：json=%s",json.toString()));
 				sessionService.toFormatAndsendToServer(json.toString());
 				returnData.put("status", ErrorCode.SUCCESS_2000.getStatus());
@@ -749,6 +731,64 @@ public class SocketDataService {
 		os.flush();
 	}
 	*/
+	
+
+	/**
+	 * 推送数据包到客户端
+	 * @param writer
+	 * @param content
+	 * @throws IOException 
+	 */
+	public void pushDataToClient(OutputStream os, String content) throws IOException{
+		if(null==content)
+			return;
+		int funID=0;
+		String msgId="";
+		try
+		{
+			SocketDataVo vo = new SocketDataVo(content);
+			funID = vo.getFunID();
+			msgId = vo.getData().getString("msgid");
+		}
+		catch(Exception e){}
+		
+		//if(content!=null && !content.contains("12004"))
+		//if(content!=null && funID!=12004)
+		//	LogUtil.log.info(String.format("Socket推送消息：hashCode=%d,uid=%s,funID=%d,msgId=%s",st.hashCode(),st.getUid(),funID, msgId));
+			//LogUtil.log.info(String.format("Socket推送消息：hashCode=%d,uid=%s,funID=%d,content=%s",st.hashCode(),st.getUid(),funID, content));
+
+		
+		//替换掉特殊字符
+		content=content.replaceAll("\n|\r|\t|\b|\f", "");
+		//SocketConnectServer.LogInfo(st,String.format("Socket推送消息：uid=%s,content=%s", st.getUid(), content));
+
+		byte[] body = GZipUtil.compressToByte(content);
+		byte[] head = ByteUtil.toByteArray(body.length, 4);
+		
+		byte[] data = new byte[body.length+head.length];
+
+		System.arraycopy(head, 0, data, 0, head.length);
+		System.arraycopy(body, 0, data, head.length, body.length);
+
+		//DataOutputStream os=st.getOs();
+		if(os==null)
+			throw new RuntimeException("输出流已关闭！");
+		os.write(data);
+		//for(byte a:data)
+		//	System.out.print(Integer.toHexString(a&0xff)+",");
+		//System.out.println();
+		os.flush();
+
+		/*		
+		//不压缩测试
+		OutputStream os=st.getOs();
+		byte[] data = content.getBytes();
+		byte[] head = ByteUtil.toByteArray(data.length, 4);
+		os.write(head);
+		os.write(data);
+		os.flush();*/
+	}
+	
 	/**
 	 * 推送数据包到客户端
 	 * @param writer

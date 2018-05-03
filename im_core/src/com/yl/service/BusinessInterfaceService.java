@@ -35,8 +35,12 @@ public class BusinessInterfaceService {
 	private static final String FRIEND_RELATIVE_URL = BUSINESS_SYSTEM_URL + "getFriendRelative";
 	
 	//private static final String USER_BASEINFO_URL = BUSINESS_SYSTEM_URL + "getUserBaseInfo";
-	private static final String USER_BASEINFO_URL = BUSINESS_SYSTEM_URL + "/U12/0/";
-	private static final String SYNC_ROOM_USER_URL = BUSINESS_SYSTEM_URL + "/U16/0/";
+	private static final String USER_BASEINFO_URL = BUSINESS_SYSTEM_URL + "U12/1/";
+	private static final String SYNC_ROOM_USER_URL = BUSINESS_SYSTEM_URL + "U16/1/";
+	private static final String USER_BAN_URL = BUSINESS_SYSTEM_URL + "U119/1/";
+	
+	private static final String USER_BAN = "u_ban_";
+
 	
 	
 	/** 保存游客信息  */
@@ -344,7 +348,58 @@ public class BusinessInterfaceService {
 		return null;
 
 	}
-	
+	/**
+	 * 获取用记屏蔽私聊列表 //为了加快速度，先从memcached取，为空再请求接口
+	 * @param uid
+	 * @return
+	 */
+	public JSONObject getUserBan(String uid) {
+		try {
+			if(uid==null)
+				return null;
+			
+			JSONObject u=null;
+			
+			String key = USER_BAN+uid;
+			//查询缓存
+			String obj = RedisUtil.get(key);
+			if(null != obj){
+				//{"data":[{"a":"270184","c":0,"d":0,"h":0,"j":9168,"k":"2018-01-16 18:25:59.0","l":"节奏"},{"a":"270185","c":0,"d":0,"h":0,"j":9170,"k":"2018-01-16 18:25:59.0"}]}
+				u=JSONObject.fromObject(obj);
+			}
+			else
+			{
+				String url = USER_BAN_URL;
+				String value="{\"userbaseinfo\":{\"a\":\""+uid+"\"}}";
+				
+				//{"data":[{"a":"270184","c":0,"d":0,"h":0,"j":9168,"k":"2018-01-16 18:25:59.0","l":"节奏"},{"a":"270185","c":0,"d":0,"h":0,"j":9170,"k":"2018-01-16 18:25:59.0"}],"result":{"a":0,"b":"SUCCESS"}}
+				
+				//LogUtil.log.info("url="+url+",value="+value);
+				String response = StrUtil.getCleanString(HttpUtil.post(url, value,true));
+				//LogUtil.log.info("url="+url+",value="+value+",response="+response);
+
+				if (!response.isEmpty())
+				{
+					JSONObject json = JsonUtil.strToJsonObject(response);
+					JSONObject result=!json.has("result") ? null : json.getJSONObject("result");
+					if(result!=null)
+					{
+						int resultCode=!result.has("a") ? -1 : result.getInt("a");
+						if(resultCode==0)
+						{
+							//u=!json.has("data") ? null : json.getJSONObject("data");
+							u=json;
+						}
+					}
+				}
+			}
+			return u;
+		} catch (Exception e) {
+			LogUtil.log.warn(String.format("[getUserBan] fail, uid=%s", uid), e);
+		}
+		return null;
+
+	}
 	public String getAndSetPesudoUserName(String userId)throws Exception {
 		Random rnd = new Random();
 		long time = System.currentTimeMillis(); 

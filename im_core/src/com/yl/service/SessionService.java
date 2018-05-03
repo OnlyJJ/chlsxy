@@ -1,6 +1,7 @@
 package com.yl.service;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -9,6 +10,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
@@ -27,6 +29,7 @@ import com.yl.common.utils.HttpUtil;
 import com.yl.common.utils.JsonUtil;
 import com.yl.common.utils.LogUtil;
 import com.yl.common.utils.MCKeyUtil;
+import com.yl.common.utils.MemcachedUtil;
 import com.yl.common.utils.MessageUtil;
 import com.yl.common.utils.RedisUtil;
 import com.yl.common.utils.SensitiveWordUtil;
@@ -99,8 +102,12 @@ public class SessionService {
 	 */
 	public JSONObject toFormatClientData(HttpMsgDataVo vo, String uid) throws Exception {
 		
-		JSONObject u=businessInterfaceService.getUserBaseInfo2(uid,vo.getData().getString("targetid"));
-		
+//		JSONObject u=businessInterfaceService.getUserBaseInfo2(uid,vo.getData().getString("targetid"));
+		JSONObject u=vo.getData().has("user")?vo.getData().getJSONObject("user"):null;
+		if(u==null)//一个user对象（已有user对象则原样返回，不再从业务系统取）
+		{
+			u=businessInterfaceService.getUserBaseInfo2(uid,vo.getData().getString("targetid"));
+		}
 		JSONObject jsonu=JSONObject.fromObject(u);
 		//jsonu.put("uid", uid);
 		if(u!=null)
@@ -148,8 +155,9 @@ public class SessionService {
 		}
 		else
 		{
-			jsonu=new JSONObject();
-			jsonu.put("uid", uid);
+			u=new JSONObject();
+			u.put("uid", uid);
+			jsonu=JSONObject.fromObject(u);
 			//vo.getData().put("user", String.format("{\"uid\":\"%s\"}", uid));
 		}
 		//vo.getData().put("user",JsonUtil.beanToJsonString(jsonu));
@@ -241,7 +249,8 @@ public class SessionService {
 		HttpMsgDataVo vo = new HttpMsgDataVo(data);
 		
 		LogUtil.log.info(String.format("toFormatAndsendToServer ：vo=%s", vo.toJsonString()));
-
+		boolean isBan=false;//这条消息是否需要屏蔽（此变量屏蔽的消息客户端无感知）
+		
 		if (null != vo) {
 			String token = null==vo.getData().get("token") ? null : vo.getData().getString("token");
 			String uid=getSessionUid(token);
@@ -273,7 +282,7 @@ public class SessionService {
 			}
 			
 			String type = null==vo.getData().get("type") ? "" : vo.getData().getString("type");//1 文本消息
-
+			int msgType = vo.getData().getInt("msgtype"); // 消息形式，1-单聊，2-群聊
 			//boolean forbidSpeak=u.getBoolean("forbidSpeak");//禁言 
 			//boolean forceOut=u.getBoolean("forceOut");//是否被踢
 			boolean forbidSpeak = false;//禁言 
@@ -300,40 +309,111 @@ public class SessionService {
 			}
 
 			//LogUtil.log.info(String.format("toFormatAndsendToServer ：u=%s,forbidSpeak=%s,forceOut=%s,type=%s", u,forbidSpeak,forceOut,type));
+			//当前时间
 			long curTime=System.currentTimeMillis();
-			
-			
-			if(u!=null && (forbidSpeak||forceOut) && type.equals("1"))
-				throw new ServiceException(ErrorCode.ERROR_5012);
-			
-			int msgType = vo.getData().getInt("msgtype"); // 消息形式，1-单聊，2-群聊
-			if(u!=null && "V0".equalsIgnoreCase(userLevel) && msgType==1 && type.equals("1")) //1级以上用户才可以私聊
-				throw new ServiceException(ErrorCode.ERROR_5014);
-			
-			if(u!=null && (  "V1".equalsIgnoreCase(userLevel)
-					       ||"V2".equalsIgnoreCase(userLevel)
-					       ||"V3".equalsIgnoreCase(userLevel)
-					       ||"V4".equalsIgnoreCase(userLevel)
-					       ||"V5".equalsIgnoreCase(userLevel)
-					      )
-					&& msgType==1 && type.equals("1")) //1-5级用户 私聊间隔10秒
+			//最后公聊时间
+			Long pub_lastmsgsendtime=0l;
+			if(sic!=null)
 			{
-				Long pri_lastmsgsendtime=0l;
-				if(null != sic)
+				pub_lastmsgsendtime=sic.get(Constant.PUB_LASTSENDMSGTIME);
+			}
+			else if(st!=null)
+			{
+				pub_lastmsgsendtime=st.getLastMsgTime();
+			}
+			if(pub_lastmsgsendtime==null)
+				pub_lastmsgsendtime=0l;
+			//最后私聊时间
+			Long pri_lastmsgsendtime=0l;
+			if(null != sic)
+			{
+				pri_lastmsgsendtime=sic.get(Constant.PRI_LASTSENDMSGTIME);
+			}
+			else if(st!=null)
+			{
+				pri_lastmsgsendtime=st.getLastPriMsgTime();
+			}
+			if(pri_lastmsgsendtime==null)
+				pri_lastmsgsendtime=0l;
+
+			if(msgType==1)//私聊
+			{
+				if(token.startsWith(Constant.GUEST_TOKEN_KEY))//游客
+					throw new ServiceException(ErrorCode.ERROR_5014);
+				if(u!=null && "V0".equalsIgnoreCase(userLevel) && type.equals("1")) //1级以上用户才可以私聊
+					throw new ServiceException(ErrorCode.ERROR_5014);
+				
+				String targetid = null==vo.getData().get("targetid") ? "" : vo.getData().getString("targetid");//消息接收者
+				if(StrUtil.isNullOrEmpty(targetid))
+					throw new ServiceException(ErrorCode.ERROR_5005);
+				
+				//{"data":[{"a":"270184","c":0,"d":0,"h":0,"j":9168,"k":"2018-01-16 18:25:59.0","l":"节奏"},{"a":"270185","c":0,"d":0,"h":0,"j":9170,"k":"2018-01-16 18:25:59.0"}]}
+				JSONObject ub=businessInterfaceService.getUserBan(targetid);	
+				LogUtil.log.info("getUserBan="+ub);
+				if(ub!=null)
 				{
-					pri_lastmsgsendtime=sic.get(Constant.PRI_LASTSENDMSGTIME);
+					JSONArray banarray=!ub.has("data") ? null : ub.getJSONArray("data");
+					if(banarray!=null && banarray.size()>0)
+					{
+						for(int i=0;i<banarray.size();i++)
+						{
+							JSONObject buo = (JSONObject) banarray.get(i);
+							String banuser=!buo.has("a") ? null : buo.getString("a");	
+							if(banuser!=null && banuser.equals(uid))
+							{
+								isBan=true;
+								break;
+							}
+						}
+					}
 				}
-				else if(st!=null)
+
+				if(u!=null && (  "V1".equalsIgnoreCase(userLevel)
+						       ||"V2".equalsIgnoreCase(userLevel)
+						       ||"V3".equalsIgnoreCase(userLevel)
+						       ||"V4".equalsIgnoreCase(userLevel)
+						       ||"V5".equalsIgnoreCase(userLevel)
+						      )
+						&& type.equals("1")) //1-5级用户 私聊间隔10秒
 				{
-					pri_lastmsgsendtime=st.getLastPriMsgTime();
+					if(curTime-pri_lastmsgsendtime<Constant.V1_V5_PRI_INTERVAL)
+						throw new ServiceException(ErrorCode.ERROR_5015);
 				}
-				if(pri_lastmsgsendtime==null)
-					pri_lastmsgsendtime=0l;
-				if(curTime-pri_lastmsgsendtime<10*1000)
-					throw new ServiceException(ErrorCode.ERROR_5015);
-				else
+				else if(u!=null && type.equals("1")) 
 				{
-					//记录1-5级用户私聊最后发送时间
+					Object forbid=MemcachedUtil.get(Constant.V6_PRI_FORBID_KEY+u.get("uid"));
+					if(forbid!=null)
+						throw new ServiceException(ErrorCode.ERROR_5016);
+					if(curTime-pri_lastmsgsendtime<Constant.V6_PRI_INTERVAL)//500毫秒
+					{
+						LogUtil.log.info(String.format("私聊发送间隔小于 ：t=%s,value=%s", Constant.V6_PRI_INTERVAL,curTime-pri_lastmsgsendtime));
+						List<Long> newlist=new ArrayList<Long>();
+						List<Long> oldlist=new ArrayList<Long>();
+						Object o=MemcachedUtil.get(Constant.V6_PRI_KEY+u.get("uid"));
+						if(o!=null)
+							oldlist=(List<Long>)o;
+						for(Long l:oldlist)
+						{
+							if(curTime-l<Constant.V6_PRI_SECTION*Constant.SECOND)
+								newlist.add(l);
+						}
+						newlist.add(curTime);
+						MemcachedUtil.set(Constant.V6_PRI_KEY+u.get("uid"), newlist,Constant.V6_PRI_SECTION);
+						LogUtil.log.info(String.format("私聊%s秒内触发了%s次",Constant.V6_PRI_SECTION,newlist.size()));
+
+						if(newlist.size()>=Constant.V6_PRI_TOUCH_TIMES)
+						{
+							LogUtil.log.info(String.format("%s 秒内触发了%s次，屏蔽私聊%s秒",Constant.V6_PRI_SECTION, Constant.V6_PRI_TOUCH_TIMES,Constant.V6_PRI_FORBID_TIME));
+							MemcachedUtil.set(Constant.V6_PRI_FORBID_KEY+u.get("uid"), "1",Constant.V6_PRI_FORBID_TIME);
+						}
+						throw new ServiceException(ErrorCode.ERROR_5016);
+					}
+				}
+				
+				//用户发送的消息才记录发送时间
+				if(type.equals("1"))
+				{
+					//记录用户私聊最后发送时间
 					if(null != sic)
 					{
 						sic.set(Constant.PRI_LASTSENDMSGTIME, curTime);
@@ -343,157 +423,94 @@ public class SessionService {
 						st.setLastPriMsgTime(curTime);
 					}
 				}
+
 			}
-			
-			// 游客不给发消息
-			if(token.startsWith(Constant.GUEST_TOKEN_KEY)) 
+			else if(msgType==2)//公聊
 			{
-				Hashtable gdc=new Hashtable();
-				gdc.put("[vc1]", "主播今天好漂亮哦");
-				gdc.put("[vc2]", "吃饭没有啊");
-				gdc.put("[vc3]", "大家好，我来了～");
+				if(u!=null && (forbidSpeak||forceOut) && type.equals("1"))
+					throw new ServiceException(ErrorCode.ERROR_5012);
 				
-				String content = vo.getData().getString("content");
-				content =(String)gdc.get(content);
-				
-				if(content!=null)
+				// 游客不给发消息
+				if(token.startsWith(Constant.GUEST_TOKEN_KEY)) 
 				{
-					vo.getData().put("content", content);
+					if(curTime-pub_lastmsgsendtime<Constant.PESUDO_PUB_INTERVAL)
+						throw new ServiceException(ErrorCode.ERROR_5013);
+
+					Hashtable gdc=new Hashtable();
+					gdc.put("[vc1]", "主播今天好漂亮哦");
+					gdc.put("[vc2]", "吃饭没有啊");
+					gdc.put("[vc3]", "大家好，我来了～");
+					
+					String content = vo.getData().getString("content");
+					content =(String)gdc.get(content);
+					
+					if(content!=null)
+					{
+						vo.getData().put("content", content);
+					}
+					else
+						throw new ServiceException(ErrorCode.ERROR_5005);
+					
 				}
-				else
-					throw new ServiceException(ErrorCode.ERROR_5005);
+				// utype 发送者类型  1:主播，2:普通用户，3:房管  4:游客 5官方人员（权限最高）
+				if(u!=null && "V0".equalsIgnoreCase(userLevel) && ("2".equalsIgnoreCase(utype)  || "3".equalsIgnoreCase(utype) ) && type.equals("1")) //主播之外的草民公聊间隔10s
+				{
+					if(curTime-pub_lastmsgsendtime<Constant.CAOMIN_PUB_INTERVAL)
+						throw new ServiceException(ErrorCode.ERROR_5013);
+				}
+				else if(u!=null && type.equals("1")) 
+				{
+					Object forbid=MemcachedUtil.get(Constant.OTHER_PUB_FORBID_KEY+u.get("uid"));
+					if(forbid!=null)
+						throw new ServiceException(ErrorCode.ERROR_5016);
+					if(curTime-pub_lastmsgsendtime<Constant.OTHER_PUB_INTERVAL)//100毫秒
+					{
+						LogUtil.log.info(String.format("发送间隔小于 ：t=%s,value=%s", Constant.OTHER_PUB_INTERVAL,curTime-pub_lastmsgsendtime));
+						List<Long> newlist=new ArrayList();
+						List<Long> oldlist=new ArrayList();
+						Object o=MemcachedUtil.get(Constant.OTHER_PUB_KEY+u.get("uid"));
+						if(o!=null)
+							oldlist=(List<Long>)o;
+						for(Long l:oldlist)
+						{
+							if(curTime-l<Constant.OTHER_PUB_SECTION*Constant.SECOND)
+								newlist.add(l);
+						}
+						newlist.add(curTime);
+						MemcachedUtil.set(Constant.OTHER_PUB_KEY+u.get("uid"), newlist,Constant.OTHER_PUB_SECTION);
+						LogUtil.log.info(String.format("%s 秒内触发了%s次",Constant.OTHER_PUB_SECTION,newlist.size()));
+
+						if(newlist.size()>=Constant.OTHER_PUB_TOUCH_TIMES)
+						{
+							LogUtil.log.info(String.format("%s 秒内触发了%s次，屏蔽公聊%s秒",Constant.OTHER_PUB_SECTION, Constant.OTHER_PUB_TOUCH_TIMES,Constant.OTHER_PUB_FORBID_TIME));
+							MemcachedUtil.set(Constant.OTHER_PUB_FORBID_KEY+u.get("uid"), "1",Constant.OTHER_PUB_FORBID_TIME);
+						}
+						throw new ServiceException(ErrorCode.ERROR_5016);
+					}
+				}
 				
-				if(null != sic){
-					sic.set(Constant.PUB_LASTSENDMSGTIME, curTime);//记录游客消息的最后发送时间
-				}else if(null != st){
-					st.setLastMsgTime(curTime);//记录游客消息的最后发送时间
+				//用户发送的消息才记录发送时间
+				if(type.equals("1"))
+				{
+					//2登陆用户 3 管理员  记录公聊消息的最后发送时间
+					if(null != sic)
+					{
+						sic.set(Constant.PUB_LASTSENDMSGTIME, curTime);
+					}
+					else if(st!=null)
+					{
+						st.setLastMsgTime(curTime);
+					}
 				}
 			}
+			else
+				throw new ServiceException(ErrorCode.ERROR_5005);
 			
-			if(u!=null && "V0".equalsIgnoreCase(userLevel) && ("2".equalsIgnoreCase(utype)  || "3".equalsIgnoreCase(utype) ) && msgType==2 && type.equals("1")) //主播之外的草民公聊间隔10s
-			{
-				Long pub_lastmsgsendtime=0l;
-				if(null != sic){
-					pub_lastmsgsendtime=sic.get(Constant.PUB_LASTSENDMSGTIME);
-				}
-				else if(st!=null)
-				{
-					pub_lastmsgsendtime=st.getLastMsgTime();
-				}
-				if(pub_lastmsgsendtime==null)
-					pub_lastmsgsendtime=0l;
-				if(curTime-pub_lastmsgsendtime<10*1000)
-					throw new ServiceException(ErrorCode.ERROR_5013);
-				
-				//2登陆用户 3 管理员  只记录需要限制发送间隔的消息的最后发送时间
-				if(null != sic)
-				{
-					sic.set(Constant.PUB_LASTSENDMSGTIME, curTime);
-				}
-				else if(st!=null)
-				{
-					st.setLastMsgTime(curTime);
-				}
-			}
-			
-			toSendMsg(vo);
+			if(!isBan)
+				toSendMsg(vo);
 		
 		}
 		return vo;
-	}
-	
-	/**
-	 * 调用通信系统集群里对应服务器的踢出接口
-	 * @param uid
-	 * @return tickoutStatus: 0-失败，1-成功，2-不存在该连接
-	 */
-	public int toTickout(String uid,String token){
-		
-		LogUtil.log.info(String.format("toTickout：uid=%s,token=%s", uid,token));
-
-		int tickoutStatus = 0;
-		// 当前服务器没有对应的socket线程，则调用通信系统集群里对应服务器的踢出接口
-		String val = RedisUtil.get(MCKeyUtil.getSocketKey(uid));
-		if (StringUtils.isNotEmpty(val)) {
-			String host = val;
-			StringBuffer url = new StringBuffer().append(host).append("/server/tickout?uid=").append(uid).append("&token=").append(token);
-			String status = HttpUtil.getWithTwice(url.toString());
-			if (StrUtil.isNullOrEmpty(status) || "0".equals(status)) { // 重试一次
-				status = "0";
-			}
-			tickoutStatus = Integer.valueOf(status);
-		}
-		LogUtil.log.info(String.format("toTickout：host=%s,tickoutStatus=%d", val,tickoutStatus));
-		return tickoutStatus;
-	}
-	
-	/**
-	 * 踢出当前服务器会话中的socket处理线程
-	 * 注意：针对当前服务器
-	 * @param uid
-	 * @return tickoutStatus: 0-失败，1-成功，2-不存在该连接
-	 */
-	public int tickoutSessionSocketForCurrentServer(String uid,String token) {
-		int tickoutStatus = 0;
-		try {
-			Object obj = SessionManager.getSessionSocket(uid);
-			if(null != obj){
-				if(obj instanceof SocketTask){
-					SocketTask st = (SocketTask)obj;
-					
-					if(token==null || token.equalsIgnoreCase("null") || token.isEmpty())
-					{
-						LogUtil.log.info("tickoutSessionSocketForCurrentServer-tickout！");
-						st.tickout();
-					}
-					else
-					{
-						LogUtil.log.info("tickoutSessionSocketForCurrentServer-close！");
-						st.close();
-					}
-				}else{
-					SocketIOClient client = (SocketIOClient)obj;
-					socketIOClientService.close(client);
-				}
-				SessionManager.removeSessionSocket(uid);
-				tickoutStatus = 1;
-			}else{
-				LogUtil.log.info("tickoutSessionSocketForCurrentServer-getSessionSocket is null！");
-				tickoutStatus = 2;
-			}
-		} catch (Exception e) {
-			LogUtil.log.warn(e.getMessage(), e);
-		}
-		LogUtil.log.info(String.format("[踢出会话socket] server=%s, uid=%s, tickoutStatus=%s" , SpringContextListener.getContextProValue("application.host", "error"), uid, tickoutStatus));
-		return tickoutStatus;
-		
-	}
-	
-	/**
-	 * 签收消息
-	 * @param uid
-	 * @param msgId
-	 * @throws Exception
-	 */
-	public void acknowledgeMsg(String uid, String msgId) throws Exception{
-		Object obj = SessionManager.getSessionSocket(uid);
-		if(null != obj){
-			if(obj instanceof SocketTask){
-				//SocketTask st = (SocketTask)obj;
-				//st.getMsgCache().remove(msgId);
-				//LogUtil.log.info(String.format("acknowledgeMsg：msgId=%s", msgId));
-
-			}else{
-				//SocketIOClient client = (SocketIOClient)obj;
-				//Map<String, Object> msgCache = (Map<String, Object>)client.get(Constant.MSG_CACHE_KEY);
-				//msgCache.remove(msgId);
-				//LogUtil.log.info(String.format("acknowledgeMsg_io：msgId=%s", msgId));
-			}
-			//SessionManager.removeMsgId(msgId);
-			//HttpSQSUtil.putData(HttpSQSUtil.QNAME_MSG, messageDBService.getUpdateAckSql(msgId));
-		}else{
-			throw new ServiceException(ErrorCode.ERROR_5004);
-		}
 	}
 	
 	/**
@@ -721,4 +738,98 @@ public class SessionService {
 		}
 	}
 	
+	/**
+	 * 调用通信系统集群里对应服务器的踢出接口
+	 * @param uid
+	 * @return tickoutStatus: 0-失败，1-成功，2-不存在该连接
+	 */
+	public int toTickout(String uid,String token){
+		
+		LogUtil.log.info(String.format("toTickout：uid=%s,token=%s", uid,token));
+		
+		int tickoutStatus = 0;
+		// 当前服务器没有对应的socket线程，则调用通信系统集群里对应服务器的踢出接口
+		Object obj = MemcachedUtil.get(MCKeyUtil.getSocketKey(uid));
+		if (null != obj) {
+			String host = String.valueOf(obj);
+			StringBuffer url = new StringBuffer().append(host).append("/server/tickout?uid=").append(uid).append("&token=").append(token);
+			String status = HttpUtil.getWithTwice(url.toString());
+			if (StrUtil.isNullOrEmpty(status) || "0".equals(status)) { // 重试一次
+				status = "0";
+			}
+			tickoutStatus = Integer.valueOf(status);
+		}
+		LogUtil.log.info(String.format("toTickout：host=%s,tickoutStatus=%d", String.valueOf(obj),tickoutStatus));
+		return tickoutStatus;
+	}
+	
+	/**
+	 * 签收消息
+	 * @param uid
+	 * @param msgId
+	 * @throws Exception
+	 */
+	public void acknowledgeMsg(String uid, String msgId) throws Exception{
+		Object obj = SessionManager.getSessionSocket(uid);
+		if(null != obj){
+			if(obj instanceof SocketTask){
+				//SocketTask st = (SocketTask)obj;
+				//st.getMsgCache().remove(msgId);
+				//LogUtil.log.info(String.format("acknowledgeMsg：msgId=%s", msgId));
+
+			}else{
+				//SocketIOClient client = (SocketIOClient)obj;
+				//Map<String, Object> msgCache = (Map<String, Object>)client.get(Constant.MSG_CACHE_KEY);
+				//msgCache.remove(msgId);
+				//LogUtil.log.info(String.format("acknowledgeMsg_io：msgId=%s", msgId));
+			}
+			//SessionManager.removeMsgId(msgId);
+			//HttpSQSUtil.putData(HttpSQSUtil.QNAME_MSG, messageDBService.getUpdateAckSql(msgId));
+		}else{
+			throw new ServiceException(ErrorCode.ERROR_5004);
+		}
+	}
+	
+	/**
+	 * 踢出当前服务器会话中的socket处理线程
+	 * 注意：针对当前服务器
+	 * @param uid
+	 * @return tickoutStatus: 0-失败，1-成功，2-不存在该连接
+	 */
+	public int tickoutSessionSocketForCurrentServer(String uid,String token) {
+		int tickoutStatus = 0;
+		try {
+			Object obj = SessionManager.getSessionSocket(uid);
+			if(null != obj){
+				if(obj instanceof SocketTask){
+					SocketTask st = (SocketTask)obj;
+					
+					if(token==null || token.equalsIgnoreCase("null") || token.isEmpty())
+					{
+						LogUtil.log.info("tickoutSessionSocketForCurrentServer-tickout！");
+						st.tickout();
+					}
+					else
+					{
+						LogUtil.log.info("tickoutSessionSocketForCurrentServer-close！");
+						st.close();
+					}
+				}else{
+					SocketIOClient client = (SocketIOClient)obj;
+					socketIOClientService.close(client);
+				}
+				SessionManager.removeSessionSocket(uid);
+				tickoutStatus = 1;
+			}else{
+				LogUtil.log.info("tickoutSessionSocketForCurrentServer-getSessionSocket is null！");
+				tickoutStatus = 2;
+			}
+		} catch (Exception e) {
+			LogUtil.log.warn(e.getMessage(), e);
+		}
+		LogUtil.log.info(String.format("[踢出会话socket] server=%s, uid=%s, tickoutStatus=%s" , SpringContextListener.getContextProValue("application.host", "error"), uid, tickoutStatus));
+		return tickoutStatus;
+		
+	}
 }
+

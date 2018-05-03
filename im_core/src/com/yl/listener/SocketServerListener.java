@@ -16,6 +16,7 @@ import com.yl.common.utils.RedisUtil;
 import com.yl.common.utils.SpringContextListener;
 import com.yl.common.utils.StrUtil;
 import com.yl.socket.SocketConnectServer;
+import com.yl.socket.SocketServerService;
 import com.yl.socket843.SocketServer843;
 import com.yl.socketio.SocketIOConnectServer;
 
@@ -34,6 +35,9 @@ public class SocketServerListener implements ApplicationListener<ContextRefreshe
 	
 	@Autowired
 	private SocketIOConnectServer socketIOConnectServer;
+	
+	@Autowired
+	private SocketServerService socketServerService;
 	
 	private final String imDbHost = SpringContextListener.getContextProValue("im.db.host", "http://127.0.0.1:8080/im_db/");
 	private final String applicationHost = SpringContextListener.getContextProValue("application.host", "127.0.0.1:80");
@@ -123,6 +127,13 @@ public class SocketServerListener implements ApplicationListener<ContextRefreshe
 			socketConnectServer.startServer();
 		} catch (Exception e) {
 			LogUtil.log.error("##### 启动SocketConnectServer失败 ##### ", e);
+		}
+		
+		try {
+			LogUtil.log.info("##### 启动SocketServerService ######## start...");
+			socketServerService.startServer();
+		} catch (Exception e) {
+			LogUtil.log.error("##### 启动SocketServerService失败 ##### ", e);
 		}
 		
 		try {
