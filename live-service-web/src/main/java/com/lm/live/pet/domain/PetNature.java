@@ -7,8 +7,12 @@ import com.lm.live.common.vo.BaseVo;
  * 宠物属性表
 */
 public class PetNature extends BaseVo {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1183944223225550221L;
 	
-	
+	private int id;
 	/**
 	 * 属性名
 	 */
@@ -16,17 +20,25 @@ public class PetNature extends BaseVo {
 	/**
 	 * 属性描述
 	 */
-	private String remark;
+	private String info;
 	/**
 	 * 属性类型，0:额外宠物经验，1:额外用户经验
 	 */
-	private Byte natureType;
+	private int natureType;
 	/**
 	 * 属性值
 	 */
-	private Integer natureVal;
+	private int natureVal;
 	
 	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	public String getName() {
 		return this.name;
 	}
@@ -34,25 +46,25 @@ public class PetNature extends BaseVo {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public String getRemark() {
-		return this.remark;
+	public String getInfo() {
+		return this.info;
 	}
 	
-	public void setRemark(String remark) {
-		this.remark = remark;
+	public void setInfo(String info) {
+		this.info = info;
 	}
-	public Byte getNaturetype() {
+	public int getNaturetype() {
 		return this.natureType;
 	}
 	
-	public void setNaturetype(Byte natureType) {
+	public void setNaturetype(int natureType) {
 		this.natureType = natureType;
 	}
-	public Integer getNatureval() {
+	public int getNatureval() {
 		return this.natureVal;
 	}
 	
-	public void setNatureval(Integer natureVal) {
+	public void setNatureval(int natureVal) {
 		this.natureVal = natureVal;
 	}
 }

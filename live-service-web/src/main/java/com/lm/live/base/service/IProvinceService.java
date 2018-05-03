@@ -44,4 +44,13 @@ public interface IProvinceService extends ICommonService<Province> {
 	 * @return
 	 */
 	List<String> listNearRegionByAppData(String appSf);
+	
+	/**
+	 * 通过ip获取地址
+	 *@param ip
+	 *@return
+	 *@author shao.xiang
+	 *@data 2018年4月28日
+	 */
+	String getAddress(String ip);
 }

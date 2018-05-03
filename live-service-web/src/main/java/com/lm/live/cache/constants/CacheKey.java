@@ -111,6 +111,13 @@ public class CacheKey {
 	public static final String USER_PESUDONAME_CACHE = "pesudo:name:";
 	
 	
+	// 宠物模块
+	/** 用户正在使用的宠物缓存 */
+	public static final String PET_USEING_CACHE = "pet:useing:";
+	/** 用户所有宠物信息缓存 */
+	public static final String PET_ALL_CACHE = "pet:all:";
+	
+	
 	// 道具模块
 	/** 礼物缓存 */
 	public static final String TOOL_GIFT_CACHE = "tool:gift:";

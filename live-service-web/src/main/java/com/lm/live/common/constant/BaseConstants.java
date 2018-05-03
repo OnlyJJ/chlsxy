@@ -13,6 +13,8 @@ public class BaseConstants {
 	public static final String USER_DEFAULT_ICON = "default.jpg";
 	/** 礼物图片存储位置  */
 	public static final String GIFT_IMG_FILE_URI = "images/gift";
+	/** 宠物图片存储位置  */
+	public static final String PET_IMG_FILE_URI = "images/pet";
 	/** 工具（宝箱，钥匙，大喇叭…）图片存储位置 */
 	public static final String TOOL_IMG_FILE_URI = "images/tool";
 	/** 勋章图片位置 */

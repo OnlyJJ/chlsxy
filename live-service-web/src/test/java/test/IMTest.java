@@ -6,7 +6,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.alibaba.fastjson.JSONObject;
-import com.lm.live.common.utils.IMutils;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath*:spring/spring-context.xml"})
@@ -21,7 +20,7 @@ public class IMTest {
 		imData.put("type", 1);
 		imData.put("content", content);
 		
-		IMutils.sendMsg2IM(11000, 1, imData, "153706");
+//		IMutils.sendMsg2IM(11000, 1, imData, "153706");
 	}
 	
 	@Test
@@ -35,7 +34,7 @@ public class IMTest {
 		imData.put("content", content);
 		
 		try {
-			IMutils.sendMsg2IM(11000, 1, imData, "153706");
+//			IMutils.sendMsg2IM(11000, 1, imData, "153706");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

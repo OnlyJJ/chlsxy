@@ -16,6 +16,8 @@ import com.lm.live.cache.constants.CacheTimeout;
 import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.utils.LogUtil;
 import com.lm.live.common.utils.StrUtil;
+import com.lm.live.pet.service.IUserPetService;
+import com.lm.live.pet.vo.PetVo;
 import com.lm.live.user.constant.Constants;
 import com.lm.live.user.dao.UserInfoMapper;
 import com.lm.live.user.enums.ErrorCode;
@@ -44,6 +46,9 @@ public class UserCacheInfoServiceImpl implements IUserCacheInfoService {
 	
 	@Resource
 	private  IRoomBannedOperationService roomBannedOperationService;
+	
+	@Resource
+	private IUserPetService userPetService;
 	
 	@Override
 	public UserCache getUserByChe(String userId) {
@@ -205,9 +210,14 @@ public class UserCacheInfoServiceImpl implements IUserCacheInfoService {
 						userInfoVo.setAvatar(Constants.cdnPath + Constants.ICON_IMG_FILE_URI + File.separator + user.getIcon());
 						userInfoVo.setUserLevel(user.getUserLevel());
 						userInfoVo.setAnchorLevel(user.getAnchorLevel());
-						// 座驾
+						// 宠物
+						PetVo pet = userPetService.getUsePet(userId);
+						if(pet != null) {
+							userInfoVo.setPetVo(pet.buildJson());
+						}
 						// 勋章
 					}
+					RedisUtil.set(key, user, CacheTimeout.DEFAULT_TIMEOUT_2H);
 				}
 				// 是否需要处理在房间信息
 				if(!StrUtil.isNullOrEmpty(roomId)) {

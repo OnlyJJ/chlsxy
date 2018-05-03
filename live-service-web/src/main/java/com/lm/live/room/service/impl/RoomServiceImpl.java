@@ -21,15 +21,14 @@ import com.lm.live.account.service.IUserAccountService;
 import com.lm.live.account.service.IUserLevelService;
 import com.lm.live.base.dao.ShareInfoMapper;
 import com.lm.live.base.domain.UserShareInfo;
+import com.lm.live.base.enums.IMBusinessEnum.ImCommonEnum;
 import com.lm.live.base.service.ISendMsgService;
 import com.lm.live.cache.constants.CacheKey;
 import com.lm.live.cache.constants.CacheTimeout;
-import com.lm.live.common.enums.IMBusinessEnum.ImTypeEnum;
 import com.lm.live.common.redis.RdLock;
 import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.utils.DateUntil;
 import com.lm.live.common.utils.HttpUtils;
-import com.lm.live.common.utils.IMutils;
 import com.lm.live.common.utils.JsonUtil;
 import com.lm.live.common.utils.LogUtil;
 import com.lm.live.common.utils.StrUtil;
@@ -108,7 +107,7 @@ public class RoomServiceImpl implements IRoomService {
 	
 	@Resource
 	private IRoomBannedOperationService roomBannedOperationService;
-
+	
 	@Transactional(rollbackFor=Exception.class)
 	@Override
 	public JSONObject sendGift(String userId, String roomId, String anchorId,
@@ -263,7 +262,6 @@ public class RoomServiceImpl implements IRoomService {
 				onGiftRunwayImData = new JSONObject();
 				JSONObject shouhuContent = new JSONObject();
 				// 与IM之间约定的全站通知时所用特殊房间号 
-				String wholeSiteNoticeRoomId = Constants.WHOLE_SITE_NOTICE_ROOMID;
 				shouhuContent.put("msg", msg.toString());
 				shouhuContent.put("msgColor", msgColor);
 				shouhuContent.put("headMsg", headMsg);
@@ -279,58 +277,41 @@ public class RoomServiceImpl implements IRoomService {
 					shouhuContent.put("anchorName", anchorUserInfo.getNickName());
 					shouhuContent.put("giftName", giftName);
 				}
-				onGiftRunwayImData.put("msgtype", 2);
-				onGiftRunwayImData.put("targetid", wholeSiteNoticeRoomId);
-				onGiftRunwayImData.put("type", ImTypeEnum.IM_11001_hanhuasmg.getValue());
-				onGiftRunwayImData.put("content", shouhuContent);
-			}else{
-				onGiftRunwayImData = null;
+				
+				// 礼物跑道消息
+				try {
+					if(shouhuContent != null) {
+						LogUtil.log.info(String.format("####　begin推送礼物跑道的im消息:发消息begin..,onGiftRunwayImData:%s",JsonUtil.beanToJsonString(onGiftRunwayImData)));
+						sendMsgService.sendMsg(userId, null, ImCommonEnum.IM_HORN.getValue(), Constants.WHOLE_SITE_NOTICE_ROOMID, shouhuContent);
+						LogUtil.log.info(String.format("####　end推送礼物跑道的im消息:发消息end..,onGiftRunwayImData:%s",JsonUtil.beanToJsonString(onGiftRunwayImData)));
+					}
+				} catch(Exception e) {
+					LogUtil.log.info(String.format("####　礼物跑道的im消息,senderUserId:%s,shouhuImData:%s",userId,JsonUtil.beanToJsonString(onGiftRunwayImData)));
+					LogUtil.log.error(e.getMessage(),e);
+				}
 			}
 			
-			int funID = 11001; 
-			int seqID = 1; 
-			// 礼物跑道消息
-			try {
-				if(onGiftRunwayImData != null) {
-					LogUtil.log.info(String.format("####　begin推送礼物跑道的im消息:发消息begin..,onGiftRunwayImData:%s",JsonUtil.beanToJsonString(onGiftRunwayImData)));
-					IMutils.sendMsg2IM(funID, seqID, onGiftRunwayImData,userId);
-					LogUtil.log.info(String.format("####　end推送礼物跑道的im消息:发消息end..,onGiftRunwayImData:%s",JsonUtil.beanToJsonString(onGiftRunwayImData)));
-				}
-			} catch(Exception e) {
-				LogUtil.log.info(String.format("####　礼物跑道的im消息,senderUserId:%s,shouhuImData:%s",userId,JsonUtil.beanToJsonString(onGiftRunwayImData)));
-				LogUtil.log.error(e.getMessage(),e);
-			}
 			
 			// 普通礼物消息
 			// 礼物消息体
-			JSONObject giftMsgAllDataBodyJson = new JSONObject();
-			giftMsgAllDataBodyJson.put("funID", funID);
-			giftMsgAllDataBodyJson.put("seqID", seqID);
-			JSONObject giftImMsgJsonData = new JSONObject() ;
-			giftImMsgJsonData.put("msgtype", 2);
-			giftImMsgJsonData.put("targetid", roomId);
-			giftImMsgJsonData.put("type", ImTypeEnum.IM_11001_liwu.getValue());
 			JSONObject content = new JSONObject() ;
 			content.put("id", giftId);
 			content.put("num", giftNum);
-			content.put("type", 1);
+			content.put("chargeType", 1); //计费类型 1收费、2免费
 			content.put("sumGolds", gold);
 			content.put("giftImg", Constants.cdnPath + Constants.GIFT_IMG_FILE_URI + "/" + gift.getImage());//礼物图片地址
 			content.put("giftType", gift.getGiftType());
 			content.put("giftName", gift.getName());
-			giftImMsgJsonData.put(Constants.IM_CONTENT, content);
-			giftMsgAllDataBodyJson.put(Constants.DATA_BODY, giftImMsgJsonData);
 			//发IM消息
 			try {
 				LogUtil.log.info(String.format("###begin,sendGift_sendMsg2IM_begin,senderUserId:%s,sendGiftId:%s,sendGiftNum:%s,imNotifyRoomId:%s,receiveAnchorUserId:%s",userId,giftNum,giftId,roomId,anchorId));
-				IMutils.sendMsg2IM(giftMsgAllDataBodyJson, userId);
+				sendMsgService.sendMsg(userId, null, ImCommonEnum.IM_GIFT.getValue(), roomId, content);
 				LogUtil.log.info(String.format("###end,sendGift_sendMsg2IM_end,senderUserId:%s,sendGiftId:%s,sendGiftNum:%s,imNotifyRoomId:%s,receiveAnchorUserId:%s",userId,giftId,giftNum,roomId,anchorId));
 			} catch (Exception e) {
 				String nowDateStr = DateUntil.getFormatDate("yyyy-MM-dd", new Date());
 				// 羞羞的茄子经验
 				String key = CacheKey.ROOM_EGGPLANT_CACHE + nowDateStr + roomId;
 				RedisUtil.del(key);
-				LogUtil.log.error(String.format("###sendGift_sendMsg2IM_SystemDefinitionException,senderUserId:%s,imAllDataBodyJson:%s",userId,JsonUtil.beanToJsonString(giftMsgAllDataBodyJson)));
 				throw new RoomBizException(ErrorCode.ERROR_100);
 			}
 			
@@ -713,7 +694,6 @@ public class RoomServiceImpl implements IRoomService {
 			
 			// 发送一条特殊消息，客户端用来刷新守护信息
 			try {
-				JSONObject imData = new JSONObject();
 				JSONObject content = new JSONObject();
 				// 与IM之间约定的全站通知时所用特殊房间号 
 				String allRoom = Constants.WHOLE_SITE_NOTICE_ROOMID;
@@ -730,15 +710,8 @@ public class RoomServiceImpl implements IRoomService {
 				content.put("msg", msg);
 				content.put("guardType", guardType);
 				content.put("roomId", roomId);
-				
-				imData.put("msgtype", 2);
-				imData.put("targetid", allRoom);
-				imData.put("type", ImTypeEnum.IM_11001_specialForSH.getValue());
-				imData.put(Constants.IM_CONTENT, content);
-				int funID = 11001;//21007.系统通知(没有字数限制)
-				int seqID = 1;//一般默认为1
 				try {
-					IMutils.sendMsg2IM(funID, seqID, imData,userId);
+					sendMsgService.sendMsg(userId, null, ImCommonEnum.IM_GUARD.getValue(), allRoom, content);
 				} catch(Exception e) {
 					LogUtil.log.error(e.getMessage(),e);
 				}
@@ -1013,7 +986,6 @@ public class RoomServiceImpl implements IRoomService {
 			boolean msgType = true;
 			//推送im消息
 			JSONObject content = new JSONObject();
-			JSONObject imData = new JSONObject();
 			if(isAnchor) {
 				if (level <= 10) {
 					msg = String.format("恭喜%s荣升%s级！艺坛新星正冉冉升起，好好加油，再接再厉！", toUser.getNickName(),level);
@@ -1044,29 +1016,15 @@ public class RoomServiceImpl implements IRoomService {
 				content.put("rank", rank);
 				content.put("isAnchorUpgrade", false);//是否为主播升级
 				content.put("isAllRoomNotify", msgType);//是否全站通知
-				
-				
 			}
-			imData.put("msgtype", 2);
-			imData.put("targetid", roomId);
-			imData.put("type", ImTypeEnum.IM_11001_Upgrade.getValue());
-			imData.put("content", content); 
-			imData.put("to", toUser.getUserId());
-			int funID = 11001;
-			int seqID = 1;
 			if (msgType) {
 				//发送全站通知
-				imData.put("targetid", Constants.WHOLE_SITE_NOTICE_ROOMID);
+				roomId = Constants.WHOLE_SITE_NOTICE_ROOMID;
 			}
 			//发送IM消息
-			IMutils.sendMsg2IM(funID, seqID, imData,Constants.SYSTEM_USERID_OF_IM);
+			sendMsgService.sendMsg(Constants.SYSTEM_USERID_OF_IM, toUser.getUserId(), ImCommonEnum.IM_UPGRADE.getValue(), roomId, content);
 			// 及时更新房间成员列表,体现效果
 			addOrRefreshRoomOnlineMembers(roomId, userId);
-			String targetid = roomId;
-			JSONObject imContent = new JSONObject();
-			imContent.put("msg", String.format("用户%s升级,刷新房间成员列表", userId));
-			// 发送聊天消息
-			sendMsgService.sendMsg(userId, targetid,ImTypeEnum.IM_11001_RefreshRoomOnlineMembers.getValue(), imContent);
 		} catch (Exception e) {
 			LogUtil.log.error("###升级发送im消息失败,roomId="+roomId);
 			LogUtil.log.error(e.getMessage(),e);
@@ -1112,19 +1070,9 @@ public class RoomServiceImpl implements IRoomService {
 		UserInfoVo toBeBannedUser = userCacheInfoService.getUserFromCache(toBeBannedUserId, roomId);
 		
 		//向IM发送消息
-		JSONObject imReqmsg = new JSONObject();
-		JSONObject imData = new JSONObject();
-		imData.put("token", roomBannedOperationVo.getToken());
-		imData.put("msgtype", 2);
-		imData.put("targetid", roomId);
-		imData.put("type", ImTypeEnum.IM_11001_forbidSpeak.getValue());
-		//imData.put("user", JsonUtil.beanToJsonString(fromUserVo));
-		imData.put("to", toBeBannedUserId);
-		imData.put(Constants.IM_CONTENT, new StringBuffer().append("用户:").append(roomBannedOperationVo.getUserId()).append("被").append(fromUserId).append("禁言").append(roomBannedOperationVo.getHours()).append("小时").toString());
-		imReqmsg.put("length", 102);
-		imReqmsg.put(Constants.DATA_BODY, imData.toString());
-		
-		IMutils.sendMsg2IM(imReqmsg,fromUserId);
+		JSONObject content = new JSONObject();
+		content.put("type", 0); //0:禁言;1:踢出;2:解除禁言;
+		sendMsgService.sendMsg(fromUserId, toBeBannedUserId, ImCommonEnum.IM_REFRESH.getValue(), roomId, content);
 		
 		//保存数据库记录
 		int type = RoomBannedOperateEnum.RoomBehavior.ShutUp.getValue();
@@ -1171,19 +1119,10 @@ public class RoomServiceImpl implements IRoomService {
 		UserInfoVo toBeBannedUser = userCacheInfoService.getUserFromCache(toBeBannedUserId, roomId);
 		
 		//向IM发送消息
-		JSONObject imReqmsg = new JSONObject();
-		JSONObject imData = new JSONObject();
-		imData.put("token", roomBannedOperationVo.getToken());
-		imData.put("msgtype", 2);
-		imData.put("targetid", roomId);
-		imData.put("type", ImTypeEnum.IM_11001_forceOUt.getValue());
-		//imData.put("user", JsonUtil.beanToJsonString(fromUserVo));
-		imData.put("to", toBeBannedUserId);
-		imData.put(Constants.IM_CONTENT, new StringBuffer().append("用户:").append(roomBannedOperationVo.getUserId()).append("被").append(fromUserId).append("踢出房间"));
-		imReqmsg.put("length", 102);
-		imReqmsg.put(Constants.DATA_BODY, imData.toString());
+		JSONObject content = new JSONObject();
+		content.put("type", 1); //0:禁言;1:踢出;2:解除禁言;
+		sendMsgService.sendMsg(fromUserId, toBeBannedUserId, ImCommonEnum.IM_REFRESH.getValue(), roomId, content);
 		
-		IMutils.sendMsg2IM(imReqmsg,fromUserId);
 		
 		//保存数据库记录
 		int type = RoomBannedOperateEnum.RoomBehavior.Out.getValue();
@@ -1235,19 +1174,10 @@ public class RoomServiceImpl implements IRoomService {
 		UserInfoVo toBeBannedUser = userCacheInfoService.getUserFromCache(toBeBannedUserId, roomId);
 		
 		//向IM发送消息
-		JSONObject imReqmsg = new JSONObject();
-		JSONObject imData = new JSONObject();
-		imData.put("token", roomBannedOperationVo.getToken());
-		imData.put("msgtype", 2);
-		imData.put("targetid", roomId);
-		imData.put("type", ImTypeEnum.IM_11001_unForbidSpeak.getValue());
-		//imData.put("user", JsonUtil.beanToJsonString(fromUserVo));
-		imData.put("to", toBeBannedUserId);
-		imData.put(Constants.IM_CONTENT, new StringBuffer().append("用户:").append(roomBannedOperationVo.getUserId()).append("被").append(fromUserId).append("解除禁言"));
-		imReqmsg.put("length", 102);
-		imReqmsg.put(Constants.DATA_BODY, imData.toString());
+		JSONObject content = new JSONObject();
+		content.put("type", 2); //0:禁言;1:踢出;2:解除禁言;
+		sendMsgService.sendMsg(fromUserId, toBeBannedUserId, ImCommonEnum.IM_REFRESH.getValue(), roomId, content);
 		
-		IMutils.sendMsg2IM(imReqmsg,fromUserId);
 		
 		//保存数据库记录
 		int type = RoomBannedOperateEnum.RoomBehavior.ShutUp.getValue();

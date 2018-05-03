@@ -2,66 +2,32 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!-- namespace必须指向Dao接口 -->
-<mapper namespace="com.lm.live.pet.domain.sqlmusering.PetConf">
+<mapper namespace="com.lm.live.pet.dao.PetConfMapper">
 	<resultMap type="com.lm.live.pet.domain.PetConf"  id="vo">
 		<id property="id" column="id" />
 		<result property="petName" column="petName" />
-		<result property="natureId" column="natureId" />
-		<result property="vaild" column="vaild" />
+		<result property="type" column="type" />
+		<result property="valid" column="valid" />
+		<result property="buyAble" column="buyAble" />
+		<result property="gold" column="gold" />
+		<result property="comment" column="comment" />
 	</resultMap>
 
 	<!-- 定义可重用的SQL代码段，可以包含在其他语句中 -->
 	<sql id="base_column">
 		 id
 		 ,petName
-		 ,natureId
-		 ,vaild
+		 ,type
+		 ,valid
+		 ,buyAble
+		 ,gold
+		 ,comment
 	</sql>
 	
 	<select id="getObjectById" parameterType="java.lang.Long" resultMap="vo">
 		SELECT	<include refid="base_column" />
 		FROM t_pet_conf
-		WHERE id= SHABI
+		WHERE id= #{id}
 	</select>	
-	
-	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
-		INSERT INTO t_pet_conf
-				(id
-				,petName
-				,natureId
-				,vaild
-				)
-		VALUES	(#{id}
-				,#{petName}
-				,#{natureId}
-				,#{vaild}
-				)
-	</insert>
-	
-	<update id="update">
-		UPDATE	t_pet_conf
-		<set>
-			<if test="id != null and id != ''">
-				id = #{id},
-			</if>
-			<if test="petName != null and petName != ''">
-				petName = #{petName},
-			</if>
-			<if test="natureId != null and natureId != ''">
-				natureId = #{natureId},
-			</if>
-			<if test="vaild != null and vaild != ''">
-				vaild = #{vaild},
-			</if>
-		</set>
-		WHERE	id = #{id}
-		  
-	</update>
-	
-	<delete id="removeById" parameterType="java.lang.Long">
-		DELETE FROM t_pet_conf
-		WHERE id = #{id}
-	</delete>
-	
 	
 </mapper> 

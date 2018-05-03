@@ -3,6 +3,11 @@ package com.lm.live.base.constant;
 import com.lm.live.common.constant.BaseConstants;
 
 public class Constants extends BaseConstants {
+	
+	/**
+	 * IM消息体字段：msg
+	 */
+	public static final String MSG = "msg";
 
 	public static final String NEAR_REGION = "near:region:";
 	

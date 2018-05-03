@@ -14,7 +14,7 @@ import jodd.util.URLDecoder;
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.account.domain.UserAccount;
 import com.lm.live.account.service.IUserAccountService;
-import com.lm.live.base.service.IIpStoreService;
+import com.lm.live.base.service.IProvinceService;
 import com.lm.live.common.service.impl.CommonServiceImpl;
 import com.lm.live.common.utils.DateUntil;
 import com.lm.live.common.utils.LogUtil;
@@ -51,7 +51,7 @@ public class AliPayServiceImpl extends CommonServiceImpl<PayChargeOrderMapper, P
 	private IUserBaseService userBaseService;
 	
 	@Resource
-	private IIpStoreService ipStoreService;
+	private IProvinceService provinceService;
 
 	@Override
 	public ServiceResult<Boolean> dealPaySuccessNotify(Map verifyMap,
@@ -125,7 +125,7 @@ public class AliPayServiceImpl extends CommonServiceImpl<PayChargeOrderMapper, P
 			pco.setRetentionVaild(retentionVaild);
 		}
 		pco.setChannelId(channelId);
-		String generateOrderAddr = ipStoreService.getAddressByIp(ip);
+		String generateOrderAddr = provinceService.getAddress(ip);
 		pco.setGenerateOrderIp(ip);
 		pco.setGenerateOrderAddr(generateOrderAddr);
 		

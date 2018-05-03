@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.appclient.service.IAppInstallChannelService;
-import com.lm.live.base.service.IIpStoreService;
 import com.lm.live.common.controller.BaseController;
 import com.lm.live.common.utils.HttpServletResponseUtil;
 import com.lm.live.common.utils.HttpUtils;
@@ -61,9 +60,6 @@ public class PayWeb extends BaseController {
 	
 	@Resource
 	private IAppInstallChannelService appInstallChannelService;
-	
-	@Resource
-	private IIpStoreService ipStoreService;
 	
 	/**
 	 * P1

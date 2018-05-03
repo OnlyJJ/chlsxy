@@ -14,7 +14,7 @@ import com.lm.live.account.service.IUserAccountService;
 import com.lm.live.appclient.enums.AppType;
 import com.lm.live.base.domain.ThirdpartyConf;
 import com.lm.live.base.enums.ThirdpartyType;
-import com.lm.live.base.service.IIpStoreService;
+import com.lm.live.base.service.IProvinceService;
 import com.lm.live.base.service.IThirdpartyConfService;
 import com.lm.live.common.utils.DateUntil;
 import com.lm.live.common.utils.HttpUtils;
@@ -66,7 +66,7 @@ public class WeChatPayServiceImpl implements IWeChatPayService {
 	private IUserBaseService userBaseService;
 	
 	@Resource
-	private IIpStoreService ipStoreService;
+	private IProvinceService provinceService;
 	
 	@Resource
 	private IThirdpartyConfService thirdpartyConfService;
@@ -589,7 +589,7 @@ public class WeChatPayServiceImpl implements IWeChatPayService {
 		o.setChannelId(channelId);
 		o.setAgentUserId(agentUserId);
 		o.setGenerateOrderIp(clientIp);
-		String generateOrderAddr = ipStoreService.getAddressByIp(clientIp);
+		String generateOrderAddr = provinceService.getAddress(clientIp);
 		o.setGenerateOrderAddr(generateOrderAddr);
 		
 		UserInfoDo user = userBaseService.getUserInfoFromCache(userId);

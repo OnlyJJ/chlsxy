@@ -12,6 +12,7 @@ import com.lm.live.appclient.service.IAppStartupPageService;
 import com.lm.live.appclient.vo.AppStartupPageVo;
 import com.lm.live.base.service.IUserAccusationInfoService;
 import com.lm.live.common.vo.Page;
+import com.lm.live.common.vo.RequestVo;
 import com.lm.live.decorate.service.IDecoratePackageService;
 import com.lm.live.guard.service.IGuardService;
 import com.lm.live.home.service.IGwFilesService;
@@ -59,21 +60,26 @@ public class ServiceTest {
 
 	@Test
 	public void test() {
-		String userId = "100357";
+		String userId = "100526";
 		String roomId = "102692";
 		String anchorId = "102029";
 		String toUserId = "102029";
 		try {
 //			UserInfo vo = userInfoService.getUserInfo(userId);
-			Page page = new Page();
-			page.setCount(0);
-			page.setPageNum(1);
-			page.setPagelimit(36);
-			UserInfo vo = new UserInfo();
-			vo.setSex("m");
-			vo.setNickName("渣渣辉");
-			vo.setRemark("你是个渣渣呀");
-			vo.setUserId(userId);
+//			Page page = new Page();
+//			page.setCount(0);
+//			page.setPageNum(1);
+//			page.setPagelimit(36);
+//			UserInfo vo = new UserInfo();
+//			vo.setSex("m");
+//			vo.setNickName("渣渣辉");
+//			vo.setRemark("你是个渣渣呀");
+//			vo.setUserId(userId);
+			UserInfo info = new UserInfo();
+			info.setNickName("异次元诸葛亮100");
+			info.setUserId(userId);
+			info.setRemark("暂无愧疚");
+			userInfoService.modifyUserBase(userId, info);
 //			userInfoService.modifyUserBase(vo);
 //			userInfoService.userAttention(userId, "102029", 0);
 //			JSONObject jsonRes = userInfoService.listFans(userId, page);
@@ -92,7 +98,7 @@ public class ServiceTest {
 //			String key = CacheKey.TOOL_GIFT_ALL_CACHE;
 //			RedisUtil.del(key);
 //			roomService.sendGift(userId, roomId, anchorId, 1, 1, 0);
-			AppStartupPageVo avo =  appStartupPageService.getAppStartupPage();
+//			AppStartupPageVo avo =  appStartupPageService.getAppStartupPage();
 //			AccusationVo av = new  AccusationVo();
 //			av.setAccusationType(1);
 //			av.setAccusationDesc("不开车，没意思");
@@ -101,11 +107,11 @@ public class ServiceTest {
 //			JSONObject jsonRes = guardService.getRoomGuardData(userId, roomId);
 //			JSONObject jsonRes = giftService.qryGiftData();
 //			JSONObject jsonRes =  userPackageService.listUserBagData(userId);
-			if(avo != null) {
-				System.err.println(avo.buildJson().toString());
-			} else {
-				System.err.println("null ....");
-			}
+//			if(avo != null) {
+//				System.err.println(avo.buildJson().toString());
+//			} else {
+//				System.err.println("null ....");
+//			}
 //			BannerVo vo1 = new BannerVo();
 //			vo1.setShowPage(0);
 //			vo1.setBannerType(1);

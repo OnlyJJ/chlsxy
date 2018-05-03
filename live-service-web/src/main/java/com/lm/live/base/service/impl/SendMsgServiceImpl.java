@@ -2,23 +2,31 @@ package com.lm.live.base.service.impl;
 
 
 
+import java.net.URLEncoder;
+
+import javax.annotation.Resource;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.base.constant.Constants;
 import com.lm.live.base.enums.ErrorCode;
+import com.lm.live.base.enums.IMBusinessEnum;
+import com.lm.live.base.enums.IMBusinessEnum.MsgTypeEnum;
 import com.lm.live.base.exception.BaseBizException;
 import com.lm.live.base.service.ISendMsgService;
-import com.lm.live.common.enums.IMBusinessEnum;
-import com.lm.live.common.enums.IMBusinessEnum.ImType21007Enum;
-import com.lm.live.common.enums.IMBusinessEnum.ImTypeEnum;
-import com.lm.live.common.enums.IMBusinessEnum.MsgTypeEnum;
-import com.lm.live.common.enums.IMBusinessEnum.SeqID;
-import com.lm.live.common.utils.IMutils;
+import com.lm.live.cache.constants.CacheKey;
+import com.lm.live.cache.constants.CacheTimeout;
+import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.utils.JsonUtil;
 import com.lm.live.common.utils.LogUtil;
+import com.lm.live.common.utils.Md5CommonUtils;
 import com.lm.live.common.utils.SensitiveWordUtil;
+import com.lm.live.common.utils.StrUtil;
+import com.lm.live.socket.util.SocketUtil;
+import com.lm.live.user.service.IUserCacheInfoService;
+import com.lm.live.user.vo.UserInfoVo;
 
 
 /**
@@ -28,241 +36,140 @@ import com.lm.live.common.utils.SensitiveWordUtil;
 @Service("sendMsgService")
 public class SendMsgServiceImpl implements ISendMsgService {
 	
+	@Resource
+	private IUserCacheInfoService userCacheInfoService;
+	
 	@Override
-	public void sendMsg(String userId, String targetid, int imType,
-			JSONObject content) throws Exception {
-		if(StringUtils.isEmpty(targetid) || content == null) {
-			throw new BaseBizException(ErrorCode.ERROR_101);
-		}
-		
+	public void sendMsg(String targetid, int funId, int imType, String content) throws Exception {
 		// 聊天消息 
-		int funIDChatMsg = IMBusinessEnum.FunID.FUN_11001.getValue();
 		int seqID = IMBusinessEnum.SeqID.SEQ_1.getValue();
-		
 		JSONObject jsonIm = new JSONObject();
 		// 聊天消息 
-		
 		JSONObject data = new JSONObject();
 		//群聊 
 		int dataMsgType = MsgTypeEnum.GroupChat.getValue();
 		//房间id
 		String dataTargetid = targetid;		
+		// 系统身份
+		String senderUserId = Constants.SYSTEM_USERID_OF_IM;
 		data.put("msgtype", dataMsgType);
 		data.put("targetid", dataTargetid);
 		data.put("type", imType);
 		data.put("content", content);
-		jsonIm.put("funID", funIDChatMsg);
+		jsonIm.put("funID", funId);
 		jsonIm.put("seqID", seqID);
 		jsonIm.put("data",data );
-		String senderUserId = Constants.SYSTEM_USERID_OF_IM;
 		try {
-			IMutils.sendMsg2IM(jsonIm, senderUserId);
+			sendMsg2IM(jsonIm, senderUserId);
+		} catch (Exception e) {
+			LogUtil.log.info("### sendMsg-faile：消息发送失败，userId="+senderUserId +",targetid="+targetid + ",data=" + data.toString());
+			throw e;
+		}
+		LogUtil.log.info("### sendMsg-userId="+senderUserId +",targetid="+targetid + ",data=" + data.toString());
+	}
+
+	@Override
+	public void sendMsg(String userId, String toUserId, int imType,
+			String targetid, JSONObject content) throws Exception {
+		if(content == null) {
+			throw new BaseBizException(ErrorCode.ERROR_10005);
+		}
+		if(!StrUtil.isNullOrEmpty(toUserId)) {
+			content.put("to", toUserId);
+		}
+		// 聊天消息 
+		int seqID = IMBusinessEnum.SeqID.SEQ_1.getValue();
+		int funId = IMBusinessEnum.FunID.FUN_11001.getValue();
+		JSONObject jsonIm = new JSONObject();
+		// 聊天消息 
+		JSONObject data = new JSONObject();
+		//群聊 
+		int dataMsgType = MsgTypeEnum.GroupChat.getValue();
+		// 系统身份
+		data.put("msgtype", dataMsgType);
+		data.put("targetid", targetid);
+		data.put("type", imType);
+		data.put("content", replaceWorld(content));
+		jsonIm.put("funID", funId);
+		jsonIm.put("seqID", seqID);
+		jsonIm.put("data",data );
+		try {
+			sendMsg2IM(jsonIm, userId);
+		} catch (Exception e) {
+			LogUtil.log.info("### sendMsg-faile：消息发送失败，userId="+userId +",targetid="+targetid + ",data=" + data.toString());
+			throw e;
+		}
+	}
+
+	@Override
+	public void sendInBox(String userId, JSONObject content) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
+	private void sendMsg2IM(JSONObject imAllDataBodyJson,String senderUserId) throws Exception{
+		if(imAllDataBodyJson==null || StringUtils.isEmpty(senderUserId)){
+			throw new BaseBizException(ErrorCode.ERROR_101);
+		}
+		String imToken = getImtoken(senderUserId);
+		String keyDataJson = "data";
+		JSONObject dataJsonObj =  imAllDataBodyJson.getJSONObject(keyDataJson);
+		dataJsonObj.put("token", imToken);
+		String roomId = null;
+		if(dataJsonObj.containsKey("seqID")) {
+			dataJsonObj.put("seqID", SocketUtil.getSeqId());
+		}
+		if(dataJsonObj.containsKey("targetid")) {
+			roomId = dataJsonObj.getString("targetid");
+		}
+		if(dataJsonObj.containsKey("to")) { // 把to完整信息放入数据流中
+			String to = dataJsonObj.getString("to");
+			if(StrUtil.isNullOrEmpty(to) && !to.startsWith("{")) {
+				UserInfoVo toUser = userCacheInfoService.getUserFromCache(to, roomId);
+				if(toUser != null) {
+					dataJsonObj.put("to", toUser);
+				}
+			}
+		}
+		UserInfoVo user = userCacheInfoService.getUserFromCache(senderUserId, roomId);
+		if(user != null) {
+			dataJsonObj.put("user", JsonUtil.beanToJsonString(user));
+		}
+		imAllDataBodyJson.put(keyDataJson, dataJsonObj);
+		String imAllDataBodyJsonStr = imAllDataBodyJson.toString();
+		if(!StringUtils.isEmpty(imAllDataBodyJsonStr)){
+			//将值编码(避免有空格等特殊字符时请求失败)
+			imAllDataBodyJsonStr = URLEncoder.encode(imAllDataBodyJsonStr,"utf-8");
+		}
+		try {
+			LogUtil.log.info("###sendMsg-msg: " + imAllDataBodyJsonStr);
+			SocketUtil.sendToIm(imAllDataBodyJsonStr);
 		} catch (Exception e) {
 			throw e;
 		}
-		LogUtil.log.info("### sendMsg-userId="+userId +",targetid="+targetid + ",data=" + data.toString());
 	}
 	
-	@Override
-	public void sendDalaba(String dalabaMsg, String dalabaMsgColor, String senderUserId, String userLevel, String sourceRoomId, 
-			String anchorId, String anchorLevel, String attentionCount, String anchorNickname, String isAutomatic) throws Exception{
-		if (StringUtils.isEmpty(dalabaMsg) || StringUtils.isEmpty(senderUserId) || StringUtils.isEmpty(sourceRoomId)
-				|| StringUtils.isEmpty(anchorId) || StringUtils.isEmpty(anchorNickname)) {
-			throw new BaseBizException(ErrorCode.ERROR_101);
-		}
-		String wholeSiteNoticeRoomId = Constants.WHOLE_SITE_NOTICE_ROOMID;
-		JSONObject imAllDataBodyJson = new JSONObject();
-		imAllDataBodyJson.put("funID", IMBusinessEnum.FunID.FUN_11001.getValue());
-		imAllDataBodyJson.put("seqID", IMBusinessEnum.SeqID.SEQ_1.getValue());
-		JSONObject imMsgJsonData = new JSONObject() ;
-		imMsgJsonData.put("msgtype", 2);
-		imMsgJsonData.put("targetid", wholeSiteNoticeRoomId);
-		imMsgJsonData.put("type", IMBusinessEnum.ImTypeEnum.IM_11001_dalaba.getValue());
-		JSONObject content = new JSONObject() ;
-		content.put("roomId", sourceRoomId); // 发喇叭房间
-		content.put("anchorId", anchorId);
-		content.put("attentionCount",attentionCount);
-		content.put("nickname", anchorNickname);
-		content.put("userLevel", userLevel);
-		content.put("anchorLevel", anchorLevel);
-		content.put("msg", SensitiveWordUtil.replaceSensitiveWord(dalabaMsg));
-		content.put("msgColor", dalabaMsgColor);
-		content.put("isAutomatic", isAutomatic);
-		imMsgJsonData.put("content", content);
-		imAllDataBodyJson.put("data", imMsgJsonData);
-		LogUtil.log.info(String.format("###begin-发送大喇叭senderUserId:%s,消息体:%s", senderUserId,JsonUtil.beanToJsonString(imMsgJsonData))) ;
-		IMutils.sendMsg2IM(imAllDataBodyJson, senderUserId);
-		LogUtil.log.info(String.format("###end-发送大喇叭senderUserId:%s,消息体:%s", senderUserId,JsonUtil.beanToJsonString(imAllDataBodyJson))) ;
-
+	/**
+	 * 根据userId生成imToken(service与im之间通过内存交互token)
+	 * @param userId
+	 * @return
+	 */
+	private static String getImtoken(String userId) {
+		String imToken = Md5CommonUtils.getMD5String(userId);
+		String cacheKey = CacheKey.IM_MC_SESSION_+imToken;
+		int timeoutSecond = CacheTimeout.DEFAULT_TIMEOUT_5M;
+		RedisUtil.set(cacheKey, userId, timeoutSecond);
+		return imToken;
 	}
 	
-	@Override
-	public void sendModifyPackageMsg(String notifyRoomId,JSONObject content) throws Exception{
-		LogUtil.log.info(String.format("###begin-用户礼物包裹变更,im消息,roomId:[%s],content:[%s]", notifyRoomId,JsonUtil.beanToJsonString(content)));
-		if(StringUtils.isEmpty(notifyRoomId) || content == null) {
-			throw new BaseBizException(ErrorCode.ERROR_101);
-		}
-		JSONObject jsonIm = new JSONObject();
-		// 聊天消息 
-		int funIDChatMsg = IMBusinessEnum.FunID.FUN_11001.getValue();
-		int seqID = IMBusinessEnum.SeqID.SEQ_1.getValue();
-		JSONObject data = new JSONObject();
-		int dataType = IMBusinessEnum.ImTypeEnum.IM_11001_userGiftPackageChange.getValue();
-		//群聊
-		int dataMsgType = IMBusinessEnum.MsgTypeEnum.GroupChat.getValue();
-		//房间id
-		String dataTargetid = notifyRoomId;		
-		data.put("msgtype", dataMsgType);
-		data.put("targetid", dataTargetid);
-		data.put("type", dataType);
-		data.put("content", content);
-		jsonIm.put("funID", funIDChatMsg);
-		jsonIm.put("seqID", seqID);
-		jsonIm.put("data",data );
-		String senderUserId = Constants.SYSTEM_USERID_OF_IM;
-		try {
-			IMutils.sendMsg2IM(jsonIm, senderUserId);
-		} catch (Exception e) {
-			LogUtil.log.error(String.format("###发送用户礼物包裹变更,im消息发生异常,通知房间:[%s],content:%s", notifyRoomId,JsonUtil.beanToJsonString(jsonIm)));
-			//throw e;
-		}
-		LogUtil.log.info(String.format("###end-用户礼物包裹变更,im消息,roomId:[%s],jsonIm:[%s]", notifyRoomId,JsonUtil.beanToJsonString(jsonIm)));
-	}
 	
-	@Override
-	public void sendMsg2AnchorByCustom(SeqID seqID, MsgTypeEnum msgTypeEnum, String targetid, JSONObject content) throws Exception{
-		LogUtil.log.info("###客服管理后台发送消息["+ JsonUtil.beanToJsonString(content) +"]到主播端");
-		JSONObject data = new JSONObject();
-		JSONObject jsonIm = new JSONObject();
-		if(StringUtils.isEmpty(targetid) || null == content){
-			throw new BaseBizException(ErrorCode.ERROR_101);
+	private JSONObject replaceWorld(JSONObject content) {
+		if(content.containsKey(Constants.MSG) && content.get(Constants.MSG) != null) {
+			String msg = SensitiveWordUtil.replaceSensitiveWord(content.get(Constants.MSG).toString());
+			content.put(Constants.MSG, msg);
 		}
-		int seqIDInt = seqID.getValue();
-		// 系统消息还是聊天消息
-		int funIDChatMsg = IMBusinessEnum.FunID.FUN_11001.getValue();
-		int dataMsgType = msgTypeEnum.getValue();
-		int dataType = IMBusinessEnum.ImTypeEnum.IM_11001_Popup_ByTime.getValue();
-		data.put("msgtype", dataMsgType);
-		data.put("targetid", targetid);
-		data.put("type", dataType);
-		data.put("content", content);
-		jsonIm.put("funID", funIDChatMsg);
-		jsonIm.put("seqID", seqIDInt);
-		jsonIm.put("data", data);
-		LogUtil.log.info("推送IM内容："+jsonIm.toString());
-		String senderUserId = Constants.SYSTEM_USERID_OF_IM;
-		IMutils.sendMsg2IM(jsonIm, senderUserId);
-	}
-	
-	@Override
-	public boolean sendRunwayMSG(String notifyRoomId, JSONObject content) throws Exception {
-		if(StringUtils.isEmpty(notifyRoomId) || content == null) {
-			throw new BaseBizException(ErrorCode.ERROR_101);
-		}
-		boolean ret = false;
-		JSONObject jsonIm = new JSONObject();
-		// 聊天消息 
-		int funIDChatMsg = IMBusinessEnum.FunID.FUN_11001.getValue();
-		int seqID = IMBusinessEnum.SeqID.SEQ_1.getValue();
-		JSONObject data = new JSONObject();
-		
-		//群聊
-		int dataMsgType = IMBusinessEnum.MsgTypeEnum.GroupChat.getValue();
-		int dataType = ImTypeEnum.IM_11001_RUNWAY.getValue();
-		//房间id
-		String dataTargetid = notifyRoomId;		
-		data.put("msgtype", dataMsgType);
-		data.put("targetid", dataTargetid);
-		data.put("type", dataType);
-		data.put("content", content);
-		jsonIm.put("funID", funIDChatMsg);
-		jsonIm.put("seqID", seqID);
-		jsonIm.put("data",data );
-		String senderUserId = Constants.SYSTEM_USERID_OF_IM;
-		try {
-			ret = IMutils.sendMsg2IM(jsonIm, senderUserId);
-		} catch (Exception e) {
-			LogUtil.log.error(String.format("###发送滚屏通知请求im消息发生异常,通知房间:[%s],content:%s", notifyRoomId,JsonUtil.beanToJsonString(jsonIm)));
-		}
-		return ret;
-	}
-	
-	@Override
-	public boolean sendMailBoxMSG(String notifyUId, String msg) throws Exception {
-		if(StringUtils.isEmpty(notifyUId) || StringUtils.isEmpty(msg)) {
-			throw new BaseBizException(ErrorCode.ERROR_101);
-		}
-		boolean ret = false;
-		JSONObject imDataAnchor = new JSONObject();
-		String senderUserId = Constants.SYSTEM_USERID_OF_IM;
-		int imType = ImType21007Enum.shoujianxiang.getValue();
-		int funID = 21007;
-		int msgtype = IMBusinessEnum.MsgTypeEnum.SingleChat.getValue();
-		int seqID = IMBusinessEnum.SeqID.SEQ_1.getValue();
-		imDataAnchor.put("msgtype", msgtype);
-		imDataAnchor.put("type", imType);
-		imDataAnchor.put("content", msg);
-		imDataAnchor.put("targetid", notifyUId);
-		try {
-			ret = IMutils.sendMsg2IM(funID, seqID, imDataAnchor,senderUserId);
-		} catch (Exception e) {
-			LogUtil.log.error(e.getMessage(),e);
-		}
-		return ret;
-	}
-
-	@Override
-	public void sendHeadlineMsg(JSONObject content) throws Exception{
-		JSONObject jsonIm = new JSONObject();
-		// 聊天消息 
-		int funIDChatMsg = IMBusinessEnum.FunID.FUN_11001.getValue();
-		int seqID = IMBusinessEnum.SeqID.SEQ_1.getValue();
-		JSONObject data = new JSONObject();
-		int dataType = IMBusinessEnum.ImTypeEnum.IM_1001_HEADLINE_MSG.getValue();
-		//群聊
-		int dataMsgType = IMBusinessEnum.MsgTypeEnum.GroupChat.getValue();
-		//房间id
-		String dataTargetid = Constants.WHOLE_SITE_NOTICE_ROOMID;		
-		data.put("msgtype", dataMsgType);
-		data.put("targetid", dataTargetid);
-		data.put("type", dataType);
-		data.put("content", content);
-//		data.put("to", sendUser);
-		jsonIm.put("funID", funIDChatMsg);
-		jsonIm.put("seqID", seqID);
-		jsonIm.put("data",data );
-		String senderUserId = Constants.SYSTEM_USERID_OF_IM;
-		try {
-			IMutils.sendMsg2IM(jsonIm, senderUserId);
-		} catch (Exception e) {
-			LogUtil.log.error(String.format("###发送im消息发生异常,content:%s",JsonUtil.beanToJsonString(jsonIm)));
-		}
-	}
-	
-	@Override
-	public void sendPrivateChatMsg(String targetId, JSONObject content) throws Exception{
-		JSONObject jsonIm = new JSONObject();
-		// 聊天消息 
-		int funIDChatMsg = IMBusinessEnum.FunID.FUN_11001.getValue();
-		int seqID = IMBusinessEnum.SeqID.SEQ_1.getValue();
-		JSONObject data = new JSONObject();
-		int dataType = IMBusinessEnum.ImTypeEnum.IM_11001_Private_MSG.getValue();
-		//群聊
-		int dataMsgType = IMBusinessEnum.MsgTypeEnum.GroupChat.getValue();
-		//房间id
-		data.put("msgtype", dataMsgType);
-		data.put("targetid", targetId);
-		data.put("type", dataType);
-		data.put("content", content);
-		jsonIm.put("funID", funIDChatMsg);
-		jsonIm.put("seqID", seqID);
-		jsonIm.put("data",data );
-		String senderUserId = Constants.SYSTEM_USERID_OF_IM;
-		try {
-			IMutils.sendMsg2IM(jsonIm, senderUserId);
-		} catch (Exception e) {
-			LogUtil.log.error(String.format("###发送im消息发生异常,content:%s",JsonUtil.beanToJsonString(jsonIm)));
-		}
+		return content;
 	}
 
 }

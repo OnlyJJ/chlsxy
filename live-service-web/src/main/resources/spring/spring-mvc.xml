@@ -41,6 +41,7 @@
 			<mvc:mapping path="/R**/**"/>
 			<mvc:mapping path="/G**/**"/>
 			<mvc:mapping path="/E**/**"/>
+	    	<mvc:mapping path="/F**/**"/>
 			<bean name="analyzeReqParameterInterceptor" class="com.lm.live.web.listeners.AnalyzeReqParameterInterceptor"></bean>
 		</mvc:interceptor>
 		<!-- 

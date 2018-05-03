@@ -125,9 +125,7 @@ public class ProvinceServiceImpl extends CommonServiceImpl<ProvinceMapper,Provin
 		Province regionObj = RedisUtil.getJavaBean(codeKey, Province.class);
 		if(regionObj != null) {
 			returnValue= regionObj;
-		}
-		else
-		{
+		} else {
 			returnValue=dao.getByCode(code);
 			//重新设置省市缓存
 			this.getProvinceSetCache();
@@ -141,6 +139,28 @@ public class ProvinceServiceImpl extends CommonServiceImpl<ProvinceMapper,Provin
 			throw new BaseBizException(ErrorCode.ERROR_101);
 		}
 		return dao.listNearRegionByAppData(appSf);
+	}
+
+	@Override
+	public String getAddress(String ip) {
+		if(StrUtil.isNullOrEmpty(ip)) {
+			return null;
+		}
+		String address = null;
+		String code = IpUtils.getRegionCode(ip);
+		String codeKey = CacheKey.PROVINCE_CODE_CACHE+code;
+		Province regionObj = RedisUtil.getJavaBean(codeKey, Province.class);
+		if(regionObj != null) {
+			address= regionObj.getCity();
+		} else {
+			regionObj = dao.getByCode(code);
+			if(regionObj != null) {
+				address= regionObj.getCity();
+			}
+			//重新设置省市缓存
+			this.getProvinceSetCache();
+		}
+		return address;
 	}
 
 }

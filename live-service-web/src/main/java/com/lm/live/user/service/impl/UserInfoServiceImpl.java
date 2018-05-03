@@ -10,14 +10,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.lm.live.base.enums.IMBusinessEnum;
+import com.lm.live.base.enums.IMBusinessEnum.ImSystemEnum;
+import com.lm.live.base.service.ISendMsgService;
 import com.lm.live.cache.constants.CacheKey;
 import com.lm.live.cache.constants.CacheTimeout;
-import com.lm.live.common.enums.IMBusinessEnum;
 import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.utils.DateUntil;
-import com.lm.live.common.utils.IMutils;
 import com.lm.live.common.utils.LogUtil;
 import com.lm.live.common.utils.SensitiveWordUtil;
 import com.lm.live.common.utils.StrUtil;
@@ -71,6 +71,9 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 	
 	@Resource
 	private IPushUserSetAttentionService pushUserSetAttentionService;
+	
+	@Resource
+	private ISendMsgService sendMsgService;
 	
 	@Override
 	public UserInfo getUserDetailInfo(String userId) throws Exception {
@@ -220,22 +223,13 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 					userName = user.getNickName();
 				}
 				msg.append(userName).append("已关注了美丽可爱的你，加油呦~~~");
-				String senderUserId = Constants.SYSTEM_USERID_OF_IM;
-				int imType = IMBusinessEnum.ImTypeEnum.IM_11001_Attention.getValue();
+				int imType = ImSystemEnum.ATTENTION.getValue();
 				JSONObject content = new JSONObject();
 				content.put("msg", msg.toString());
-				
-				JSONObject imData = new JSONObject();
-				imData.put("msgtype", 2); 
-				imData.put("targetid", roomId);
-				imData.put("type", imType);
-				imData.put("content", content);
-				
-				int funID = IMBusinessEnum.FunID.FUN_11001.getValue();
-				int seqID = IMBusinessEnum.SeqID.SEQ_1.getValue();
+				int funID = IMBusinessEnum.FunID.FUN_21007.getValue();
 				try {
 					LogUtil.log.info("####attentionUserId-发送通知：msg=" + msg);
-					IMutils.sendMsg2IM(funID, seqID, imData,senderUserId);
+					sendMsgService.sendMsg(roomId, funID, imType, content.toString());
 				} catch (Exception e) {
 					LogUtil.log.error(e.getMessage(), e);
 				}
@@ -263,7 +257,6 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public JSONObject listFans(String userId, Page page) throws Exception {
 		if(StringUtils.isEmpty(userId) || page == null) {
@@ -358,7 +351,7 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 			
 			newNickName = StrUtil.replaceSqlspecial(newNickName);
 			UserInfoDo userinfo = userBaseService.getUserByNickname(newNickName);
-			if(userinfo !=null && userinfo.getUserId() != userId){
+			if(userinfo !=null && !userinfo.getUserId().equals(userId)){
 				throw new UserBizException(ErrorCode.ERROR_1003);
 			}
 			dbUserInfo.setNickName(newNickName);

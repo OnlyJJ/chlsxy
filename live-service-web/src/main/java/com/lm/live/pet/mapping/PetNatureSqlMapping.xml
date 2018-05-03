@@ -6,7 +6,7 @@
 	<resultMap type="com.lm.live.pet.domain.PetNature"  id="vo">
 		<id property="id" column="id" />
 		<result property="name" column="name" />
-		<result property="remark" column="remark" />
+		<result property="info" column="info" />
 		<result property="natureType" column="natureType" />
 		<result property="natureVal" column="natureVal" />
 	</resultMap>
@@ -15,7 +15,7 @@
 	<sql id="base_column">
 		 id
 		 ,name
-		 ,remark
+		 ,info
 		 ,natureType
 		 ,natureVal
 	</sql>
@@ -23,52 +23,7 @@
 	<select id="getObjectById" parameterType="java.lang.Long" resultMap="vo">
 		SELECT	<include refid="base_column" />
 		FROM t_pet_nature
-		WHERE id= SHABI
+		WHERE id= #{id}
 	</select>	
-	
-	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
-		INSERT INTO t_pet_nature
-				(id
-				,name
-				,remark
-				,natureType
-				,natureVal
-				)
-		VALUES	(#{id}
-				,#{name}
-				,#{remark}
-				,#{natureType}
-				,#{natureVal}
-				)
-	</insert>
-	
-	<update id="update">
-		UPDATE	t_pet_nature
-		<set>
-			<if test="id != null and id != ''">
-				id = #{id},
-			</if>
-			<if test="name != null and name != ''">
-				name = #{name},
-			</if>
-			<if test="remark != null and remark != ''">
-				remark = #{remark},
-			</if>
-			<if test="natureType != null and natureType != ''">
-				natureType = #{natureType},
-			</if>
-			<if test="natureVal != null and natureVal != ''">
-				natureVal = #{natureVal},
-			</if>
-		</set>
-		WHERE	id = #{id}}
-		  
-	</update>
-	
-	<delete id="removeById" parameterType="java.lang.Long">
-		DELETE FROM t_pet_nature
-		WHERE id = SHABI
-	</delete>
-	
 	
 </mapper> 

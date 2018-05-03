@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!-- namespace必须指向Dao接口 -->
-<mapper namespace="com.lm.live.pet.domain.sqlmusering.PetLevel">
+<mapper namespace="com.lm.live.pet.dao.PetLevelMapper">
 	<resultMap type="com.lm.live.pet.domain.PetLevel"  id="vo">
 		<id property="id" column="id" />
 		<result property="petId" column="petId" />
@@ -23,52 +23,15 @@
 	<select id="getObjectById" parameterType="java.lang.Long" resultMap="vo">
 		SELECT	<include refid="base_column" />
 		FROM t_pet_level
-		WHERE id= SHABI
+		WHERE id= #{id}
 	</select>	
 	
-	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
-		INSERT INTO t_pet_level
-				(id
-				,petId
-				,level
-				,point
-				,image
-				)
-		VALUES	(#{id}
-				,#{petId}
-				,#{level}
-				,#{point}
-				,#{image}
-				)
-	</insert>
-	
-	<update id="update">
-		UPDATE	t_pet_level
-		<set>
-			<if test="id != null and id != ''">
-				id = #{id},
-			</if>
-			<if test="petId != null and petId != ''">
-				petId = #{petId},
-			</if>
-			<if test="level != null and level != ''">
-				level = #{level},
-			</if>
-			<if test="point != null and point != ''">
-				point = #{point},
-			</if>
-			<if test="image != null and image != ''">
-				image = #{image},
-			</if>
-		</set>
-		WHERE	id = #{id}}
-		  
-	</update>
-	
-	<delete id="removeById" parameterType="java.lang.Long">
-		DELETE FROM t_pet_level
-		WHERE id = SHABI
-	</delete>
-	
+	<select id="getPetLevel"  resultMap="vo">
+		SELECT	<include refid="base_column" />
+		FROM t_pet_level
+		WHERE petId= #{petId}
+		AND level = #{level}
+		LIMIT 1
+	</select>	
 	
 </mapper> 

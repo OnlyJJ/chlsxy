@@ -14,7 +14,7 @@ import com.lm.live.account.service.IUserAccountService;
 import com.lm.live.base.constant.Constants;
 import com.lm.live.base.dao.ServiceLogMapper;
 import com.lm.live.base.domain.ServiceLog;
-import com.lm.live.base.service.IIpStoreService;
+import com.lm.live.base.service.IProvinceService;
 import com.lm.live.cache.constants.CacheKey;
 import com.lm.live.cache.util.CacheUtil;
 import com.lm.live.common.utils.HttpUtils;
@@ -44,7 +44,7 @@ public class ChargeCommonServiceImpl implements IChargeCommonService{
 	private IUserAccountService userAccountService;
 	
 	@Resource
-	private IIpStoreService ipStoreService;
+	private IProvinceService provinceService;
 	
 	@Resource
 	private IUserBaseService userBaseService;
@@ -103,7 +103,7 @@ public class ChargeCommonServiceImpl implements IChargeCommonService{
 			throw new PayBizException(ErrorCode.ERROR_5020);
 		}
 		
-		String paySuccessNotifyAddr = ipStoreService.getAddressByIp(notifyIp);
+		String paySuccessNotifyAddr = provinceService.getAddress(notifyIp);
 		dbPayChargeOrder.setPaySuccessNotifyIp(notifyIp);
 		dbPayChargeOrder.setPaySuccessNotifyAddr(paySuccessNotifyAddr) ;
 		dbPayChargeOrder.setTransactionId(transactionId);
@@ -205,7 +205,7 @@ public class ChargeCommonServiceImpl implements IChargeCommonService{
 			dbPayChargeOrder.setOrderStatus(3);
 			dbPayChargeOrder.setRemark(remark);
 			dbPayChargeOrder.setResultTime(new Date());
-			String paySuccessNotifyAddr = ipStoreService.getAddressByIp(clientIp);
+			String paySuccessNotifyAddr = provinceService.getAddress(clientIp);
 			
 			dbPayChargeOrder.setPaySuccessNotifyIp(clientIp);
 			dbPayChargeOrder.setPaySuccessNotifyAddr(paySuccessNotifyAddr);

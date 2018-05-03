@@ -1,5 +1,7 @@
 package com.lm.live.pet.domain;
 
+import java.util.Date;
+
 import com.lm.live.common.vo.BaseVo;
 
 /**
@@ -8,7 +10,11 @@ import com.lm.live.common.vo.BaseVo;
 */
 public class UserPet extends BaseVo {
 	
-	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4015561226191828609L;
+	private int id;
 	/**
 	 * 用户id
 	 */
@@ -24,17 +30,26 @@ public class UserPet extends BaseVo {
 	/**
 	 * 当前宠物等级
 	 */
-	private Integer level;
+	private int level;
 	/**
 	 * 当前宠物经验
 	 */
-	private Integer petPoint;
+	private long petPoint;
 	/**
-	 * 宠物状态，0:未使用，1:正在使用
+	 * 宠物状态，宠物状态，0:停用，1:正在使用，2:放归山林
 	 */
-	private Boolean status;
+	private int status;
 	
+	private Date addTime;
 	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	public String getUserid() {
 		return this.userId;
 	}
@@ -56,25 +71,33 @@ public class UserPet extends BaseVo {
 	public void setPetname(String petName) {
 		this.petName = petName;
 	}
-	public Integer getLevel() {
+	public int getLevel() {
 		return this.level;
 	}
 	
-	public void setLevel(Integer level) {
+	public void setLevel(int level) {
 		this.level = level;
 	}
-	public Integer getPetpoint() {
+	public long getPetpoint() {
 		return this.petPoint;
 	}
 	
-	public void setPetpoint(Integer petPoint) {
+	public void setPetpoint(long petPoint) {
 		this.petPoint = petPoint;
 	}
-	public Boolean getStatus() {
+	public int getStatus() {
 		return this.status;
 	}
 	
-	public void setStatus(Boolean status) {
+	public void setStatus(int status) {
 		this.status = status;
+	}
+
+	public Date getAddTime() {
+		return addTime;
+	}
+
+	public void setAddTime(Date addTime) {
+		this.addTime = addTime;
 	}
 }

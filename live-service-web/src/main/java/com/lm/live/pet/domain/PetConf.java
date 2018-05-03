@@ -14,15 +14,24 @@ public class PetConf extends BaseVo {
 	 * 默认的宠物名，用户可修改
 	 */
 	private String petName;
-	/**
-	 * 属性id，关联宠物属性配置表id
-	 */
-	private int natureId;
+	/** 宠物类型，0-普通，1-稀有，2-S级，3-R级 */
+	private int type;
+	/** 是否可购买，0-不可以，1-可以 */
+	private int buyAble;
 	/**
 	 * 是否有效，0:无效，1:有效
 	 */
-	private int vaild;
+	private int valid;
 	
+	/**
+	 * 可购买时对应的金币价值
+	 */
+	private int gold;
+	
+	/**
+	 * 宠物描述
+	 */
+	private String comment;
 	
 	public int getId() {
 		return id;
@@ -39,18 +48,43 @@ public class PetConf extends BaseVo {
 	public void setPetname(String petName) {
 		this.petName = petName;
 	}
-	public int getNatureid() {
-		return this.natureId;
+	public int getValid() {
+		return this.valid;
 	}
 	
-	public void setNatureid(int natureId) {
-		this.natureId = natureId;
+	public void setValid(int valid) {
+		this.valid = valid;
 	}
-	public int getVaild() {
-		return this.vaild;
+
+	public int getType() {
+		return type;
 	}
-	
-	public void setVaild(int vaild) {
-		this.vaild = vaild;
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
+	public int getBuyAble() {
+		return buyAble;
+	}
+
+	public void setBuyAble(int buyAble) {
+		this.buyAble = buyAble;
+	}
+
+	public int getGold() {
+		return gold;
+	}
+
+	public void setGold(int gold) {
+		this.gold = gold;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 }
