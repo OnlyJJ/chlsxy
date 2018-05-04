@@ -116,4 +116,22 @@ public class JsonUtil {
 		return jsonArray;
 	}
 
+	/**
+	 * 转换为json，此方法会避免多余反斜杠
+	 *@param obj
+	 *@return
+	 *@author shao.xiang
+	 *@data 2018年5月3日
+	 */
+	public static Object toJson(Object obj){
+ 		try{
+			if(obj != null) {
+				return JSON.toJSON(obj);
+			}
+		}catch(Exception e){
+			LogUtil.log.error(e.getMessage());
+		}
+		
+		return null;
+	}
 }

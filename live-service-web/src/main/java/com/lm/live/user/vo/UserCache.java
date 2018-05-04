@@ -27,9 +27,9 @@ public class UserCache implements Serializable{
 	private long anchorPoint; 
 	private String sex;
 	private String addres;
-	/** 用户身份，0-普通用户，1-主播，2-房管，3-游客，5-官方 */
+	/** 用户房间身份，0-普通用户，1-主播，2-房管，3-游客，5-官方 */
 	private int type;
-	/** 用户身份，0-普通用户，1-主播 */;
+	/** 用户本质身份，0-普通用户，1-主播 */;
 	private int identity;
 	/** 房间身份： 0-普通用户，1房管*/
 	private int roomIdentity;

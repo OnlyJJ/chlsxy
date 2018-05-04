@@ -134,14 +134,10 @@ public class SendMsgServiceImpl implements ISendMsgService {
 		}
 		UserInfoVo user = userCacheInfoService.getUserFromCache(senderUserId, roomId);
 		if(user != null) {
-			dataJsonObj.put("user", JsonUtil.beanToJsonString(user));
+			dataJsonObj.put("user", JsonUtil.toJson(user));
 		}
 		imAllDataBodyJson.put(keyDataJson, dataJsonObj);
 		String imAllDataBodyJsonStr = imAllDataBodyJson.toString();
-		if(!StringUtils.isEmpty(imAllDataBodyJsonStr)){
-			//将值编码(避免有空格等特殊字符时请求失败)
-			imAllDataBodyJsonStr = URLEncoder.encode(imAllDataBodyJsonStr,"utf-8");
-		}
 		try {
 			LogUtil.log.info("###sendMsg-msg: " + imAllDataBodyJsonStr);
 			SocketUtil.sendToIm(imAllDataBodyJsonStr);

@@ -6,7 +6,7 @@ import com.lm.live.common.service.ICommonService;
 
 public interface IUserAccusationInfoService extends ICommonService<UserAccusationInfo> {
 	/**
-	 * 
+	 * 举报记录
 	 * @param userId
 	 * @param toUserId
 	 * @param vo

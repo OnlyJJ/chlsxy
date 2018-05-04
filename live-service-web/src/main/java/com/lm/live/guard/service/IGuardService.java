@@ -3,6 +3,7 @@ package com.lm.live.guard.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.common.vo.Page;
@@ -51,4 +52,15 @@ public interface IGuardService {
 	GuardConf getGuardConfData(int guardType, int priceType) throws Exception;
 	
 	void clean(String userId, String roomId) throws Exception;
+	
+	/**
+	 * 获取用户房间守护信息，缓存
+	 *@param userId
+	 *@param roomId
+	 *@return
+	 *@throws Exception
+	 *@author shao.xiang
+	 *@data 2018年5月4日
+	 */
+	List<Map> listRoomGuardCache(String userId, String roomId) throws Exception;
 }

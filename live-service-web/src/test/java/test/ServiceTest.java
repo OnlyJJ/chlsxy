@@ -25,7 +25,7 @@ import com.lm.live.user.vo.UserInfo;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({ "classpath*:spring/spring-context.xml"})
+@ContextConfiguration({  "classpath*:spring/spring-context.xml"})
 public class ServiceTest {
 	
 	@Resource

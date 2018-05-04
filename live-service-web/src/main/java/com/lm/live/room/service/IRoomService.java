@@ -72,7 +72,7 @@ public interface IRoomService {
 	void buyGuard(String userId, String anchorId, String roomId,int workId, int guardType, int priceType) throws Exception;
 	
 	/**
-	 * 禁言/解禁(hours=0表示解禁)
+	 * 禁言
 	 * @param fromUserId
 	 * @param roomBannedOperationVo
 	 * @throws Exception
@@ -94,5 +94,15 @@ public interface IRoomService {
 	 * @throws Exception
 	 */
 	public void unForbidSpeak(String fromUserId,RoomBannedOperationVo roomBannedOperationVo) throws Exception;
+	
+	/**
+	 * 设置 or 取消房管
+	 *@param fromUserId 操作者
+	 *@param roomBannedOperationVo 被操作者对象
+	 *@throws Exception
+	 *@author shao.xiang
+	 *@data 2018年5月4日
+	 */
+	public void mgrUserRoomMembers(String fromUserId,RoomBannedOperationVo roomBannedOperationVo) throws Exception;
 	
 }

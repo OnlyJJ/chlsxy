@@ -11,6 +11,8 @@ import java.util.Map;
  *
  */
 public enum ErrorCode {
+	/** 用户信息异常 */
+	ERROR_8006(8006, "用户信息异常"),
 	/** 守护已经满员了 */
 	ERROR_8005(8005, "守护已经满员了"),
 	/** 背包余量不足 */

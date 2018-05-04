@@ -240,7 +240,7 @@ public class SocketTask extends Thread {
 			
 			SocketDataVo vo = new SocketDataVo(msg);
 			if( null != vo && MessageFunID.FUNID_11000.getFunID() == vo.getFunID() ){
-				uid = null==vo.getData().get("uid") ? null : vo.getData().getString("uid");
+				uid = null==vo.getData().get("userId") ? null : vo.getData().getString("userId");
 				sessionId = null==vo.getData().get("sessionid") ? null : vo.getData().getString("sessionid");
 				String token = !vo.getData().has("token") ? null : vo.getData().getString("token");
 				if(!StrUtil.isNullOrEmpty(uid) && !StrUtil.isNullOrEmpty(sessionId)){

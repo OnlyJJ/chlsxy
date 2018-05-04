@@ -11,6 +11,7 @@ import com.lm.live.cache.constants.CacheTimeout;
 import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.service.impl.CommonServiceImpl;
 import com.lm.live.common.utils.MemcachedUtil;
+import com.lm.live.user.constant.Constants;
 import com.lm.live.userbase.dao.UserBaseMapper;
 import com.lm.live.userbase.domain.UserInfoDo;
 import com.lm.live.userbase.enums.ErrorCode;
@@ -100,4 +101,50 @@ public class UserBaseServiceImpl extends CommonServiceImpl<UserBaseMapper, UserI
 		dao.updateIcon(userId, icon);
 	}
 
+	@Override
+	public boolean checkIfHasLogin(String userId, String sessionId)
+			throws Exception {
+		if(StringUtils.isEmpty(userId)||StringUtils.isEmpty(sessionId)){
+			return false;
+		}
+		boolean flag = false;
+		//游客用户userId前缀
+		String visitorUserIdPreStr = Constants.PSEUDO_PREFIX;
+		if(userId.indexOf(visitorUserIdPreStr) != -1 ){//游客
+			flag = false;
+		}else{
+			String cache = RedisUtil.get(CacheKey.MC_TOKEN_PREFIX+ userId);
+			if(!StringUtils.isEmpty(cache) && cache.equals(sessionId)) {
+				flag = true;
+			}else {
+				flag = false ; 
+			}
+		}
+		return flag;
+	}
+
+	@Override
+	public boolean validateIfRobot(String userId) throws Exception {
+		if(StringUtils.isEmpty(userId)){
+			throw new UserBaseBizException(ErrorCode.ERROR_101);
+		}else{
+			String robotUserIdPre = Constants.ROBOT_PREFIX; 
+	    	if(userId.startsWith(robotUserIdPre)){//userId中包含有机器人的userId前缀，说明是机器人,直接排到次后面
+	    		return true;
+	    	}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean checkIfRegistUser(String userId) {
+		boolean flag = false;
+		if(!StringUtils.isEmpty(userId)){
+			UserInfoDo u = this.dao.getUserByUserId(userId);
+			if(u != null){
+				flag = true;
+			}
+		}
+		return flag;
+	}
 }

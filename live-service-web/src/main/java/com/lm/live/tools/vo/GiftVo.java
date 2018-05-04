@@ -34,7 +34,7 @@ public class GiftVo extends JsonParseInterface implements Serializable{
 	private String name;
 	private String image;
 	private int price;
-	private Double priceRMB;
+	private double priceRMB;
 	/** 礼物分类 */
 	private int giftType;
 	/** 剩余金币  */

@@ -48,33 +48,33 @@ public class RoomEnum {
 		/* 0:禁言;1:踢出;2:解除禁言;3:设置房管;4:取消房管 5:拉黑*/
 		
 		/** 0:禁言 */
-		forbidSpeak("0"),
+		forbidSpeak(0),
 		
 		
 		/** 1:踢出  */
-		fourceOut("1"),
+		fourceOut(1),
 		
 		/** 2:解除禁言; */
-		unForbidSpeak("2") ,
+		unForbidSpeak(2) ,
 		
 		
 		/** 3:设置房管 */
-		setRoomMgr("3"),
+		setRoomMgr(3),
 		
 		/** 4:取消房管  */
-		cancelRoomMgr("4"),
+		cancelRoomMgr(4),
 		
 		/** 5:拉黑  */
-		userBan("5");
+		userBan(5);
 		
 		
-		private final String value;
+		private final int value;
 		
-		ActionType(String value) {
+		ActionType(int value) {
 			this.value = value;
 		}
 
-		public String getValue() {
+		public int getValue() {
 			return value;
 		}
 	}

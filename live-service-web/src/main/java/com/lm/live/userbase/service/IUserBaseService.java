@@ -84,4 +84,35 @@ public interface IUserBaseService  extends ICommonService<UserInfoDo>{
 	 */
 	void updateIcon(String userId, String icon);
 	
+	/**
+	 * 校验是否登录
+	 *@param userId
+	 *@param sessionId
+	 *@return
+	 *@throws Exception
+	 *@author shao.xiang
+	 *@data 2018年4月8日
+	 */
+	boolean checkIfHasLogin(String userId,String sessionId) throws Exception;
+	
+	
+	/**
+	 * 校验是否是机器人
+	 *@param userId
+	 *@param sessionId
+	 *@return
+	 *@throws Exception
+	 *@author shao.xiang
+	 *@data 2018年4月8日
+	 */
+	boolean validateIfRobot(String userId) throws Exception;
+	
+	/**
+	 * 校验是否注册
+	 *@param userId
+	 *@return
+	 *@author shao.xiang
+	 *@data 2018年5月4日
+	 */
+	boolean checkIfRegistUser(String userId);
 }

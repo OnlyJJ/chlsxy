@@ -393,25 +393,4 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 		userBaseService.update(dbUserInfo);
 	}
 
-	@Override
-	public boolean checkIfHasLogin(String userId, String sessionId)
-			throws Exception {
-		if(StringUtils.isEmpty(userId)||StringUtils.isEmpty(sessionId)){
-			return false;
-		}
-		boolean flag = false;
-		//游客用户userId前缀
-		String visitorUserIdPreStr = Constants.PSEUDO_PREFIX;
-		if(userId.indexOf(visitorUserIdPreStr) != -1 ){//游客
-			flag = false;
-		}else{
-			String cache = RedisUtil.get(CacheKey.MC_TOKEN_PREFIX+ userId);
-			if(!StringUtils.isEmpty(cache) && cache.equals(sessionId)) {
-				flag = true;
-			}else {
-				flag = false ; 
-			}
-		}
-		return flag;
-	}
 }

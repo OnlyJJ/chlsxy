@@ -378,9 +378,18 @@ public class GuardServiceImpl implements IGuardService {
 		
 	}
 	
+	@Override
+	public List<Map> listRoomGuardCache(String userId, String roomId)
+			throws Exception {
+		if(StrUtil.isNullOrEmpty(userId) || StrUtil.isNullOrEmpty(roomId)) {
+			return null;
+		}
+		return getUserGuardInfoByRoomCache(userId, roomId);
+	}
+	
 	private List<Map> getUserGuardInfoByRoomCache(String userId,
 			String roomId) throws Exception {
-		if(StringUtils.isEmpty(userId) || StringUtils.isEmpty(roomId)) {
+		if(StrUtil.isNullOrEmpty(userId) || StrUtil.isNullOrEmpty(roomId)) {
 			return null;
 		}
 		List<Map> list = null;
@@ -396,5 +405,6 @@ public class GuardServiceImpl implements IGuardService {
 		}
 		return list;
 	}
+
 	
 }

@@ -1,6 +1,8 @@
 package com.yl.listener;
 
 
+import java.util.Map;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
@@ -92,29 +94,29 @@ public class SocketServerListener implements ApplicationListener<ContextRefreshe
 	private void deleteMcSessionData(){
 		LogUtil.log.info("##### 清理无效的会话标识 ######## start...");
 		try {
-//			
-//			RedisUtil.getJavaBean(MCKeyUtil.getServerCacheKey(), String[].class);
-//			if(null!=obj){
-//				Map<String, Object[]> cacheMap = (Map<String, Object[]>)obj;
-//				if(null!=cacheMap && cacheMap.size()>0){
-//					Object[] uids = cacheMap.get("uids");
-//					Object[] sessionTokens = cacheMap.get("sessionTokens");
-//					
-//					if(null!=uids && uids.length>0){
-//						for(Object uid : uids){
-//							MemcachedUtil.delete(MCKeyUtil.getSocketKey(String.valueOf(uid)));
-//						}
-//					}
-//					
-//					if(null!=sessionTokens && sessionTokens.length>0){
-//						for(Object sessionToken : sessionTokens){
-//							MemcachedUtil.delete(MCKeyUtil.getSessionKey(String.valueOf(sessionToken)));
-//						}
-//					}
-//					
-//				}
-//			}
-//			MemcachedUtil.delete(MCKeyUtil.getServerCacheKey());
+			
+			Map obj = RedisUtil.getJavaBean(MCKeyUtil.getServerCacheKey(), Map.class);
+			if(null!=obj){
+				Map<String, Object[]> cacheMap = obj;
+				if(null!=cacheMap && cacheMap.size()>0){
+					Object[] uids = cacheMap.get("uids");
+					Object[] sessionTokens = cacheMap.get("sessionTokens");
+					
+					if(null!=uids && uids.length>0){
+						for(Object uid : uids){
+							RedisUtil.del(MCKeyUtil.getSocketKey(String.valueOf(uid)));
+						}
+					}
+					
+					if(null!=sessionTokens && sessionTokens.length>0){
+						for(Object sessionToken : sessionTokens){
+							RedisUtil.del(MCKeyUtil.getSessionKey(String.valueOf(sessionToken)));
+						}
+					}
+					
+				}
+			}
+			RedisUtil.del(MCKeyUtil.getServerCacheKey());
 			LogUtil.log.info("##### 清理无效的会话标识 ######## done...");
 		} catch (Exception e) {
 			LogUtil.log.error("##### 清理无效的会话标识失败 ##### ", e);

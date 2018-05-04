@@ -8,6 +8,11 @@
    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
 	<context:property-placeholder location="classpath:db.properties" ignore-unresolvable="true"/>
+	
+	<bean id="log-filter" class="com.alibaba.druid.filter.logging.Log4jFilter">
+        <property name="statementExecutableSqlLogEnable" value="true" />
+ 	</bean>
+
 	<!-- 基于Druid数据库链接池的数据源配置 -->
 	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
 		init-method="init" destroy-method="close">
@@ -31,6 +36,13 @@
 		<property name="timeBetweenEvictionRunsMillis" value="60000" />
 		<!-- 解密密码必须要配置的项 <property name="filters" value="config" /> <property name="connectionProperties" 
 			value="config.decrypt=true" /> -->
+		<!-- 以下配置是尝试优化 -->
+		<!-- 配置监控统计拦截的filters -->
+      	<property name="proxyFilters">
+	        <list>
+	            <ref bean="log-filter"/>
+	        </list>
+   		</property>
 	</bean>
 	<!-- 将数据源映射到sqlSessionFactory中 -->
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
@@ -46,7 +58,7 @@
 	
 	<!-- SqlSession模板类实例 -->
 	<bean id="sessionTemplate" class="org.mybatis.spring.SqlSessionTemplate"
-		destroy-method="close">
+		destroy-method="close" scope="prototype">
 		<constructor-arg index="0" ref="sqlSessionFactory" />
 	</bean>
 

@@ -65,9 +65,11 @@ import com.lm.live.user.vo.UserCache;
 import com.lm.live.user.vo.UserInfoVo;
 import com.lm.live.userbase.domain.RoomBannedOperation;
 import com.lm.live.userbase.domain.UserAnchor;
+import com.lm.live.userbase.domain.UserRoomMember;
 import com.lm.live.userbase.enums.RoomBannedOperateEnum;
 import com.lm.live.userbase.service.IRoomBannedOperationService;
 import com.lm.live.userbase.service.IUserAnchorService;
+import com.lm.live.userbase.service.IUserBaseService;
 
 @Service("roomService")
 public class RoomServiceImpl implements IRoomService {
@@ -107,6 +109,9 @@ public class RoomServiceImpl implements IRoomService {
 	
 	@Resource
 	private IRoomBannedOperationService roomBannedOperationService;
+	
+	@Resource
+	private IUserBaseService userBaseService;
 	
 	@Transactional(rollbackFor=Exception.class)
 	@Override
@@ -1249,5 +1254,63 @@ public class RoomServiceImpl implements IRoomService {
 			}
 		}
 		return flag;
+	}
+
+	@Override
+	public void mgrUserRoomMembers(String fromUserId,
+			RoomBannedOperationVo roomBannedOperationVo) throws Exception {
+		if(StrUtil.isNullOrEmpty(fromUserId) || roomBannedOperationVo == null){
+			throw new RoomBizException(ErrorCode.ERROR_101);
+		}
+		int type = roomBannedOperationVo.getType();
+		String roomId = roomBannedOperationVo.getRoomid();
+		String toUserId = roomBannedOperationVo.getUserId();
+		
+		boolean isRegistUser = userBaseService.checkIfRegistUser(toUserId);
+		boolean isRobot = userBaseService.validateIfRobot(toUserId);
+		if(!isRegistUser && !isRobot){
+			throw new RoomBizException(ErrorCode.ERROR_8006);
+		}
+		
+		UserRoomMember userRoom=new UserRoomMember();
+		userRoom.setUserId(toUserId);
+		userRoom.setRoomId(roomId);
+		userRoom.setUserId(fromUserId);
+		userRoom.setAddTime(new Date());
+		userRoom.setRoleType(1);
+//		UserRoomMember userRoom1= this.selectUserRoomMember(userRoom);
+//		if (type == 3) {//设置管理
+//			if (userRoom1 ==null) {
+//				userRoom = this.insert(userRoom);
+//				MemcachedUtil.delete(MCPrefix.ROOMCHEINFO_PREKEY + roomId);//设置管理成功，清除Memcached房间成员缓存
+//				// 设置、取消管理,及时更新房间成员列表
+//				if(roomCacheInfoService.validateIfInRoom(toUserId, roomId)) {
+//					roomCacheInfoService.addOrRefreshRoomOnlineMembers(roomId, toUserId);
+//				}
+//				String targetid = roomId;
+//				JSONObject content = new JSONObject();
+//				content.put("msg", String.format("用户%s被设置成房间%s的管理员,刷新房间成员列表", toUserId,roomId));
+//				// 发送聊天消息
+//				imSendComponent.sendFun11001Msg2Im(SeqID.SEQ_1, MsgTypeEnum.GroupChat,  targetid,ImTypeEnum.IM_11001_RefreshRoomOnlineMembers, content);
+//			}else{
+//				LogUtil.log.info(String.format("###用户:%s在房间:%s已经是房管,无需重新设置", toUserId,roomId));
+//			}
+//		}else if (type == 4){//取消管理
+//			if (userRoom1 !=null) {
+//				this.removeById(userRoom1.getId());
+//				MemcachedUtil.delete(MCPrefix.ROOMCHEINFO_PREKEY + roomId);//取消管理成功，清除Memcached房间成员缓存
+//				// 设置、取消管理,及时更新房间成员列表
+//				if(roomCacheInfoService.validateIfInRoom(toUserId, roomId)) {
+//					roomCacheInfoService.addOrRefreshRoomOnlineMembers(roomId, toUserId);
+//				}
+//				String targetid = roomId;
+//				JSONObject content = new JSONObject();
+//				content.put("msg", String.format("用户%s被取消房间%s的管理员资格,刷新房间成员列表", toUserId,roomId));
+//				// 发送聊天消息
+//				imSendComponent.sendFun11001Msg2Im(SeqID.SEQ_1, MsgTypeEnum.GroupChat,  targetid,ImTypeEnum.IM_11001_RefreshRoomOnlineMembers, content);
+//			}else{
+//				LogUtil.log.info(String.format("###用户:%s在房间:%s不是房管,无需取消房管", toUserId,roomId));
+//			}
+//		}
 	}
 }

@@ -18,7 +18,6 @@
 	<!-- 读入配置属性文件 -->
 	<context:property-placeholder location="classpath:dubbo.properties" ignore-unresolvable="true"/>
 	
-	<!-- 配置要扫描的包 -->
 	<context:component-scan base-package="com.lm.live" />
 	
 	<!-- 引入相关配置 -->

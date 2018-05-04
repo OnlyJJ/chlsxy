@@ -24,6 +24,7 @@ import com.lm.live.common.vo.RequestVo;
 import com.lm.live.common.vo.Result;
 import com.lm.live.common.vo.Session;
 import com.lm.live.user.service.IUserInfoService;
+import com.lm.live.userbase.service.IUserBaseService;
 import com.lm.live.web.vo.DataRequest;
 
 /**
@@ -36,6 +37,10 @@ public class LoginSessionInterceptor extends HandlerInterceptorAdapter {
 	
 	@Resource
 	private IUserInfoService userInfoService;
+	
+	@Resource
+	private IUserBaseService userBaseService;
+	
 
 	/**
 	 * 拦截器的前端，执行控制器之前所要处理的方法，通常用于权限控制、日志，其中，Object handler表示下一个拦截器；
@@ -75,7 +80,7 @@ public class LoginSessionInterceptor extends HandlerInterceptorAdapter {
 						out(json.toString(), request, response);
 						return false;
 					}
-					boolean flagIfHasLogin = this.userInfoService.checkIfHasLogin(userId, sessionId);
+					boolean flagIfHasLogin = userBaseService.checkIfHasLogin(userId, sessionId);
 					if(!flagIfHasLogin){
 						Result result = new Result(ErrorCode.ERROR_403.getResultCode(),ErrorCode.ERROR_403.getResultDescr());
 						JSONObject json = new JSONObject();

@@ -24,16 +24,18 @@ import com.lm.live.common.vo.DeviceProperties;
 import com.lm.live.common.vo.Page;
 import com.lm.live.common.vo.RequestVo;
 import com.lm.live.common.vo.Result;
+import com.lm.live.decorate.exception.DecorateBizException;
 import com.lm.live.decorate.service.IDecoratePackageService;
+import com.lm.live.guard.exception.GuardBizException;
 import com.lm.live.guard.service.IGuardService;
 import com.lm.live.guard.vo.GuardVo;
+import com.lm.live.room.enums.ErrorCode;
+import com.lm.live.room.exception.RoomBizException;
 import com.lm.live.room.service.IRoomService;
+import com.lm.live.tools.exception.ToolBizException;
 import com.lm.live.tools.service.IGiftService;
 import com.lm.live.tools.service.IUserPackageService;
-import com.lm.live.tools.service.impl.GiftServiceImpl;
 import com.lm.live.tools.vo.GiftVo;
-import com.lm.live.user.enums.ErrorCode;
-import com.lm.live.user.exception.UserBizException;
 import com.lm.live.web.vo.DataRequest;
 
 @Controller("RoomWeb")
@@ -76,13 +78,13 @@ public class RoomWeb  extends BaseController{
 			if(data==null  
 					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
-				throw new UserBizException(ErrorCode.ERROR_101);
+				throw new RoomBizException(ErrorCode.ERROR_101);
 			}
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
 			String anchorId = req.getTargetId();
 			jsonRes = decoratePackageService.getRoomDecorateData(anchorId);
-		} catch(UserBizException e) {
+		} catch(DecorateBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
 			result.setResultDescr(e.getErrorCode().getResultDescr());
@@ -118,7 +120,7 @@ public class RoomWeb  extends BaseController{
 			if(data==null  
 					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
-				throw new UserBizException(ErrorCode.ERROR_101);
+				throw new RoomBizException(ErrorCode.ERROR_101);
 			}
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
@@ -128,7 +130,7 @@ public class RoomWeb  extends BaseController{
 				userId = req.getUserId();
 			}
 			jsonRes = guardService.getRoomGuardData(userId, roomId);
-		} catch(UserBizException e) {
+		} catch(GuardBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
 			result.setResultDescr(e.getErrorCode().getResultDescr());
@@ -163,11 +165,11 @@ public class RoomWeb  extends BaseController{
 			if(data==null  
 					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
-				throw new UserBizException(ErrorCode.ERROR_101);
+				throw new RoomBizException(ErrorCode.ERROR_101);
 			}
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
-		} catch(UserBizException e) {
+		} catch(RoomBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
 			result.setResultDescr(e.getErrorCode().getResultDescr());
@@ -201,10 +203,10 @@ public class RoomWeb  extends BaseController{
 		try {
 			if(data==null  
 					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())) {
-				throw new UserBizException(ErrorCode.ERROR_101);
+				throw new RoomBizException(ErrorCode.ERROR_101);
 			}
 			jsonRes = giftService.qryGiftData();
-		} catch(UserBizException e) {
+		} catch(RoomBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
 			result.setResultDescr(e.getErrorCode().getResultDescr());
@@ -239,13 +241,13 @@ public class RoomWeb  extends BaseController{
 			if(data==null  
 					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
-				throw new UserBizException(ErrorCode.ERROR_101);
+				throw new RoomBizException(ErrorCode.ERROR_101);
 			}
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
 			String userId = req.getUserId();
 			jsonRes = userPackageService.listUserBagData(userId);
-		} catch(UserBizException e) {
+		} catch(ToolBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
 			result.setResultDescr(e.getErrorCode().getResultDescr());
@@ -280,7 +282,7 @@ public class RoomWeb  extends BaseController{
 			if(data==null  
 					|| !data.getData().containsKey(Page.class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
-				throw new UserBizException(ErrorCode.ERROR_101);
+				throw new RoomBizException(ErrorCode.ERROR_101);
 			}
 			Page page = new Page();
 			page.parseJson(data.getData().getJSONObject(page.getShortName()));
@@ -288,7 +290,7 @@ public class RoomWeb  extends BaseController{
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
 			String roomId = req.getRoomId();
 			jsonRes = roomService.getRoomOnlineData(roomId, page);
-		} catch(UserBizException e) {
+		} catch(RoomBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
 			result.setResultDescr(e.getErrorCode().getResultDescr());
@@ -323,11 +325,11 @@ public class RoomWeb  extends BaseController{
 			if(data==null  
 					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
-				throw new UserBizException(ErrorCode.ERROR_101);
+				throw new RoomBizException(ErrorCode.ERROR_101);
 			}
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
-		} catch(UserBizException e) {
+		} catch(RoomBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
 			result.setResultDescr(e.getErrorCode().getResultDescr());
@@ -363,7 +365,7 @@ public class RoomWeb  extends BaseController{
 					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(GiftVo.class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
-				throw new UserBizException(ErrorCode.ERROR_101);
+				throw new RoomBizException(ErrorCode.ERROR_101);
 			}
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
@@ -378,7 +380,7 @@ public class RoomWeb  extends BaseController{
 			synchronized(UserAccount.class) {
 				jsonRes = roomService.sendGift(userId, roomId, anchorId, giftId, num, sourceType);
 			}
-		} catch(UserBizException e) {
+		} catch(RoomBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
 			result.setResultDescr(e.getErrorCode().getResultDescr());
@@ -413,7 +415,7 @@ public class RoomWeb  extends BaseController{
 			if(data==null  
 					|| !data.getData().containsKey(GuardVo .class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
-				throw new UserBizException(ErrorCode.ERROR_101);
+				throw new RoomBizException(ErrorCode.ERROR_101);
 			}
 			GuardVo vo = new GuardVo();
 			vo.parseJson(data.getData().getJSONObject(vo.getShortName()));
@@ -427,14 +429,14 @@ public class RoomWeb  extends BaseController{
 			String roomId = req.getRoomId();
 			if(StrUtil.isNullOrEmpty(userId) || StrUtil.isNullOrEmpty(roomId)
 					|| StrUtil.isNullOrEmpty(anchorId)) {
-				throw new UserBizException(ErrorCode.ERROR_101);
+				throw new RoomBizException(ErrorCode.ERROR_101);
 			}
 			// my-todo
 			// 同步处理，是否需要改为分布式锁来处理。
 			synchronized(UserAccount.class) {
 				roomService.buyGuard(userId, anchorId, roomId, workId, guardType, priceType);
 			}
-		} catch(UserBizException e) {
+		} catch(RoomBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
 			result.setResultDescr(e.getErrorCode().getResultDescr());
@@ -469,7 +471,7 @@ public class RoomWeb  extends BaseController{
 			if(data==null  
 					|| !data.getData().containsKey(ShareInfo .class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
-				throw new UserBizException(ErrorCode.ERROR_101);
+				throw new RoomBizException(ErrorCode.ERROR_101);
 			}
 			ShareInfo info = new ShareInfo();
 			info.parseJson(data.getData().getJSONObject(info.getShortName()));
@@ -482,7 +484,7 @@ public class RoomWeb  extends BaseController{
 			String roomId = info.getRoomId();
 			int shareType = info.getShareType();
 			roomService.shareApp(userId, roomId, shareType, clientIp);
-		} catch(UserBizException e) {
+		} catch(RoomBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
 			result.setResultDescr(e.getErrorCode().getResultDescr());
@@ -517,7 +519,7 @@ public class RoomWeb  extends BaseController{
 			if(data==null  
 					|| !data.getData().containsKey(AccusationVo.class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
-				throw new UserBizException(ErrorCode.ERROR_101);
+				throw new RoomBizException(ErrorCode.ERROR_101);
 			}
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
@@ -526,7 +528,7 @@ public class RoomWeb  extends BaseController{
 			AccusationVo vo = new AccusationVo();
 			vo.parseJson(data.getData().getJSONObject(vo.getShortName()));
 			userAccusationInfoService.recordAccusationInfo(userId, toUserId, vo);
-		} catch(UserBizException e) {
+		} catch(RoomBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
 			result.setResultDescr(e.getErrorCode().getResultDescr());
@@ -561,11 +563,11 @@ public class RoomWeb  extends BaseController{
 			if(data==null  
 					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
-				throw new UserBizException(ErrorCode.ERROR_101);
+				throw new RoomBizException(ErrorCode.ERROR_101);
 			}
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
-		} catch(UserBizException e) {
+		} catch(RoomBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
 			result.setResultDescr(e.getErrorCode().getResultDescr());
@@ -600,11 +602,11 @@ public class RoomWeb  extends BaseController{
 			if(data==null  
 					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
-				throw new UserBizException(ErrorCode.ERROR_101);
+				throw new RoomBizException(ErrorCode.ERROR_101);
 			}
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
-		} catch(UserBizException e) {
+		} catch(RoomBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
 			result.setResultDescr(e.getErrorCode().getResultDescr());
@@ -639,11 +641,11 @@ public class RoomWeb  extends BaseController{
 			if(data==null  
 					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
-				throw new UserBizException(ErrorCode.ERROR_101);
+				throw new RoomBizException(ErrorCode.ERROR_101);
 			}
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
-		} catch(UserBizException e) {
+		} catch(RoomBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
 			result.setResultDescr(e.getErrorCode().getResultDescr());
@@ -678,11 +680,11 @@ public class RoomWeb  extends BaseController{
 			if(data==null  
 					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
-				throw new UserBizException(ErrorCode.ERROR_101);
+				throw new RoomBizException(ErrorCode.ERROR_101);
 			}
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
-		} catch(UserBizException e) {
+		} catch(RoomBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
 			result.setResultDescr(e.getErrorCode().getResultDescr());
@@ -715,9 +717,8 @@ public class RoomWeb  extends BaseController{
 		JSONObject jsonRes = new JSONObject();
 		try {
 			if(data==null  
-					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
-				throw new UserBizException(ErrorCode.ERROR_101);
+				throw new RoomBizException(ErrorCode.ERROR_101);
 			}
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
@@ -725,7 +726,7 @@ public class RoomWeb  extends BaseController{
 			String roomId = req.getRoomId();
 			int type = req.getHandleType();
 			roomService.recordRoomOnlineMember(userId, roomId, type);
-		} catch(UserBizException e) {
+		} catch(RoomBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
 			result.setResultDescr(e.getErrorCode().getResultDescr());

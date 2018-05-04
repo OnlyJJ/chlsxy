@@ -32,22 +32,22 @@ public class BusinessInterfaceService {
 	
 	private static final String GROUP_RELATIVE_URL = BUSINESS_SYSTEM_URL + "getGroupRelative";
 	
-	private static final String FRIEND_RELATIVE_URL = BUSINESS_SYSTEM_URL + "getFriendRelative";
+//	private static final String FRIEND_RELATIVE_URL = BUSINESS_SYSTEM_URL + "getFriendRelative";
 	
 	//private static final String USER_BASEINFO_URL = BUSINESS_SYSTEM_URL + "getUserBaseInfo";
-	private static final String USER_BASEINFO_URL = BUSINESS_SYSTEM_URL + "U12/1/";
-	private static final String SYNC_ROOM_USER_URL = BUSINESS_SYSTEM_URL + "U16/1/";
-	private static final String USER_BAN_URL = BUSINESS_SYSTEM_URL + "U119/1/";
+	private static final String USER_BASEINFO_URL = BUSINESS_SYSTEM_URL + "U16/1/"; // 用户信息
+	private static final String SYNC_ROOM_USER_URL = BUSINESS_SYSTEM_URL + "R16/1/"; // 进、出房间
+	private static final String USER_BAN_URL = BUSINESS_SYSTEM_URL + "U17/1/"; // 黑名单
 	
 	private static final String USER_BAN = "u_ban_";
 
 	
 	
 	/** 保存游客信息  */
-	public static final String USER_DEFAULT_ICON = "145432501711592.png";  //用户默认头像图片
-	public static final String ICON_IMG_FILE_URI = "images/icon";  //个人用户头像
+	public static final String USER_DEFAULT_ICON = "default.png";  //用户默认头像图片
+	public static final String ICON_IMG_FILE_URI = "images/icon/";  //个人用户头像
 	public static final String PESUDOUSERNAME = "pesudoUserName_";
-	public static final String cdnPath="http://cdn.9mitao.com/";
+	public static final String cdnPath="http://192.168.1.70:8616/upload/";
 	
 	/**
 	 * 获取群组成员关系
@@ -194,16 +194,11 @@ public class BusinessInterfaceService {
 			{
 				u=new User();
 				String systemUserNickName = "系统公告";
-				u.setType("5"); // 发送者类型  1:主播，2:普通用户，3:房管  4:游客 5官方人员（权限最高）
-				u.setLevel("V20");
-				u.setForbidSpeak(false);
-				u.setForceOut(false);
-				u.setUid(uid);
+				u.setUserType(5); // 发送者类型  1:主播，2:普通用户，3:房管  4:游客 5超级管理员（权限最高）
+				u.setUserId(uid);
 				u.setNickname(systemUserNickName);
-				u.setUserLevel("V30"); //设置默认的V20,避免im端对等级低的截取长度
-				u.setAnchorLevel("S0"); //设置默认的S20
-				u.setIfOfficialUser(true);
-				u.setGoodCodeLevel(0);
+				u.setUserLevel(30); //设置默认的V20,避免im端对等级低的截取长度
+				u.setAnchorLevel(0); //设置默认的S20
 				LogUtil.log.info("系统用户，UserBaseInfo="+JsonUtil.beanToJsonString(u));
 				return u;
 			}
@@ -215,26 +210,20 @@ public class BusinessInterfaceService {
 				//拼接头像的完整url,再存到cache
 				StringBuffer avatarSbf = new StringBuffer();
 				avatarSbf.append(cdnPath)
-				.append("/")
 				.append(ICON_IMG_FILE_URI)
-				.append("/")
 				.append(USER_DEFAULT_ICON);
-				u.setType("4"); // 发送者类型  1:主播，2:普通用户，3:房管  4:游客
-				u.setLevel("V0");
-				u.setForbidSpeak(false);
-				u.setForceOut(false);
-				u.setUid(uid);
+				u.setUserType(4); // 发送者类型  1:主播，2:普通用户，3:房管  4:游客
+				u.setUserId(uid);
 				u.setNickname(pesudoUserName);
 				u.setAvatar(avatarSbf.toString());
-				u.setUserLevel("V0"); //游客设置默认的V0
-				u.setAnchorLevel("S0"); //游客设置默认的S0
-				u.setGoodCodeLevel(0);
+				u.setUserLevel(0); //游客设置默认的V0
+				u.setAnchorLevel(0); //游客设置默认的S0
 				LogUtil.log.info("游客，UserBaseInfo="+JsonUtil.beanToJsonString(u));
 				return u;
 			}
 			
 			String url = USER_BASEINFO_URL;
-			String value="{\"userbaseinfo\":{\"a\":\""+uid+"\"},\"anchorinfo\":{\"b\":\""+(roomid==null?"":roomid)+"\"}}";
+			String value="{\"requestvo\":{\"a\":\""+uid+",\"b\":\""+(roomid==null?"":roomid)+"\"}}";
 			
 			String response = StrUtil.getCleanString(HttpUtil.post(url, value.getBytes("utf-8")));
 			if (!response.isEmpty())
@@ -277,17 +266,11 @@ public class BusinessInterfaceService {
 			{
 				u=new JSONObject();
 				String systemUserNickName = "系统公告";
-				u.put("type", "5"); // 发送者类型  1:主播，2:普通用户，3:房管  4:游客 5官方人员（权限最高）
-				u.put("level","V20");
-				u.put("forbidSpeak", false);
-				u.put("forceOut", false);
-				u.put("uid", uid);
+				u.put("userType", 5); // 发送者类型  1:主播，2:普通用户，3:房管  4:游客 5官方人员（权限最高）
+				u.put("userId", uid);
 				u.put("nickname", systemUserNickName);
-				u.put("userLevel", "V30");
-				u.put("anchorLevel", "S0");
-				u.put("ifOfficialUser", true);
-				u.put("goodCodeLevel", 0);
-				
+				u.put("userLevel", 30);
+				u.put("anchorLevel", 0);
 				LogUtil.log.info("系统用户，UserBaseInfo="+u.toString());
 				return u;
 			}
@@ -299,28 +282,21 @@ public class BusinessInterfaceService {
 				//拼接头像的完整url,再存到cache
 				StringBuffer avatarSbf = new StringBuffer();
 				avatarSbf.append(cdnPath)
-				.append("/")
 				.append(ICON_IMG_FILE_URI)
-				.append("/")
 				.append(USER_DEFAULT_ICON);
 				
-				u.put("type", "4"); // 发送者类型  1:主播，2:普通用户，3:房管  4:游客 5官方人员（权限最高）
-				u.put("level","V0");
-				u.put("forbidSpeak", false);
-				u.put("forceOut", false);
-				u.put("uid", uid);
+				u.put("userType", 4); // 发送者类型  1:主播，2:普通用户，3:房管  4:游客 5官方人员（权限最高）
+				u.put("userId", uid);
 				u.put("nickname", pesudoUserName);
 				u.put("avatar", avatarSbf.toString());
-				u.put("userLevel", "V0");
-				u.put("anchorLevel", "S0");
-				u.put("goodCodeLevel", 0);
-
+				u.put("userLevel", 0);
+				u.put("anchorLevel", 0);
 				LogUtil.log.info("游客，UserBaseInfo="+u.toString());
 				return u;
 			}
 			
 			String url = USER_BASEINFO_URL;
-			String value="{\"userbaseinfo\":{\"a\":\""+uid+"\"},\"anchorinfo\":{\"b\":\""+(roomid==null?"":roomid)+"\"}}";
+			String value="{\"requestvo\":{\"a\":\""+uid+",\"b\":\""+(roomid==null?"":roomid)+"\"}}";
 			
 			//LogUtil.log.info("url="+url+",value="+value);
 			

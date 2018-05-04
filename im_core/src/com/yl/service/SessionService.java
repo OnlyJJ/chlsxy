@@ -14,7 +14,6 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.corundumstudio.socketio.SocketIOClient;
@@ -24,23 +23,19 @@ import com.yl.common.constant.ErrorCode;
 import com.yl.common.constant.MessageFunID;
 import com.yl.common.exception.ServiceException;
 import com.yl.common.service.ActiveMqService;
-import com.yl.common.utils.HttpSQSUtil;
 import com.yl.common.utils.HttpUtil;
 import com.yl.common.utils.JsonUtil;
 import com.yl.common.utils.LogUtil;
 import com.yl.common.utils.MCKeyUtil;
-import com.yl.common.utils.MemcachedUtil;
 import com.yl.common.utils.MessageUtil;
 import com.yl.common.utils.RedisUtil;
 import com.yl.common.utils.SensitiveWordUtil;
 import com.yl.common.utils.SpringContextListener;
 import com.yl.common.utils.StrUtil;
 import com.yl.session.SessionManager;
-import com.yl.shows.User;
 import com.yl.socket.SocketTask;
 import com.yl.socketio.Constant;
 import com.yl.vo.HttpMsgDataVo;
-import com.yl.vo.SocketDataVo;
 
 /**
  * 会话相关操作业务逻辑
@@ -112,29 +107,6 @@ public class SessionService {
 		//jsonu.put("uid", uid);
 		if(u!=null)
 		{
-			/*
-			jsonu.put("nickname", u.getNickname());
-			jsonu.put("level", u.getLevel());
-			jsonu.put("userLevel", u.getUserLevel());
-			jsonu.put("anchorLevel", u.getAnchorLevel());
-			jsonu.put("avatar", u.getAvatar());
-			jsonu.put("type", u.getType());
-			jsonu.put("carId", u.getCarId());
-			jsonu.put("ifOfficialUser", u.isIfOfficialUser());
-			jsonu.put("userDecorateList", u.getUserDecorateList());
-			jsonu.put("isRoomGuard", u.isRoomGuard());
-			jsonu.put("guardList", u.getGuardList());
-			jsonu.put("payCount", u.getPayCount());
-			jsonu.put("anchorLevelIcon", u.isAnchorLevelIcon());
-			jsonu.put("goodCodeLevel", u.getGoodCodeLevel());
-			jsonu.put("goodCodeLevelUrl", u.getGoodCodeLevelUrl());
-
-			//private boolean forbidSpeak;//禁言 
-			//private boolean forceOut;//是否被踢
-			//private String channelId; //渠道id
-			//private String fontColor;//此用户的字体颜色
-			*/
-			
 			//有用户资料，按渠道存聊天数量
 			int type = vo.getData().getInt("type"); // 消息类型 ，1：文本，2：图片，3：声音，4：视频，5.礼物，6.禁言，7.踢出房间 8.红包 9赠送坐驾 10
 			if(MessageFunID.FUNID_11001.getFunID() == vo.getFunID()&&(type==1||type==5||type==8))
@@ -156,7 +128,7 @@ public class SessionService {
 		else
 		{
 			u=new JSONObject();
-			u.put("uid", uid);
+			u.put("userId", uid);
 			jsonu=JSONObject.fromObject(u);
 			//vo.getData().put("user", String.format("{\"uid\":\"%s\"}", uid));
 		}
@@ -170,25 +142,6 @@ public class SessionService {
 			JSONObject touser=businessInterfaceService.getUserBaseInfo2(to,vo.getData().getString("targetid"));
 			if(touser!=null)
 			{
-				/*
-				JSONObject jsto=new JSONObject();
-				jsto.put("nickname", touser.getNickname());
-				jsto.put("level", touser.getLevel());
-				jsto.put("userLevel", touser.getUserLevel());
-				jsto.put("anchorLevel", touser.getAnchorLevel());
-				jsto.put("avatar", touser.getAvatar());
-				jsto.put("type", touser.getType());
-				jsto.put("carId", touser.getCarId());
-				jsto.put("ifOfficialUser", touser.isIfOfficialUser());
-				jsto.put("uid", to);
-				jsto.put("userDecorateList", touser.getUserDecorateList());
-				jsto.put("isRoomGuard", touser.isRoomGuard());
-				jsto.put("guardList", touser.getGuardList());
-				jsto.put("payCount", touser.getPayCount());
-				jsto.put("anchorLevelIcon", touser.isAnchorLevelIcon());
-				jsto.put("goodCodeLevel", touser.getGoodCodeLevel());
-				jsto.put("goodCodeLevelUrl", touser.getGoodCodeLevelUrl());
-				*/
 				JSONObject jsto=JSONObject.fromObject(touser);;
 				jsto.remove("forbidSpeak");
 				jsto.remove("forceOut");
@@ -207,14 +160,14 @@ public class SessionService {
 			
 			int len=40;
 			//非主播草民控制10个字符
-			String userLevel="V0";
-			String utype="1";
+			int userLevel=0;
+			int utype=1;
 			if(u!=null)
 			{
-				userLevel=(String)u.get("userLevel");
-				utype=(String)u.get("type");
+				userLevel= Integer.parseInt(u.get("userLevel").toString());
+				utype= Integer.parseInt(u.get("userType").toString());
 			}
-			if(u!=null && "V0".equalsIgnoreCase(userLevel) && !"1".equalsIgnoreCase(utype) )
+			if(u!=null && 0 == userLevel && 1 != utype)
 				len=10;
 				
 			//控制最长发言字符数
@@ -263,8 +216,8 @@ public class SessionService {
 				vo.getData().remove("token"); //
 			}
 			
-			if(null != vo.getData().get("uid")){
-				vo.getData().remove("uid"); //安卓客户端发消息时，多余的无用字段，需要清理掉，确保符合协议
+			if(null != vo.getData().get("userId")){
+				vo.getData().remove("userId"); //安卓客户端发消息时，多余的无用字段，需要清理掉，确保符合协议
 			}
 			
 			//LogUtil.log.info("uid="+uid);
@@ -300,12 +253,12 @@ public class SessionService {
 			catch(Exception e){
 			}
 
-			String userLevel="V0";
-			String utype="1";
+			int userLevel= 0;
+			int utype= 1;
 			if(u!=null)
 			{
-				userLevel=(String)u.get("userLevel");
-				utype=(String)u.get("type");
+				userLevel= Integer.parseInt(u.get("userLevel").toString());
+				utype= Integer.parseInt(u.get("type").toString());
 			}
 
 			//LogUtil.log.info(String.format("toFormatAndsendToServer ：u=%s,forbidSpeak=%s,forceOut=%s,type=%s", u,forbidSpeak,forceOut,type));
@@ -340,7 +293,7 @@ public class SessionService {
 			{
 				if(token.startsWith(Constant.GUEST_TOKEN_KEY))//游客
 					throw new ServiceException(ErrorCode.ERROR_5014);
-				if(u!=null && "V0".equalsIgnoreCase(userLevel) && type.equals("1")) //1级以上用户才可以私聊
+				if(u!=null && 0 == userLevel && type.equals("1")) //1级以上用户才可以私聊
 					throw new ServiceException(ErrorCode.ERROR_5014);
 				
 				String targetid = null==vo.getData().get("targetid") ? "" : vo.getData().getString("targetid");//消息接收者
@@ -368,11 +321,11 @@ public class SessionService {
 					}
 				}
 
-				if(u!=null && (  "V1".equalsIgnoreCase(userLevel)
-						       ||"V2".equalsIgnoreCase(userLevel)
-						       ||"V3".equalsIgnoreCase(userLevel)
-						       ||"V4".equalsIgnoreCase(userLevel)
-						       ||"V5".equalsIgnoreCase(userLevel)
+				if(u!=null && (  1 == userLevel
+						       || 2 == userLevel
+						       || 3 == userLevel
+						       || 4 == userLevel
+						       || 5 == userLevel
 						      )
 						&& type.equals("1")) //1-5级用户 私聊间隔10秒
 				{
@@ -381,7 +334,7 @@ public class SessionService {
 				}
 				else if(u!=null && type.equals("1")) 
 				{
-					Object forbid=MemcachedUtil.get(Constant.V6_PRI_FORBID_KEY+u.get("uid"));
+					Object forbid=RedisUtil.get(Constant.V6_PRI_FORBID_KEY+u.get("userId"));
 					if(forbid!=null)
 						throw new ServiceException(ErrorCode.ERROR_5016);
 					if(curTime-pri_lastmsgsendtime<Constant.V6_PRI_INTERVAL)//500毫秒
@@ -389,7 +342,7 @@ public class SessionService {
 						LogUtil.log.info(String.format("私聊发送间隔小于 ：t=%s,value=%s", Constant.V6_PRI_INTERVAL,curTime-pri_lastmsgsendtime));
 						List<Long> newlist=new ArrayList<Long>();
 						List<Long> oldlist=new ArrayList<Long>();
-						Object o=MemcachedUtil.get(Constant.V6_PRI_KEY+u.get("uid"));
+						List<Long> o=RedisUtil.getList(Constant.V6_PRI_KEY+u.get("userId"), Long.class);
 						if(o!=null)
 							oldlist=(List<Long>)o;
 						for(Long l:oldlist)
@@ -398,13 +351,13 @@ public class SessionService {
 								newlist.add(l);
 						}
 						newlist.add(curTime);
-						MemcachedUtil.set(Constant.V6_PRI_KEY+u.get("uid"), newlist,Constant.V6_PRI_SECTION);
+						RedisUtil.set(Constant.V6_PRI_KEY+u.get("userId"), newlist,Constant.V6_PRI_SECTION);
 						LogUtil.log.info(String.format("私聊%s秒内触发了%s次",Constant.V6_PRI_SECTION,newlist.size()));
 
 						if(newlist.size()>=Constant.V6_PRI_TOUCH_TIMES)
 						{
 							LogUtil.log.info(String.format("%s 秒内触发了%s次，屏蔽私聊%s秒",Constant.V6_PRI_SECTION, Constant.V6_PRI_TOUCH_TIMES,Constant.V6_PRI_FORBID_TIME));
-							MemcachedUtil.set(Constant.V6_PRI_FORBID_KEY+u.get("uid"), "1",Constant.V6_PRI_FORBID_TIME);
+							RedisUtil.set(Constant.V6_PRI_FORBID_KEY+u.get("userId"), "1",Constant.V6_PRI_FORBID_TIME);
 						}
 						throw new ServiceException(ErrorCode.ERROR_5016);
 					}
@@ -453,22 +406,22 @@ public class SessionService {
 					
 				}
 				// utype 发送者类型  1:主播，2:普通用户，3:房管  4:游客 5官方人员（权限最高）
-				if(u!=null && "V0".equalsIgnoreCase(userLevel) && ("2".equalsIgnoreCase(utype)  || "3".equalsIgnoreCase(utype) ) && type.equals("1")) //主播之外的草民公聊间隔10s
+				if(u!=null && 0 == userLevel && (2 == utype  || 3 == utype)  && type.equals("1")) //主播之外的草民公聊间隔10s
 				{
 					if(curTime-pub_lastmsgsendtime<Constant.CAOMIN_PUB_INTERVAL)
 						throw new ServiceException(ErrorCode.ERROR_5013);
 				}
 				else if(u!=null && type.equals("1")) 
 				{
-					Object forbid=MemcachedUtil.get(Constant.OTHER_PUB_FORBID_KEY+u.get("uid"));
+					Object forbid=RedisUtil.get(Constant.OTHER_PUB_FORBID_KEY+u.get("userId"));
 					if(forbid!=null)
 						throw new ServiceException(ErrorCode.ERROR_5016);
 					if(curTime-pub_lastmsgsendtime<Constant.OTHER_PUB_INTERVAL)//100毫秒
 					{
 						LogUtil.log.info(String.format("发送间隔小于 ：t=%s,value=%s", Constant.OTHER_PUB_INTERVAL,curTime-pub_lastmsgsendtime));
-						List<Long> newlist=new ArrayList();
-						List<Long> oldlist=new ArrayList();
-						Object o=MemcachedUtil.get(Constant.OTHER_PUB_KEY+u.get("uid"));
+						List<Long> newlist=new ArrayList<Long>();
+						List<Long> oldlist=new ArrayList<Long>();
+						List<Long> o=RedisUtil.getList(Constant.OTHER_PUB_KEY+u.get("userId"),Long.class);
 						if(o!=null)
 							oldlist=(List<Long>)o;
 						for(Long l:oldlist)
@@ -477,13 +430,13 @@ public class SessionService {
 								newlist.add(l);
 						}
 						newlist.add(curTime);
-						MemcachedUtil.set(Constant.OTHER_PUB_KEY+u.get("uid"), newlist,Constant.OTHER_PUB_SECTION);
+						RedisUtil.set(Constant.OTHER_PUB_KEY+u.get("userId"), newlist,Constant.OTHER_PUB_SECTION);
 						LogUtil.log.info(String.format("%s 秒内触发了%s次",Constant.OTHER_PUB_SECTION,newlist.size()));
 
 						if(newlist.size()>=Constant.OTHER_PUB_TOUCH_TIMES)
 						{
 							LogUtil.log.info(String.format("%s 秒内触发了%s次，屏蔽公聊%s秒",Constant.OTHER_PUB_SECTION, Constant.OTHER_PUB_TOUCH_TIMES,Constant.OTHER_PUB_FORBID_TIME));
-							MemcachedUtil.set(Constant.OTHER_PUB_FORBID_KEY+u.get("uid"), "1",Constant.OTHER_PUB_FORBID_TIME);
+							RedisUtil.set(Constant.OTHER_PUB_FORBID_KEY+u.get("userId"), "1",Constant.OTHER_PUB_FORBID_TIME);
 						}
 						throw new ServiceException(ErrorCode.ERROR_5016);
 					}
@@ -599,7 +552,7 @@ public class SessionService {
 	 * @throws Exception
 	 */
 	private void toSendSingleMsg(HttpMsgDataVo vo) throws Exception{
-		String uid = vo.getData().getJSONObject("user").getString("uid");
+		String uid = vo.getData().getJSONObject("user").getString("userId");
 		String targetId = vo.getData().getString("targetid");
 		final int funID = vo.getFunID();
 		boolean isSend = false;
@@ -677,7 +630,7 @@ public class SessionService {
 			vo.setFunID(MessageFunID.FUNID_11002.getFunID());
 		}
 		
-		String fromId = vo.getData().getJSONObject("user").getString("uid");
+		String fromId = vo.getData().getJSONObject("user").getString("userId");
 		
 		if(null!=vo && null==vo.getData().get("msgid")){ //还未分配msgid，则分配
 			String msgid = MessageUtil.buildMessageId(targetId);
@@ -749,7 +702,7 @@ public class SessionService {
 		
 		int tickoutStatus = 0;
 		// 当前服务器没有对应的socket线程，则调用通信系统集群里对应服务器的踢出接口
-		Object obj = MemcachedUtil.get(MCKeyUtil.getSocketKey(uid));
+		Object obj = RedisUtil.get(MCKeyUtil.getSocketKey(uid));
 		if (null != obj) {
 			String host = String.valueOf(obj);
 			StringBuffer url = new StringBuffer().append(host).append("/server/tickout?uid=").append(uid).append("&token=").append(token);

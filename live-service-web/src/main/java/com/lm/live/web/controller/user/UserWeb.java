@@ -504,4 +504,47 @@ public class UserWeb extends BaseController {
 		handleInfo(LogUtil.log, request, data.getRequestStr(), spendTimes, jsonRes.toString(), true);
 		out(jsonRes, request, response, q);
 	}
+	
+	/**
+	 * U16
+	 * 获取用户信息，此方法供IM使用（以后有解耦方式再来修改）
+	 *@param request
+	 *@param response
+	 *@param q
+	 *@author shao.xiang
+	 *@data 2018年5月3日
+	 */
+	@RequestMapping(value = {"U16/{q}"} , method= {RequestMethod.POST})
+	public void getUserInfoFromCache(HttpServletRequest request,HttpServletResponse response, @PathVariable String q){
+		long time1 = System.currentTimeMillis();
+		DataRequest data = (DataRequest) RequestUtil.getDataRequest(request, response);
+		Result result = new Result(ErrorCode.SUCCESS_0.getResultCode(),ErrorCode.SUCCESS_0.getResultDescr());  
+		JSONObject jsonRes = new JSONObject();
+		try {
+			if(data==null  
+					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())
+					|| !data.getData().containsKey(UserInfo.class.getSimpleName().toLowerCase())) {
+				throw new UserBizException(ErrorCode.ERROR_101);
+			}
+			RequestVo req = new RequestVo();
+			req.parseJson(data.getData().getJSONObject(req.getShortName()));
+			String userId = req.getUserId();
+			UserInfo info = new UserInfo();
+			info.parseJson(data.getData().getJSONObject(info.getShortName()));
+			userInfoService.modifyUserBase(userId, info);
+		} catch(UserBizException e) {
+			LogUtil.log.error(e.getMessage(), e);
+			result.setResultCode(e.getErrorCode().getResultCode());
+			result.setResultDescr(e.getErrorCode().getResultDescr());
+		} catch (Exception e) {
+			LogUtil.log.error(e.getMessage(), e);
+			result.setResultCode(ErrorCode.ERROR_100.getResultCode());
+			result.setResultDescr(ErrorCode.ERROR_100.getResultDescr());
+		}
+		jsonRes.put(result.getShortName(),result.buildJson());
+		long time2 = System.currentTimeMillis();
+		long spendTimes = time2 - time1;
+		handleInfo(LogUtil.log, request, data.getRequestStr(), spendTimes, jsonRes.toString(), true);
+		out(jsonRes, request, response, q);
+	}
 }
