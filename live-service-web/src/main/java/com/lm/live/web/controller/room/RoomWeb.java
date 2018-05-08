@@ -32,10 +32,12 @@ import com.lm.live.guard.vo.GuardVo;
 import com.lm.live.room.enums.ErrorCode;
 import com.lm.live.room.exception.RoomBizException;
 import com.lm.live.room.service.IRoomService;
+import com.lm.live.room.vo.RoomOperationVo;
 import com.lm.live.tools.exception.ToolBizException;
 import com.lm.live.tools.service.IGiftService;
 import com.lm.live.tools.service.IUserPackageService;
 import com.lm.live.tools.vo.GiftVo;
+import com.lm.live.userbase.service.IRoomBannedOperationService;
 import com.lm.live.web.vo.DataRequest;
 
 @Controller("RoomWeb")
@@ -58,6 +60,9 @@ public class RoomWeb  extends BaseController{
 	
 	@Resource
 	private IUserPackageService userPackageService;
+	
+	@Resource
+	private IRoomBannedOperationService roomBannedOperationService;
 	
 	/**
 	 * R1
@@ -561,12 +566,16 @@ public class RoomWeb  extends BaseController{
 		JSONObject jsonRes = new JSONObject();
 		try {
 			if(data==null  
-					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())
+					|| !data.getData().containsKey(RoomOperationVo.class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
 				throw new RoomBizException(ErrorCode.ERROR_101);
 			}
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
+			RoomOperationVo rbo = new RoomOperationVo();
+			rbo.parseJson(data.getData().getJSONObject(rbo.getShortName()));
+			String userId = req.getUserId();
+			roomService.mgrUserRoomMembers(userId, rbo);
 		} catch(RoomBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
@@ -600,12 +609,29 @@ public class RoomWeb  extends BaseController{
 		JSONObject jsonRes = new JSONObject();
 		try {
 			if(data==null  
-					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())
+					|| !data.getData().containsKey(RoomOperationVo.class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
 				throw new RoomBizException(ErrorCode.ERROR_101);
 			}
+			RoomOperationVo rbo = new RoomOperationVo();
+			rbo.parseJson(data.getData().getJSONObject(rbo.getShortName()));
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
+			String userId = req.getUserId();
+			int type = rbo.getType();
+			switch(type) { // 0:禁言;1:踢出;2:解除禁言;3:设置房管;4:取消房管 5:拉黑
+			case 0 : 
+				roomService.forbidSpeak(userId, rbo);
+				break;
+			case 1 :
+				roomService.forceOut(userId, rbo);
+				break;
+			case 2 :
+				roomService.unForbidSpeak(userId, rbo);
+				break;
+			default :
+				throw new RoomBizException(ErrorCode.ERROR_101);	
+			}
 		} catch(RoomBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
@@ -639,12 +665,26 @@ public class RoomWeb  extends BaseController{
 		JSONObject jsonRes = new JSONObject();
 		try {
 			if(data==null  
-					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())
+					|| !data.getData().containsKey(RoomOperationVo.class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
 				throw new RoomBizException(ErrorCode.ERROR_101);
 			}
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
+			RoomOperationVo rbo = new RoomOperationVo();
+			rbo.parseJson(data.getData().getJSONObject(rbo.getShortName()));
+			String userId = req.getUserId();
+			String roomId = rbo.getRoomid();
+			int type = rbo.getType();
+			switch(type) {
+			case 0 :
+				break;
+			case 1 :
+				break;
+			default :
+				throw new RoomBizException(ErrorCode.ERROR_101);
+			}
+			roomBannedOperationService.checkShutUp(userId, roomId);
 		} catch(RoomBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
@@ -678,12 +718,19 @@ public class RoomWeb  extends BaseController{
 		JSONObject jsonRes = new JSONObject();
 		try {
 			if(data==null  
-					|| !data.getData().containsKey(DeviceProperties .class.getSimpleName().toLowerCase())
+					|| !data.getData().containsKey(RoomOperationVo .class.getSimpleName().toLowerCase())
 					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
 				throw new RoomBizException(ErrorCode.ERROR_101);
 			}
+			RoomOperationVo ro = new RoomOperationVo();
+			ro.parseJson(data.getData().getJSONObject(ro.getShortName()));
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
+			String userId = req.getUserId();
+			String roomId = ro.getRoomid();
+			String msg = ro.getMsg();
+			String token = ro.getToken(); // my-todo，这里要传token的，im实现要再改一下
+			roomService.sendHorn(userId, roomId, msg);
 		} catch(RoomBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());

@@ -8,18 +8,18 @@ package com.lm.live.user.enums;
 public class UserInfoVoEnum {
 	/**
 	 * 身份类型
-	 * 用户身份，0:普通用户， 1:主播，2:房管， 3:游客，5:官方
+	 * 用户类型 1、主播 2、普通用户 3、房管 4、游客 5 超级管理员
 	 */
 	public enum Type {
 		
-		/** 0:普通用户  */
-		CommonUser(0),
 		/** 1:主播 */
 		Anchor(1),
-		/** 2:房管 */
-		RoomMgr(2),
-		/** 3:游客 */
-		Visitor(3),
+		/** 2:普通用户  */
+		CommonUser(2),
+		/** 3:房管 */
+		RoomMgr(3),
+		/** 4:游客 */
+		Visitor(4),
 		/** 5官方人员（权限最高） */
 		OfficialUser(5);
 		

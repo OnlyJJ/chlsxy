@@ -64,4 +64,15 @@ public interface IUserPetService{
 	 *@data 2018年4月27日
 	 */
 	void buyPet(String userId, int petId) throws Exception;
+	
+	/**
+	 * 启用/ 停用宠物
+	 *@param userId
+	 *@param petId
+	 *@param type 0-停用，1-启用
+	 *@throws Exception
+	 *@author shao.xiang
+	 *@data 2018年5月7日
+	 */
+	void usePet(String userId, int petId, int type) throws Exception;
 }

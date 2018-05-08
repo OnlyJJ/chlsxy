@@ -13,7 +13,6 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.account.domain.UserAccount;
 import com.lm.live.account.domain.UserAccountBook;
@@ -21,7 +20,11 @@ import com.lm.live.account.service.IUserAccountService;
 import com.lm.live.account.service.IUserLevelService;
 import com.lm.live.base.dao.ShareInfoMapper;
 import com.lm.live.base.domain.UserShareInfo;
+import com.lm.live.base.enums.IMBusinessEnum;
 import com.lm.live.base.enums.IMBusinessEnum.ImCommonEnum;
+import com.lm.live.base.enums.IMBusinessEnum.MsgTypeEnum;
+import com.lm.live.base.enums.IMBusinessEnum.RefreshType;
+import com.lm.live.base.enums.IMBusinessEnum.SeqID;
 import com.lm.live.base.service.ISendMsgService;
 import com.lm.live.cache.constants.CacheKey;
 import com.lm.live.cache.constants.CacheTimeout;
@@ -31,6 +34,8 @@ import com.lm.live.common.utils.DateUntil;
 import com.lm.live.common.utils.HttpUtils;
 import com.lm.live.common.utils.JsonUtil;
 import com.lm.live.common.utils.LogUtil;
+import com.lm.live.common.utils.MemcachedUtil;
+import com.lm.live.common.utils.SensitiveWordUtil;
 import com.lm.live.common.utils.StrUtil;
 import com.lm.live.common.vo.Page;
 import com.lm.live.guard.domain.GuardConf;
@@ -42,12 +47,12 @@ import com.lm.live.guard.service.IGuardService;
 import com.lm.live.room.constant.Constants;
 import com.lm.live.room.enums.ErrorCode;
 import com.lm.live.room.enums.Locker;
+import com.lm.live.room.enums.RoomEnum;
 import com.lm.live.room.enums.RoomEnum.SourceType;
 import com.lm.live.room.exception.RoomBizException;
 import com.lm.live.room.service.IRoomService;
 import com.lm.live.room.vo.OnlineUserInfo;
-import com.lm.live.room.vo.RoomBannedOperationVo;
-import com.lm.live.room.vo.RoomOnlineInfo;
+import com.lm.live.room.vo.RoomOperationVo;
 import com.lm.live.tools.domain.Gift;
 import com.lm.live.tools.domain.PayGiftOut;
 import com.lm.live.tools.domain.UserPackage;
@@ -70,6 +75,7 @@ import com.lm.live.userbase.enums.RoomBannedOperateEnum;
 import com.lm.live.userbase.service.IRoomBannedOperationService;
 import com.lm.live.userbase.service.IUserAnchorService;
 import com.lm.live.userbase.service.IUserBaseService;
+import com.lm.live.userbase.service.IUserRoomMemberService;
 
 @Service("roomService")
 public class RoomServiceImpl implements IRoomService {
@@ -112,6 +118,10 @@ public class RoomServiceImpl implements IRoomService {
 	
 	@Resource
 	private IUserBaseService userBaseService;
+	
+	@Resource
+	private IUserRoomMemberService userRoomMemberService;
+	
 	
 	@Transactional(rollbackFor=Exception.class)
 	@Override
@@ -1056,28 +1066,24 @@ public class RoomServiceImpl implements IRoomService {
 	}
 
 	@Override
-	public void forbidSpeak(String fromUserId, RoomBannedOperationVo roomBannedOperationVo) throws Exception {
-		if(roomBannedOperationVo==null
-				||StringUtils.isEmpty(roomBannedOperationVo.getUserId())
-				||StringUtils.isEmpty(roomBannedOperationVo.getRoomid())
-				||StringUtils.isEmpty(roomBannedOperationVo.getToken())) {
+	public void forbidSpeak(String fromUserId, RoomOperationVo roomOperationVo) throws Exception {
+		if(roomOperationVo==null
+				||StringUtils.isEmpty(roomOperationVo.getUserId())
+				||StringUtils.isEmpty(roomOperationVo.getRoomid())
+				||StringUtils.isEmpty(roomOperationVo.getToken())) {
 			throw new RoomBizException(ErrorCode.ERROR_101);
 		}
-		String roomId = roomBannedOperationVo.getRoomid();
-		String toBeBannedUserId = roomBannedOperationVo.getUserId(); //  被操作者
+		String roomId = roomOperationVo.getRoomid();
+		String toBeBannedUserId = roomOperationVo.getUserId(); //  被操作者
 		boolean isForbidSpeak = roomBannedOperationService.checkShutUp(toBeBannedUserId, roomId);
 		if(isForbidSpeak) {
 			return;
 		}
-		// my-to-do
-		//被操作者
-		// 这里改造之后，再来修改
-		UserInfoVo toBeBannedUser = userCacheInfoService.getUserFromCache(toBeBannedUserId, roomId);
 		
 		//向IM发送消息
 		JSONObject content = new JSONObject();
 		content.put("type", 0); //0:禁言;1:踢出;2:解除禁言;
-		sendMsgService.sendMsg(fromUserId, toBeBannedUserId, ImCommonEnum.IM_REFRESH.getValue(), roomId, content);
+		sendMsgService.sendMsg(fromUserId, toBeBannedUserId, ImCommonEnum.IM_AUTHORITY.getValue(), roomId, content);
 		
 		//保存数据库记录
 		int type = RoomBannedOperateEnum.RoomBehavior.ShutUp.getValue();
@@ -1105,29 +1111,23 @@ public class RoomServiceImpl implements IRoomService {
 
 	@Override
 	public void forceOut(String fromUserId,
-			RoomBannedOperationVo roomBannedOperationVo) throws Exception {
-		if(roomBannedOperationVo==null
-				||StringUtils.isEmpty(roomBannedOperationVo.getUserId())
-				||StringUtils.isEmpty(roomBannedOperationVo.getRoomid())
-				||StringUtils.isEmpty(roomBannedOperationVo.getToken())) {
+			RoomOperationVo roomOperationVo) throws Exception {
+		if(roomOperationVo==null
+				||StringUtils.isEmpty(roomOperationVo.getUserId())
+				||StringUtils.isEmpty(roomOperationVo.getRoomid())
+				||StringUtils.isEmpty(roomOperationVo.getToken())) {
 			throw new RoomBizException(ErrorCode.ERROR_101);
 		}
-		String roomId = roomBannedOperationVo.getRoomid();
-		String toBeBannedUserId = roomBannedOperationVo.getUserId(); //  被操作者
+		String roomId = roomOperationVo.getRoomid();
+		String toBeBannedUserId = roomOperationVo.getUserId(); //  被操作者
 		boolean isForceOut  = roomBannedOperationService.checkOut(toBeBannedUserId, roomId);
 		if(isForceOut) {
 			return;
 		}
-		// my-to-do
-		//被操作者
-		// 这里改造之后，再来修改
-		UserInfoVo toBeBannedUser = userCacheInfoService.getUserFromCache(toBeBannedUserId, roomId);
-		
 		//向IM发送消息
 		JSONObject content = new JSONObject();
 		content.put("type", 1); //0:禁言;1:踢出;2:解除禁言;
-		sendMsgService.sendMsg(fromUserId, toBeBannedUserId, ImCommonEnum.IM_REFRESH.getValue(), roomId, content);
-		
+		sendMsgService.sendMsg(fromUserId, toBeBannedUserId, ImCommonEnum.IM_AUTHORITY.getValue(), roomId, content);
 		
 		//保存数据库记录
 		int type = RoomBannedOperateEnum.RoomBehavior.Out.getValue();
@@ -1137,10 +1137,8 @@ public class RoomServiceImpl implements IRoomService {
 		if(rbo != null) { // 更新
 			rbo.setBeginTime(now);
 			rbo.setEndTime(endTime);
-			rbo.setFromUserId(fromUserId);
 			rbo.setStatus(Constants.STATUS_1);
-			// my-to-do
-			// update
+			roomBannedOperationService.updateById(rbo);
 		} else { // 插入
 			RoomBannedOperation roomBannedOperation = new RoomBannedOperation();
 			roomBannedOperation.setBeginTime(now);
@@ -1161,28 +1159,23 @@ public class RoomServiceImpl implements IRoomService {
 
 	@Override
 	public void unForbidSpeak(String fromUserId,
-			RoomBannedOperationVo roomBannedOperationVo) throws Exception {
-		if(roomBannedOperationVo==null
-				||StringUtils.isEmpty(roomBannedOperationVo.getUserId())
-				||StringUtils.isEmpty(roomBannedOperationVo.getRoomid())) {
+			RoomOperationVo roomOperationVo) throws Exception {
+		if(roomOperationVo==null
+				||StringUtils.isEmpty(roomOperationVo.getUserId())
+				||StringUtils.isEmpty(roomOperationVo.getRoomid())) {
 			throw new RoomBizException(ErrorCode.ERROR_101);
 		}
-		String roomId = roomBannedOperationVo.getRoomid();
-		String toBeBannedUserId = roomBannedOperationVo.getUserId(); //  被操作者
+		String roomId = roomOperationVo.getRoomid();
+		String toBeBannedUserId = roomOperationVo.getUserId(); //  被操作者
 		boolean isForbidSpeak = roomBannedOperationService.checkShutUp(toBeBannedUserId, roomId);
 		if(!isForbidSpeak) {
 			return;
 		}
-		// my-to-do
-		//被操作者
-		// 这里改造之后，再来修改
-		UserInfoVo toBeBannedUser = userCacheInfoService.getUserFromCache(toBeBannedUserId, roomId);
 		
 		//向IM发送消息
 		JSONObject content = new JSONObject();
 		content.put("type", 2); //0:禁言;1:踢出;2:解除禁言;
-		sendMsgService.sendMsg(fromUserId, toBeBannedUserId, ImCommonEnum.IM_REFRESH.getValue(), roomId, content);
-		
+		sendMsgService.sendMsg(fromUserId, toBeBannedUserId, ImCommonEnum.IM_AUTHORITY.getValue(), roomId, content);
 		
 		//保存数据库记录
 		int type = RoomBannedOperateEnum.RoomBehavior.ShutUp.getValue();
@@ -1193,6 +1186,7 @@ public class RoomServiceImpl implements IRoomService {
 			rbo.setEndTime(now);
 			rbo.setFromUserId(fromUserId);
 			rbo.setStatus(Constants.STATUS_0);
+			roomBannedOperationService.updateById(rbo);
 		} 
 		//刷新房间在线成员的列表信息
 		refreshRoomOnlineUserInfo(toBeBannedUserId, roomId);
@@ -1258,13 +1252,13 @@ public class RoomServiceImpl implements IRoomService {
 
 	@Override
 	public void mgrUserRoomMembers(String fromUserId,
-			RoomBannedOperationVo roomBannedOperationVo) throws Exception {
-		if(StrUtil.isNullOrEmpty(fromUserId) || roomBannedOperationVo == null){
+			RoomOperationVo roomOperationVo) throws Exception {
+		if(StrUtil.isNullOrEmpty(fromUserId) || roomOperationVo == null){
 			throw new RoomBizException(ErrorCode.ERROR_101);
 		}
-		int type = roomBannedOperationVo.getType();
-		String roomId = roomBannedOperationVo.getRoomid();
-		String toUserId = roomBannedOperationVo.getUserId();
+		int type = roomOperationVo.getType();
+		String roomId = roomOperationVo.getRoomid();
+		String toUserId = roomOperationVo.getUserId();
 		
 		boolean isRegistUser = userBaseService.checkIfRegistUser(toUserId);
 		boolean isRobot = userBaseService.validateIfRobot(toUserId);
@@ -1278,39 +1272,63 @@ public class RoomServiceImpl implements IRoomService {
 		userRoom.setUserId(fromUserId);
 		userRoom.setAddTime(new Date());
 		userRoom.setRoleType(1);
-//		UserRoomMember userRoom1= this.selectUserRoomMember(userRoom);
-//		if (type == 3) {//设置管理
-//			if (userRoom1 ==null) {
-//				userRoom = this.insert(userRoom);
-//				MemcachedUtil.delete(MCPrefix.ROOMCHEINFO_PREKEY + roomId);//设置管理成功，清除Memcached房间成员缓存
-//				// 设置、取消管理,及时更新房间成员列表
-//				if(roomCacheInfoService.validateIfInRoom(toUserId, roomId)) {
-//					roomCacheInfoService.addOrRefreshRoomOnlineMembers(roomId, toUserId);
-//				}
-//				String targetid = roomId;
-//				JSONObject content = new JSONObject();
-//				content.put("msg", String.format("用户%s被设置成房间%s的管理员,刷新房间成员列表", toUserId,roomId));
-//				// 发送聊天消息
-//				imSendComponent.sendFun11001Msg2Im(SeqID.SEQ_1, MsgTypeEnum.GroupChat,  targetid,ImTypeEnum.IM_11001_RefreshRoomOnlineMembers, content);
-//			}else{
-//				LogUtil.log.info(String.format("###用户:%s在房间:%s已经是房管,无需重新设置", toUserId,roomId));
-//			}
-//		}else if (type == 4){//取消管理
-//			if (userRoom1 !=null) {
-//				this.removeById(userRoom1.getId());
-//				MemcachedUtil.delete(MCPrefix.ROOMCHEINFO_PREKEY + roomId);//取消管理成功，清除Memcached房间成员缓存
-//				// 设置、取消管理,及时更新房间成员列表
-//				if(roomCacheInfoService.validateIfInRoom(toUserId, roomId)) {
-//					roomCacheInfoService.addOrRefreshRoomOnlineMembers(roomId, toUserId);
-//				}
-//				String targetid = roomId;
-//				JSONObject content = new JSONObject();
-//				content.put("msg", String.format("用户%s被取消房间%s的管理员资格,刷新房间成员列表", toUserId,roomId));
-//				// 发送聊天消息
-//				imSendComponent.sendFun11001Msg2Im(SeqID.SEQ_1, MsgTypeEnum.GroupChat,  targetid,ImTypeEnum.IM_11001_RefreshRoomOnlineMembers, content);
-//			}else{
-//				LogUtil.log.info(String.format("###用户:%s在房间:%s不是房管,无需取消房管", toUserId,roomId));
-//			}
-//		}
+		UserRoomMember userRoom1= userRoomMemberService.getUserRoomMember(toUserId, roomId, RoomEnum.RoleType.ADMIN.getType());
+		if (type == 3) {//设置管理
+			if (userRoom1 ==null) {
+				userRoomMemberService.insert(userRoom);
+				RedisUtil.del(CacheKey.ROOM_USER_CACHE + roomId);//设置管理成功，清除Memcached房间成员缓存
+				// 设置、取消管理,及时更新房间成员列表
+				if(validateIfInRoom(toUserId, roomId)) {
+					addOrRefreshRoomOnlineMembers(roomId, toUserId);
+				}
+				String targetid = roomId;
+				JSONObject content = new JSONObject();
+				content.put("type", RefreshType.ROOMUSER.getValue());
+				sendMsgService.sendMsg(Constants.SYSTEM_USERID_OF_IM, null, ImCommonEnum.IM_REFRESH.getValue(), targetid, content);
+			}else{
+				LogUtil.log.info(String.format("###用户:%s在房间:%s已经是房管,无需重新设置", toUserId,roomId));
+			}
+		}else if (type == 4){//取消管理
+			if (userRoom1 !=null) {
+				userRoomMemberService.removeById(userRoom1.getId());
+				RedisUtil.del(CacheKey.ROOM_USER_CACHE + roomId);//取消管理成功，清除Memcached房间成员缓存
+				// 设置、取消管理,及时更新房间成员列表
+				if(validateIfInRoom(toUserId, roomId)) {
+					addOrRefreshRoomOnlineMembers(roomId, toUserId);
+				}
+				String targetid = roomId;
+				JSONObject content = new JSONObject();
+				content.put("type", RefreshType.ROOMUSER.getValue());
+				sendMsgService.sendMsg(Constants.SYSTEM_USERID_OF_IM, null, ImCommonEnum.IM_REFRESH.getValue(), targetid, content);
+			}else{
+				LogUtil.log.info(String.format("###用户:%s在房间:%s不是房管,无需取消房管", toUserId,roomId));
+			}
+		}
+	}
+
+	@Override
+	public void sendHorn(String userId, String roomId, String msg)
+			throws Exception {
+		if(StrUtil.isNullOrEmpty(userId) || StrUtil.isNullOrEmpty(roomId)){
+			throw new RoomBizException(ErrorCode.ERROR_101);
+		}
+		if(StrUtil.isNullOrEmpty(msg)) {
+			throw new RoomBizException(ErrorCode.ERROR_8007);
+		}
+		// 金币是否足够
+		UserAccount ua = this.userAccountService.getByUserId(userId);
+		if(ua == null) {
+			throw new RoomBizException(ErrorCode.ERROR_8000);
+		}
+		if(ua.getGold() < Constants.HORN_GOLD) {
+			throw new RoomBizException(ErrorCode.ERROR_8003);
+		}
+		// 发送消息
+		JSONObject content = new JSONObject();
+		content.put("roomId", roomId);
+		content.put("msg", SensitiveWordUtil.replaceSensitiveWord(msg));
+		content.put("roomId", roomId);
+		String targetid = Constants.WHOLE_SITE_NOTICE_ROOMID;
+		sendMsgService.sendMsg(userId, null, ImCommonEnum.IM_HORN.getValue(), targetid, content);
 	}
 }

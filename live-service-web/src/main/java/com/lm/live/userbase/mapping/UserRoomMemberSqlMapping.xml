@@ -35,7 +35,7 @@
 	</select>
 	
 	<select id="getUserRoomMember"  resultMap="vo">
-		select * from t_user_room_member where userId=#{userId} and roomId=#{roomId}
+		select * from t_user_room_member where userId=#{userId} and roomId=#{roomId} and roleType=#{roleType}
 	</select>
 	
 	<delete id="removeById" parameterType="java.lang.Integer">

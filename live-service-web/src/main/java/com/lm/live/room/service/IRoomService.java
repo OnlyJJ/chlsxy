@@ -2,7 +2,7 @@ package com.lm.live.room.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.common.vo.Page;
-import com.lm.live.room.vo.RoomBannedOperationVo;
+import com.lm.live.room.vo.RoomOperationVo;
 
 /**
  * 房间业务服务
@@ -77,7 +77,7 @@ public interface IRoomService {
 	 * @param roomBannedOperationVo
 	 * @throws Exception
 	 */
-	public void forbidSpeak(String fromUserId,RoomBannedOperationVo roomBannedOperationVo)  throws Exception;
+	public void forbidSpeak(String fromUserId,RoomOperationVo roomBannedOperationVo)  throws Exception;
 	
 	/**
 	 * 踢出房间
@@ -85,7 +85,7 @@ public interface IRoomService {
 	 * @param roomBannedOperationVo
 	 * @throws Exception
 	 */
-	public void forceOut(String fromUserId,RoomBannedOperationVo roomBannedOperationVo)  throws Exception;
+	public void forceOut(String fromUserId,RoomOperationVo roomBannedOperationVo)  throws Exception;
 	
 	/**
 	 *  解除禁言
@@ -93,7 +93,7 @@ public interface IRoomService {
 	 * @param roomBannedOperationVo
 	 * @throws Exception
 	 */
-	public void unForbidSpeak(String fromUserId,RoomBannedOperationVo roomBannedOperationVo) throws Exception;
+	public void unForbidSpeak(String fromUserId,RoomOperationVo roomBannedOperationVo) throws Exception;
 	
 	/**
 	 * 设置 or 取消房管
@@ -103,6 +103,17 @@ public interface IRoomService {
 	 *@author shao.xiang
 	 *@data 2018年5月4日
 	 */
-	public void mgrUserRoomMembers(String fromUserId,RoomBannedOperationVo roomBannedOperationVo) throws Exception;
+	public void mgrUserRoomMembers(String fromUserId,RoomOperationVo roomBannedOperationVo) throws Exception;
+	
+	/**
+	 * 大喇叭
+	 *@param userId 发送者
+	 *@param roomId 房间id
+	 *@param msg 大喇叭内容
+	 *@throws Exception
+	 *@author shao.xiang
+	 *@data 2018年5月7日
+	 */
+	void sendHorn(String userId, String roomId, String msg) throws Exception;
 	
 }

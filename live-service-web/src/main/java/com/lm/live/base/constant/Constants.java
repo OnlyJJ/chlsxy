@@ -4,6 +4,9 @@ import com.lm.live.common.constant.BaseConstants;
 
 public class Constants extends BaseConstants {
 	
+	/** android默认官方的包名*/
+	public static String ANDROID_DEFAULT_PACKNAME = "com.lm.live";
+	
 	/**
 	 * IM消息体字段：msg
 	 */

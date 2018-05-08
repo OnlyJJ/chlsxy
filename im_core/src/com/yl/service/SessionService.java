@@ -103,10 +103,12 @@ public class SessionService {
 		{
 			u=businessInterfaceService.getUserBaseInfo2(uid,vo.getData().getString("targetid"));
 		}
+		
 		JSONObject jsonu=JSONObject.fromObject(u);
 		//jsonu.put("uid", uid);
 		if(u!=null)
 		{
+			LogUtil.log.info("### user = " + u.toString());
 			//有用户资料，按渠道存聊天数量
 			int type = vo.getData().getInt("type"); // 消息类型 ，1：文本，2：图片，3：声音，4：视频，5.礼物，6.禁言，7.踢出房间 8.红包 9赠送坐驾 10
 			if(MessageFunID.FUNID_11001.getFunID() == vo.getFunID()&&(type==1||type==5||type==8))
@@ -258,7 +260,7 @@ public class SessionService {
 			if(u!=null)
 			{
 				userLevel= Integer.parseInt(u.get("userLevel").toString());
-				utype= Integer.parseInt(u.get("type").toString());
+				utype= Integer.parseInt(u.get("userType").toString());
 			}
 
 			//LogUtil.log.info(String.format("toFormatAndsendToServer ：u=%s,forbidSpeak=%s,forceOut=%s,type=%s", u,forbidSpeak,forceOut,type));

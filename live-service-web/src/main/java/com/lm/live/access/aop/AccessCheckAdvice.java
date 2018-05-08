@@ -18,7 +18,7 @@ import com.lm.live.common.utils.LogUtil;
 import com.lm.live.common.utils.StrUtil;
 import com.lm.live.guard.service.IGuardService;
 import com.lm.live.room.service.IRoomService;
-import com.lm.live.room.vo.RoomBannedOperationVo;
+import com.lm.live.room.vo.RoomOperationVo;
 import com.lm.live.user.enums.UserInfoVoEnum;
 import com.lm.live.user.service.IUserCacheInfoService;
 import com.lm.live.user.vo.UserCache;
@@ -44,7 +44,7 @@ public class AccessCheckAdvice {
 	private IRoomService roomService;
 	
 	@Resource
-	private IGuardService guardWorkService;
+	private IGuardService guardService;
 	
 	/**
 	 * 房间禁言、踢人、解禁权限检查
@@ -71,10 +71,10 @@ public class AccessCheckAdvice {
 	 * @param roomBannedOperationVo
 	 * @throws Exception
 	 */
-	@Before("aspectRoomAction() && args(fromUserId,roomBannedOperationVo)")
+	@Before("aspectRoomAction() && args(fromUserId,roomOperationVo)")
 	public void beforeAspectRoomAction(String fromUserId,
-			RoomBannedOperationVo roomBannedOperationVo) throws Exception {
-		LogUtil.log.info(String.format("#######begin-beforeAspectRoomAction,fromUserId:%s,roomBannedOperationVo:%s ", fromUserId,JsonUtil.beanToJsonString(roomBannedOperationVo)));
+			RoomOperationVo roomBannedOperationVo) throws Exception {
+		LogUtil.log.info(String.format("#######begin-beforeAspectRoomAction,fromUserId:%s,roomOperationVo:%s ", fromUserId,JsonUtil.beanToJsonString(roomBannedOperationVo)));
 		if(org.apache.commons.lang.StringUtils.isEmpty(fromUserId) || roomBannedOperationVo==null){
 			throw new AccessBizException(ErrorCode.ERROR_101);
 		}
@@ -108,7 +108,7 @@ public class AccessCheckAdvice {
 				throw new AccessBizException(ErrorCode.ERROR_101);
 		}
 		
-		LogUtil.log.info(String.format("#######end-beforeAspectRoomAction,fromUserId:%s,roomBannedOperationVo:%s ", fromUserId,JsonUtil.beanToJsonString(roomBannedOperationVo)));
+		LogUtil.log.info(String.format("#######end-beforeAspectRoomAction,fromUserId:%s,roomOperationVo:%s ", fromUserId,JsonUtil.beanToJsonString(roomBannedOperationVo)));
 	}
 
 
@@ -136,7 +136,7 @@ public class AccessCheckAdvice {
 		int fromUserGuardLevel = 0;
 		int toUserGuardLevel = 0;
 		String levelKey = Constants.GUARD_LEVEL;
-		List<Map> fromUserList = guardWorkService.listRoomGuardCache(fromUserId, roomId);
+		List<Map> fromUserList = guardService.listRoomGuardCache(fromUserId, roomId);
 		if(fromUserList != null && fromUserList.size() >0) {
 			Map fromUserMap = fromUserList.get(0);
 			if(fromUserMap.containsKey(levelKey) && fromUserMap.get(levelKey) != null) {
@@ -144,7 +144,7 @@ public class AccessCheckAdvice {
 				fromUserIsGuard =true;
 			}
 		}
-		List<Map> toUserList = guardWorkService.listRoomGuardCache(toUserId, roomId);
+		List<Map> toUserList = guardService.listRoomGuardCache(toUserId, roomId);
 		if(toUserList != null && toUserList.size() >0) {
 			Map toUserMap = toUserList.get(0);
 			if(toUserMap.containsKey(levelKey) && toUserMap.get(levelKey) != null) {
@@ -235,7 +235,7 @@ public class AccessCheckAdvice {
 		int fromUserGuardLevel = 0;
 		int toUserGuardLevel = 0;
 		String levelKey = "level";
-		List<Map> fromUserList = guardWorkService.listRoomGuardCache(fromUserId, roomId);
+		List<Map> fromUserList = guardService.listRoomGuardCache(fromUserId, roomId);
 		if(fromUserList != null && fromUserList.size() >0) {
 			Map fromUserMap = fromUserList.get(0);
 			if(fromUserMap.containsKey(levelKey) && fromUserMap.get(levelKey) != null) {
@@ -243,7 +243,7 @@ public class AccessCheckAdvice {
 				fromUserIsGuard =true;
 			}
 		}
-		List<Map> toUserList = guardWorkService.listRoomGuardCache(toUserId, roomId);
+		List<Map> toUserList = guardService.listRoomGuardCache(toUserId, roomId);
 		if(toUserList != null && toUserList.size() >0) {
 			Map toUserMap = toUserList.get(0);
 			if(toUserMap.containsKey(levelKey) && toUserMap.get(levelKey) != null) {
@@ -411,7 +411,7 @@ public class AccessCheckAdvice {
 		int fromUserGuardLevel = 0;
 		int toUserGuardLevel = 0;
 		String levelKey = "level";
-		List<Map> fromUserList = guardWorkService.listRoomGuardCache(fromUserId, roomId);
+		List<Map> fromUserList = guardService.listRoomGuardCache(fromUserId, roomId);
 		if(fromUserList != null && fromUserList.size() >0) {
 			Map fromUserMap = fromUserList.get(0);
 			if(fromUserMap.containsKey(levelKey) && fromUserMap.get(levelKey) != null) {
@@ -419,7 +419,7 @@ public class AccessCheckAdvice {
 				fromUserIsGuard =true;
 			}
 		}
-		List<Map> toUserList = guardWorkService.listRoomGuardCache(toUserId, roomId);
+		List<Map> toUserList = guardService.listRoomGuardCache(toUserId, roomId);
 		if(toUserList != null && toUserList.size() >0) {
 			Map toUserMap = toUserList.get(0);
 			if(toUserMap.containsKey(levelKey) && toUserMap.get(levelKey) != null) {
@@ -543,8 +543,8 @@ public class AccessCheckAdvice {
 	 * @param roomBannedOperationVo
 	 * @throws Exception
 	 */
-	@Before("mgrUserRoomMembers() && args(userBaseInfo,roomBannedOperationVo)")
-	public void beforeMgrUserRoomMembers(String fromUserId,RoomBannedOperationVo roomBannedOperationVo) throws Exception {
+	@Before("mgrUserRoomMembers() && args(userBaseInfo,roomOperationVo)")
+	public void beforeMgrUserRoomMembers(String fromUserId,RoomOperationVo roomBannedOperationVo) throws Exception {
 		LogUtil.log.info("#######AccessCheckAdvice-beforeMgrUserRoomMembers 权限校验开始。。。 ");
 		if(StrUtil.isNullOrEmpty(fromUserId) || roomBannedOperationVo==null){
 			throw new AccessBizException(ErrorCode.ERROR_100);

@@ -42,7 +42,7 @@ public class UserInfoVo implements Serializable{
 	/**
 	 * 用户身份，0:普通用户， 1:主播，2:房管， 3:游客，5:官方
 	 */
-	private int type;
+	private int userType;
 	/**
 	 * 是否被禁用
 	 */
@@ -95,11 +95,11 @@ public class UserInfoVo implements Serializable{
 	public void setAnchorLevel(int anchorLevel) {
 		this.anchorLevel = anchorLevel;
 	}
-	public int getType() {
-		return type;
+	public int getUserType() {
+		return userType;
 	}
-	public void setType(int type) {
-		this.type = type;
+	public void setUserType(int userType) {
+		this.userType = userType;
 	}
 	public boolean isForbidSpeak() {
 		return forbidSpeak;

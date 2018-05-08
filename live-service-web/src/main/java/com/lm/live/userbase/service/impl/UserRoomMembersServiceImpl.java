@@ -1,16 +1,13 @@
 package com.lm.live.userbase.service.impl;
 
 
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
 
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import com.lm.live.common.service.impl.CommonServiceImpl;
 import com.lm.live.userbase.dao.UserRoomMemberMapper;
@@ -34,8 +31,8 @@ public class UserRoomMembersServiceImpl extends CommonServiceImpl<UserRoomMember
 	}
 	
 	@Override
-	public UserRoomMember getUserRoomMember(String userId, String roomId) {
-		return dao.getUserRoomMember(userId, roomId);
+	public UserRoomMember getUserRoomMember(String userId, String roomId, int roleType) {
+		return dao.getUserRoomMember(userId, roomId,roleType);
 	}
 
 	

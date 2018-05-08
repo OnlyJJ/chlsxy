@@ -8,6 +8,14 @@ import com.lm.live.userbase.domain.RoomBannedOperation;
 public interface RoomBannedOperationMapper extends ICommonMapper<RoomBannedOperation> {
 	
 	/**
+	 * 更新开始、结束时间、状态
+	 *@param id
+	 *@author shao.xiang
+	 *@data 2018年5月7日
+	 */
+	void updateById(RoomBannedOperation vo);
+	
+	/**
 	 * 获取用户在房间被操作信息（被禁言，被踢出）
 	 *@param userId
 	 *@param roomId

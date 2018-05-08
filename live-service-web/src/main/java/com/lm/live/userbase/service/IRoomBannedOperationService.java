@@ -1,5 +1,6 @@
 package com.lm.live.userbase.service;
 
+
 import com.lm.live.common.service.ICommonService;
 import com.lm.live.userbase.domain.RoomBannedOperation;
 
@@ -44,4 +45,12 @@ public interface IRoomBannedOperationService extends ICommonService<RoomBannedOp
 	 *@data 2018年4月18日
 	 */
 	boolean checkBlack(String userId, String fromUserId);
+	
+	/**
+	 * 更新开始、结束、状态
+	 *@param id
+	 *@author shao.xiang
+	 *@data 2018年5月7日
+	 */
+	void updateById(RoomBannedOperation vo);
 }

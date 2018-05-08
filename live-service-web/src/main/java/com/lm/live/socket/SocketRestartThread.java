@@ -7,12 +7,12 @@ import java.net.Socket;
 import com.lm.live.common.thread.ThreadManager;
 import com.lm.live.common.utils.LogUtil;
 import com.lm.live.common.utils.SpringContextListener;
+import com.lm.live.socket.util.SocketUtil;
 
 
 
 public class SocketRestartThread implements Runnable {
 
-	private static boolean rebuildFlag = false;
 	private static final String URL = SpringContextListener.getContextProValue("im.socket.url", "");
 	private static final int PORT = 9998;
 	public SocketRestartThread() {
@@ -20,9 +20,9 @@ public class SocketRestartThread implements Runnable {
 
 	@Override
 	public void run() {
-		Socket client = SocketClient.getInstance();
-		if(!rebuildFlag) {
-			rebuildFlag = true;
+		Socket client = SocketUtil.getSocket();
+		if(!SocketUtil.rebuildFlag) {
+			SocketUtil.rebuildFlag = true;
 			try {
 				if(client != null) {
 					LogUtil.log.info("### rebuild sokcet, destory。。。");
@@ -46,7 +46,7 @@ public class SocketRestartThread implements Runnable {
 					SocketClient.client = client;
 					LogUtil.log.info("### rebuild sokcet end!");
 					// 成功后退出
-					rebuildFlag = false;
+					SocketUtil.rebuildFlag = false;
 					break;
 				} catch(Exception e) {
 					try {

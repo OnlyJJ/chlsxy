@@ -195,5 +195,36 @@ public class UserPetServiceImpl implements IUserPetService {
 		vo.setComment(pc.getComment());
 		return vo;
 	}
+
+	@Override
+	public void usePet(String userId, int petId, int type) throws Exception {
+		if(StrUtil.isNullOrEmpty(userId)) {
+			throw new PetBizException(ErrorCode.ERROR_101);
+		}
+		switch(type) {
+		case 0 : // 停用
+			UserPet up = userPetMapper.getUserPetByCondition(userId, petId);
+			if(up == null) {
+				throw new PetBizException(ErrorCode.ERROR_11002);
+			}
+			if(up.getStatus() == StatusEnum.STOP.getValue()) {
+				return;
+			}
+			userPetMapper.updateStatus(userId, petId, StatusEnum.STOP.getValue());
+			break;
+		case 1 : // 启用
+			UserPet upet = userPetMapper.getUserPetByCondition(userId, petId);
+			if(upet == null) {
+				throw new PetBizException(ErrorCode.ERROR_11002);
+			}
+			if(upet.getStatus() == StatusEnum.USEING.getValue()) {
+				return;
+			}
+			userPetMapper.updateStatus(userId, petId, StatusEnum.USEING.getValue());
+			break;
+		default : 
+			throw new PetBizException(ErrorCode.ERROR_101);
+		}
+	}
 	
 }

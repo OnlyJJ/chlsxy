@@ -79,4 +79,29 @@ public class RoomEnum {
 		}
 	}
 	
+	/**
+	 * 房间角色
+	 * @author shao.xiang
+	 * @Company lm
+	 * @data 2018年5月7日
+	 */
+	public enum RoleType {
+		/** 1：房管 */
+		ADMIN(1);
+		
+		private int type; 
+		
+		private RoleType(int type) {
+			this.type = type;
+		}
+		
+		public int getType() {
+			return type;
+		}
+		
+		public void setType(int type) {
+			this.type = type;
+		}
+	}
+	
 }

@@ -12,7 +12,7 @@ import com.lm.live.common.utils.LogUtil;
  * 禁止房间行为
  *
  */
-public class RoomBannedOperationVo extends JsonParseInterface implements Serializable{
+public class RoomOperationVo extends JsonParseInterface implements Serializable{
 
 	private static final long serialVersionUID = -5610480532408590400L;
 	
@@ -33,7 +33,7 @@ public class RoomBannedOperationVo extends JsonParseInterface implements Seriali
 	private String userId;
 	/** 房间号**/
 	private String roomid;
-	/* 0:禁言;1:踢出;2:解除禁言;3:设置房管;4:取消房管 5:拉黑*/
+	/** 0:禁言;1:踢出;2:解除禁言;3:设置房管;4:取消房管 5:拉黑*/
 	private int type ;
 	//时长
 	private int hours;

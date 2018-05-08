@@ -28,7 +28,7 @@ import com.yl.socketio.Constant;
 @Service
 public class BusinessInterfaceService {
 	
-	private static final String BUSINESS_SYSTEM_URL = SpringContextListener.getContextProValue("im.business.host", "http://127.0.0.1:8616/");
+	private static final String BUSINESS_SYSTEM_URL = SpringContextListener.getContextProValue("im.business.host", "http://192.168.1.70:8616/");
 	
 	private static final String GROUP_RELATIVE_URL = BUSINESS_SYSTEM_URL + "getGroupRelative";
 	
@@ -142,44 +142,6 @@ public class BusinessInterfaceService {
  */
 	
 	/**
-	 * 获取个人基本资料
-	 * @param uid
-	 * @return
-	 */
-	/*
-	public User getUserBaseInfo(String uid,String roomid) {
-		try {
-			String url = USER_BASEINFO_URL;
-			
-			String value="{\"userbaseinfo\":{\"a\":\""+uid+"\"},\"anchorinfo\":{\"b\":\""+(roomid==null?"":roomid)+"\"}}";
-			
-			String response = StrUtil.getCleanString(HttpUtil.post(url, value.getBytes("utf-8")));
-			if (!response.isEmpty())
-			{
-				JSONObject json = JsonUtil.strToJsonObject(response);
-				int resultCode=!json.has("resultCode") ? -1 : json.getInt("resultCode");
-				if(resultCode==0)
-				{
-					String user=!json.has("user") ? null : json.getString("user");
-					if(user!=null)
-					{
-						JSONObject jsonu=JsonUtil.strToJsonObject(user);
-						User u=(User)JSONObject.toBean(jsonu,User.class);
-						
-						LogUtil.log.info("UserBaseInfo="+JsonUtil.beanToJsonString(u));
-
-						return u;
-					}
-				}
-			}
-		} catch (Exception e) {
-			LogUtil.log.warn(String.format("[getUserBaseInfo] fail, uid=%s", uid), e);
-		}
-		return null;
-
-	}
-	*/
-	/**
 	 * 获取个人基本资料 //为了加快速度，游客从memcached取用户资料
 	 * @param uid
 	 * @return
@@ -223,9 +185,9 @@ public class BusinessInterfaceService {
 			}
 			
 			String url = USER_BASEINFO_URL;
-			String value="{\"requestvo\":{\"a\":\""+uid+",\"b\":\""+(roomid==null?"":roomid)+"\"}}";
+			String value="{\"requestvo\":{\"a\":\""+uid+"\",\"c\":\""+(roomid==null?"":roomid)+"\"}}";
 			
-			String response = StrUtil.getCleanString(HttpUtil.post(url, value.getBytes("utf-8")));
+			String response = StrUtil.getCleanString(HttpUtil.post(url, value, true));
 			if (!response.isEmpty())
 			{
 				JSONObject json = JsonUtil.strToJsonObject(response);
@@ -296,14 +258,15 @@ public class BusinessInterfaceService {
 			}
 			
 			String url = USER_BASEINFO_URL;
-			String value="{\"requestvo\":{\"a\":\""+uid+",\"b\":\""+(roomid==null?"":roomid)+"\"}}";
+			String value="{\"requestvo\":{\"a\":\""+uid+"\",\"c\":\""+(roomid==null?"":roomid)+"\"}}";
 			
 			//LogUtil.log.info("url="+url+",value="+value);
 			
-			String response = StrUtil.getCleanString(HttpUtil.post(url, value.getBytes("utf-8")));
+			String response = StrUtil.getCleanString(HttpUtil.post(url, value, true));
 			if (!response.isEmpty())
 			{
 				JSONObject json = JsonUtil.strToJsonObject(response);
+				LogUtil.log.info("### getuserbase-from-service-value = " + json.toString());
 				int resultCode=!json.has("resultCode") ? -1 : json.getInt("resultCode");
 				if(resultCode==0)
 				{
@@ -420,7 +383,7 @@ public class BusinessInterfaceService {
 		try {
 			String url = SYNC_ROOM_USER_URL;
 			
-			String value=String.format("{\"roomonlineinfo\":{\"a\":\"%s\",\"b\":\"%s\",\"c\":{\"a\":\"%s\"}}}", type,roomid,uid);
+			String value=String.format("{\"requestvo\":{\"a\":\"%s\",\"d\":%s,\"c\":\"%s\"}}",uid, type,roomid);
 			LogUtil.log.info("进出房间通知业务系统..."+value);
 
 			//if(type==2)
@@ -430,7 +393,7 @@ public class BusinessInterfaceService {
 			
 			//String value="{\"roomonlineinfo\":{\"a\":\""+type+"\",\"b\":\""+roomid+"\",\"c\":{\"a\":\""+u.getUid()+"\",\"b\":\""+u.getNickname()+"\",\"c\":\""+u.getLevel()+"\",\"d\":\""+u.getAvatar()+"\",\"e\":\""+u.getType()+"\"}}}";
 
-			String response = StrUtil.getCleanString(HttpUtil.post(url, value.getBytes("utf-8")));
+			String response = StrUtil.getCleanString(HttpUtil.post(url, value, true));
 			if (!response.isEmpty())
 			{
 				JSONObject json = JsonUtil.strToJsonObject(response);

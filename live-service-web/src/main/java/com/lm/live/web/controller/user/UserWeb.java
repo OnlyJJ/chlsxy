@@ -1,6 +1,8 @@
 package com.lm.live.web.controller.user;
 
 
+import java.util.List;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.common.controller.BaseController;
 import com.lm.live.common.utils.LogUtil;
@@ -21,11 +24,15 @@ import com.lm.live.decorate.exception.DecorateBizException;
 import com.lm.live.decorate.service.IDecoratePackageService;
 import com.lm.live.decorate.vo.DecoratePackageVo;
 import com.lm.live.guard.service.IGuardService;
+import com.lm.live.pet.service.IUserPetService;
 import com.lm.live.pet.vo.PetVo;
 import com.lm.live.user.enums.ErrorCode;
 import com.lm.live.user.exception.UserBizException;
+import com.lm.live.user.service.IUserCacheInfoService;
 import com.lm.live.user.service.IUserInfoService;
 import com.lm.live.user.vo.UserInfo;
+import com.lm.live.user.vo.UserInfoVo;
+import com.lm.live.userbase.constant.Constants;
 import com.lm.live.web.vo.DataRequest;
 
 /**
@@ -45,6 +52,12 @@ public class UserWeb extends BaseController {
 	
 	@Resource
 	private IGuardService guardService;
+	
+	@Resource
+	private IUserPetService userPetService;
+	
+	@Resource
+	private IUserCacheInfoService userCacheInfoService;
 	
 	
 	/**
@@ -358,7 +371,14 @@ public class UserWeb extends BaseController {
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
 			String userId = req.getUserId();
-			// my-todo
+			List<PetVo> list = userPetService.listUserPet(userId);
+			if(list != null && list.size() > 0) {
+				JSONArray array = new JSONArray();
+				for(PetVo vo : list) {
+					array.add(vo.buildJson());
+				}
+				jsonRes.put(Constants.DATA_BODY, array);
+			}
 		} catch(UserBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
@@ -401,7 +421,9 @@ public class UserWeb extends BaseController {
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
 			String userId = req.getUserId();
-			// my-todo
+			int petId = pet.getPetId();
+			int type = pet.getStatus();
+			userPetService.usePet(userId, petId, type);
 		} catch(UserBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
@@ -522,16 +544,17 @@ public class UserWeb extends BaseController {
 		JSONObject jsonRes = new JSONObject();
 		try {
 			if(data==null  
-					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())
-					|| !data.getData().containsKey(UserInfo.class.getSimpleName().toLowerCase())) {
+					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
 				throw new UserBizException(ErrorCode.ERROR_101);
 			}
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
 			String userId = req.getUserId();
-			UserInfo info = new UserInfo();
-			info.parseJson(data.getData().getJSONObject(info.getShortName()));
-			userInfoService.modifyUserBase(userId, info);
+			String roomId = req.getRoomId();
+			UserInfoVo vo = userCacheInfoService.getUserFromCache(userId, roomId);
+			if(vo != null) {
+				jsonRes.put(Constants.IM_USER_KEY, vo);
+			}
 		} catch(UserBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
@@ -541,7 +564,8 @@ public class UserWeb extends BaseController {
 			result.setResultCode(ErrorCode.ERROR_100.getResultCode());
 			result.setResultDescr(ErrorCode.ERROR_100.getResultDescr());
 		}
-		jsonRes.put(result.getShortName(),result.buildJson());
+		jsonRes.put("resultCode",result.getResultCode());
+		jsonRes.put("resultDescr",result.getResultDescr());
 		long time2 = System.currentTimeMillis();
 		long spendTimes = time2 - time1;
 		handleInfo(LogUtil.log, request, data.getRequestStr(), spendTimes, jsonRes.toString(), true);

@@ -188,7 +188,7 @@ public class UserCacheInfoServiceImpl implements IUserCacheInfoService {
 			// 是否官方
 			if(userId.indexOf(Constants.OFFICIAL_USER) != -1) {
 				userInfoVo = new UserInfoVo();
-				userInfoVo.setType(UserInfoVoEnum.Type.OfficialUser.getValue());
+				userInfoVo.setUserType(UserInfoVoEnum.Type.OfficialUser.getValue());
 				userInfoVo.setUserLevel(30);
 				userInfoVo.setForbidSpeak(false);
 				userInfoVo.setForceOut(false);
@@ -223,15 +223,15 @@ public class UserCacheInfoServiceImpl implements IUserCacheInfoService {
 				if(!StrUtil.isNullOrEmpty(roomId)) {
 					RoomRoleRelCacheInfo roomRoleRelCacheInfo = getRoomRelMsgVoFromCache(roomId);
 					if(userId.equals(roomRoleRelCacheInfo.getAnchorUserId())){//主播
-						userInfoVo.setType(UserInfoVoEnum.Type.Anchor.getValue());
+						userInfoVo.setUserType(UserInfoVoEnum.Type.Anchor.getValue());
 					}else if(roomRoleRelCacheInfo.getRoomAdminUserIds().contains(userId)){  //房管
-						userInfoVo.setType(UserInfoVoEnum.Type.RoomMgr.getValue());
+						userInfoVo.setUserType(UserInfoVoEnum.Type.RoomMgr.getValue());
 						boolean isShutUp = roomBannedOperationService.checkShutUp(userId, roomId);
 						boolean isForceOut = roomBannedOperationService.checkOut(userId, roomId);
 						userInfoVo.setForbidSpeak(isShutUp);
 						userInfoVo.setForceOut(isForceOut);
 					}else{//普通用户
-						userInfoVo.setType(UserInfoVoEnum.Type.CommonUser.getValue());
+						userInfoVo.setUserType(UserInfoVoEnum.Type.CommonUser.getValue());
 						boolean isShutUp = roomBannedOperationService.checkShutUp(userId, roomId);
 						boolean isForceOut = roomBannedOperationService.checkOut(userId, roomId);
 						userInfoVo.setForbidSpeak(isShutUp);
@@ -248,7 +248,7 @@ public class UserCacheInfoServiceImpl implements IUserCacheInfoService {
 			avatarSbf.append(Constants.cdnPath)
 			.append(Constants.ICON_IMG_FILE_URI).append("/")
 			.append(Constants.USER_DEFAULT_ICON);
-			userInfoVo.setType(UserInfoVoEnum.Type.Visitor.getValue()); // 发送者类型  1:主播，2:普通用户，3:房管  4:游客
+			userInfoVo.setUserType(UserInfoVoEnum.Type.Visitor.getValue()); // 用户类型 1、主播 2、普通用户 3、房管 4、游客 5 超级管理员
 			userInfoVo.setUserLevel(0);
 			userInfoVo.setForbidSpeak(false);
 			userInfoVo.setForceOut(false);

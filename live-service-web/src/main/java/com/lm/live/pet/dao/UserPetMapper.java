@@ -55,4 +55,14 @@ public interface UserPetMapper extends ICommonMapper<UserPet> {
 	 *@data 2018年4月28日
 	 */
 	void addPoint(@Param("userId") String userId, @Param("petId") int petId, @Param("petPoint") long petPoint);
+	
+	/**
+	 * 更新宠物状态
+	 *@param userId
+	 *@param petId
+	 *@param status
+	 *@author shao.xiang
+	 *@data 2018年5月7日
+	 */
+	void updateStatus(@Param("userId") String userId, @Param("petId") int petId, @Param("status") int status);
 }

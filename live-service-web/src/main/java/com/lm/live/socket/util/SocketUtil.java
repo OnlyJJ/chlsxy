@@ -19,6 +19,7 @@ import com.lm.live.socket.SocketRestartThread;
 
 public class SocketUtil {
 	public static int SEQID;
+	public static boolean rebuildFlag = false;
 	
 	/** 消息序列号 */
 	public static int getSeqId() {
@@ -27,7 +28,7 @@ public class SocketUtil {
 	
 	private SocketUtil() {}
 	
-	private static Socket getSocket() {
+	public static Socket getSocket() {
 		return SocketClient.getInstance();
 	}
 	
@@ -56,6 +57,8 @@ public class SocketUtil {
 			synchronized(SocketUtil.class) {
 				SocketRestartThread task = new SocketRestartThread();
 				ThreadManager.getInstance().execute(task);
+				// 适当休眠一下，避免多次加载这个线程
+				Thread.sleep(500);
 			}
 			throw e;
 		}

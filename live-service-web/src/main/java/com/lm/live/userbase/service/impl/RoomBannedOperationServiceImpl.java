@@ -72,4 +72,9 @@ public class RoomBannedOperationServiceImpl extends CommonServiceImpl<RoomBanned
 		}
 		return false;
 	}
+
+	@Override
+	public void updateById(RoomBannedOperation vo) {
+		dao.updateById(vo);
+	}
 }

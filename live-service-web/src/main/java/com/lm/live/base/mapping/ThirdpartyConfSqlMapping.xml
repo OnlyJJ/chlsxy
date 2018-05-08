@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+   
+<mapper namespace="com.lm.live.base.dao.ThirdpartyConfMapper">
+	<resultMap type="com.lm.live.base.domain.ThirdpartyConf" id="vo">
+	    <result property="id" column="id" />
+	    <result property="inUseLogin" column="inUseLogin" />
+	    <result property="inUsePayCreateOrder" column="inUsePayCreateOrder" />
+	    <result property="inUsePaySuccessNotify" column="inUsePaySuccessNotify" />
+	    <result property="thirdpartyType" column="thirdpartyType" />
+	    <result property="packageName" column="packageName" />
+	    <result property="clientType" column="clientType" />
+	    <result property="appId" column="appId" />
+	    <result property="loginKey" column="loginKey" />
+	    <result property="payMchId" column="payMchId" />
+	    <result property="payKey" column="payKey" />
+	    <result property="conment" column="conment" />
+	    <result property="updateTime" column="updateTime" />
+	</resultMap>
+
+	<select id="getObjectById" parameterType="int" resultMap="vo">
+		select * from t_thirdparty_conf where id=#{id}
+	</select>
+	
+	<delete id="removeById" parameterType="int">
+		delete from t_thirdparty_conf where id = #{id}
+	</delete>
+	
+	<delete id="removeByIds" >
+		delete from t_thirdparty_conf where id in 
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>	
+	
+	<delete id="removeEntityBatch" parameterType="java.util.List">
+		delete from t_thirdparty_conf where id in 
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item.id}
+		</foreach>
+	</delete>	
+
+	<select id="getListByPage"  resultMap="vo">
+		select * from t_thirdparty_conf 
+	<where>
+		<if test="inUseLogin != null">
+			AND inUseLogin = #{inUseLogin}
+		</if>	
+		<if test="inUsePayCreateOrder != null">
+			AND inUsePayCreateOrder = #{inUsePayCreateOrder}
+		</if>	
+		<if test="inUsePaySuccessNotify != null">
+			AND inUsePaySuccessNotify = #{inUsePaySuccessNotify}
+		</if>	
+		<if test="thirdpartyType != null">
+			AND thirdpartyType = #{thirdpartyType}
+		</if>	
+	 	<if test="packageName != null and packageName != ''">
+			AND packageName like '%${packageName}%'
+		</if> 	
+		<if test="clientType != null">
+			AND clientType = #{clientType}
+		</if>	
+	 	<if test="appId != null and appId != ''">
+			AND appId like '%${appId}%'
+		</if> 	
+	 	<if test="loginKey != null and loginKey != ''">
+			AND loginKey like '%${loginKey}%'
+		</if> 	
+	 	<if test="payMchId != null and payMchId != ''">
+			AND payMchId like '%${payMchId}%'
+		</if> 	
+	 	<if test="payKey != null and payKey != ''">
+			AND payKey like '%${payKey}%'
+		</if> 	
+	 	<if test="conment != null and conment != ''">
+			AND conment like '%${conment}%'
+		</if> 	
+		<if test="ltUpdateTime != null and ltUpdateTime != ''">
+			<![CDATA[AND updateTime >= #{ltUpdateTime} ]]>
+		</if> 
+		<if test="gtUpdateTime != null and gtUpdateTime != ''">
+			<![CDATA[AND updateTime <= #{gtUpdateTime} ]]>
+		</if> 
+		<if test="appendWhere != null and appendWhere != ''">
+			${appendWhere}
+		</if>           
+      </where>
+        ORDER BY 
+		<choose>
+			<when test="orderBy != null and orderBy != ''">
+				${orderBy}
+			</when>
+			<otherwise>
+				id
+			</otherwise>
+		</choose>
+		<choose>
+			<when test="descOrAsc != null and descOrAsc != ''">
+				${descOrAsc}
+			</when>
+			<otherwise>
+				asc 
+			</otherwise>
+		</choose>
+	</select>
+	  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+	  <!--
+	  <selectKey resultType="int" keyProperty="baseId" order="BEFORE">select nextval('seq_xxx')</selectKey>
+	  -->
+	  <![CDATA[
+	  INSERT INTO t_thirdparty_conf(
+			id,
+			inUseLogin,
+			inUsePayCreateOrder,
+			inUsePaySuccessNotify,
+			thirdpartyType,
+			packageName,
+			clientType,
+			appId,
+			loginKey,
+			payMchId,
+			payKey,
+			conment,
+			updateTime
+			) VALUES (
+			#{id,jdbcType=VARCHAR},
+			#{inUseLogin,jdbcType=VARCHAR},
+			#{inUsePayCreateOrder,jdbcType=VARCHAR},
+			#{inUsePaySuccessNotify,jdbcType=VARCHAR},
+			#{thirdpartyType,jdbcType=VARCHAR},
+			#{packageName,jdbcType=VARCHAR},
+			#{clientType,jdbcType=VARCHAR},
+			#{appId,jdbcType=VARCHAR},
+			#{loginKey,jdbcType=VARCHAR},
+			#{payMchId,jdbcType=VARCHAR},
+			#{payKey,jdbcType=VARCHAR},
+			#{conment,jdbcType=VARCHAR},
+			#{updateTime,jdbcType=VARCHAR}
+		)	
+		]]>
+	  </insert>
+	  
+	  <insert id="insertBatch" parameterType="java.util.List">
+	  <![CDATA[
+	  		INSERT INTO t_thirdparty_conf(
+			id,
+			inUseLogin,
+			inUsePayCreateOrder,
+			inUsePaySuccessNotify,
+			thirdpartyType,
+			packageName,
+			clientType,
+			appId,
+			loginKey,
+			payMchId,
+			payKey,
+			conment,
+			updateTime
+			) VALUES 
+		]]>
+		<foreach collection="list" item="item" separator=",">
+		<![CDATA[
+			 (#{item.id,jdbcType=VARCHAR},#{item.inUseLogin,jdbcType=VARCHAR},#{item.inUsePayCreateOrder,jdbcType=VARCHAR},#{item.inUsePaySuccessNotify,jdbcType=VARCHAR},#{item.thirdpartyType,jdbcType=VARCHAR},#{item.packageName,jdbcType=VARCHAR},#{item.clientType,jdbcType=VARCHAR},#{item.appId,jdbcType=VARCHAR},#{item.loginKey,jdbcType=VARCHAR},#{item.payMchId,jdbcType=VARCHAR},#{item.payKey,jdbcType=VARCHAR},#{item.conment,jdbcType=VARCHAR},#{item.updateTime,jdbcType=VARCHAR})
+		]]>
+		</foreach>
+	  </insert>
+	  
+	  <update id="update">
+		UPDATE t_thirdparty_conf
+			<set>
+				<if test="inUseLogin != null">
+					 <![CDATA[ inUseLogin = #{inUseLogin,jdbcType=VARCHAR},  ]]>
+				</if>	
+				<if test="inUsePayCreateOrder != null">
+					 <![CDATA[ inUsePayCreateOrder = #{inUsePayCreateOrder,jdbcType=VARCHAR},  ]]>
+				</if>	
+				<if test="inUsePaySuccessNotify != null">
+					 <![CDATA[ inUsePaySuccessNotify = #{inUsePaySuccessNotify,jdbcType=VARCHAR},  ]]>
+				</if>	
+				<if test="thirdpartyType != null">
+					 <![CDATA[ thirdpartyType = #{thirdpartyType,jdbcType=VARCHAR},  ]]>
+				</if>	
+			 	<if test="packageName != null">
+					<![CDATA[packageName = #{packageName,jdbcType=VARCHAR},  ]]>
+				</if> 	
+				<if test="clientType != null">
+					 <![CDATA[ clientType = #{clientType,jdbcType=VARCHAR},  ]]>
+				</if>	
+			 	<if test="appId != null">
+					<![CDATA[appId = #{appId,jdbcType=VARCHAR},  ]]>
+				</if> 	
+			 	<if test="loginKey != null">
+					<![CDATA[loginKey = #{loginKey,jdbcType=VARCHAR},  ]]>
+				</if> 	
+			 	<if test="payMchId != null">
+					<![CDATA[payMchId = #{payMchId,jdbcType=VARCHAR},  ]]>
+				</if> 	
+			 	<if test="payKey != null">
+					<![CDATA[payKey = #{payKey,jdbcType=VARCHAR},  ]]>
+				</if> 	
+			 	<if test="conment != null">
+					<![CDATA[conment = #{conment,jdbcType=VARCHAR},  ]]>
+				</if> 	
+				<if test="updateTime != null">
+					<![CDATA[updateTime = #{updateTime,jdbcType=VARCHAR}  ]]>
+				</if> 
+			</set>
+			<where>
+			 <![CDATA[ and id = #{id,jdbcType=VARCHAR} ]]>  			  	
+			</where>  
+	  </update>	
+	  
+	   <select id="getThirdpartyConf"  resultMap="vo">
+		select * 
+		from t_thirdparty_conf 
+		where  1 =1
+		and thirdpartyType=#{thirdpartyType}
+		and clientType=#{clientType}
+		<if test="packageName != null and packageName != ''">
+			and LOCATE(#{packageName},packageName) > 0
+		</if>
+		limit 1
+	  </select>
+	  
+	  <select id="getThirdpartyConf1"  resultMap="vo">
+		select * 
+		from t_thirdparty_conf 
+		where  1 =1
+		and thirdpartyType=#{thirdpartyType}
+		and clientType=#{clientType}
+		<if test="payMchId != null and payMchId != ''">
+			and LOCATE(#{payMchId},payMchId) > 0
+		</if>
+		limit 1
+	  </select>
+</mapper>

@@ -11,5 +11,5 @@ public interface UserRoomMemberMapper extends ICommonMapper<UserRoomMember> {
 	
 	List<UserRoomMember> findRoomAdmin(String roomId);
 	
-	UserRoomMember getUserRoomMember(@Param("userId") String userId, @Param("roomId") String roomId);
+	UserRoomMember getUserRoomMember(@Param("userId") String userId, @Param("roomId") String roomId, @Param("roleType") int roleType);
 }

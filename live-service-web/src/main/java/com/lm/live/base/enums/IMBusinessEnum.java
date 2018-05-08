@@ -110,7 +110,7 @@ public class IMBusinessEnum {
 		/** 通用活动消息 */
 		IM_ACTIVITY(10),
 		
-		/** 更新宠物|礼物|背包|金币|勋章  */
+		/** 更新宠物|礼物|背包|金币|勋章|在线成员列表  */
 		IM_REFRESH(11),
 		
 		/** 禁言|取消禁言|踢人 */
@@ -154,6 +154,45 @@ public class IMBusinessEnum {
 		private final int value;
 		
 		ImSystemEnum(int value) {
+			this.value = value;
+		}
+		public int getValue() {
+			return value;
+		}
+		
+	}
+	
+	
+	/**
+	 * 刷新类型，此类型为ImCommonEnum的11下的子类型
+	 * @author shao.xiang
+	 * @Company lm
+	 * @data 2018年5月7日
+	 */
+	public enum RefreshType {
+		
+		/** 宠物 */
+		PET(1),
+		
+		/** 礼物 */
+		GIFT(2),
+		
+		/** 背包  */
+		BAG(3),
+		
+		/** 金币  */
+		GOLD(4),
+		
+		/** 勋章   */
+		DECORATE(5),
+		
+		/** 在线成员 */
+		ROOMUSER(6);
+		
+		
+		private final int value;
+		
+		RefreshType(int value) {
 			this.value = value;
 		}
 		public int getValue() {

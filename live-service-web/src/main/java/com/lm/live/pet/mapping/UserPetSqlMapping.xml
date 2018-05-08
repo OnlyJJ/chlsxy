@@ -100,5 +100,11 @@
 		WHERE id = #{id}
 	</delete>
 	
+	<update id="updateStatus">
+		UPDATE t_user_pet SET status = #{status}
+		WHERE userId = #{userId} 
+		AND petId = #{petId}
+	</update>
+	
 	
 </mapper> 

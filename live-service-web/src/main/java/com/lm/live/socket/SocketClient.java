@@ -21,7 +21,7 @@ public class SocketClient {
 	
 	private static final String URL = SpringContextListener.getContextProValue("im.socket.url", "192.168.1.70");
 	private static final int PORT = 9998;
-	private static boolean isInitFlag = false;
+	public static boolean isInitFlag = false;
 	
 	@PostConstruct
 	public void init() {

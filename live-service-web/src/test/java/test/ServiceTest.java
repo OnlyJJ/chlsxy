@@ -7,13 +7,12 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.alibaba.fastjson.JSONObject;
 import com.lm.live.appclient.service.IAppStartupPageService;
-import com.lm.live.appclient.vo.AppStartupPageVo;
+import com.lm.live.base.domain.ThirdpartyConf;
+import com.lm.live.base.service.IThirdpartyConfService;
 import com.lm.live.base.service.IUserAccusationInfoService;
-import com.lm.live.common.vo.Page;
-import com.lm.live.common.vo.RequestVo;
 import com.lm.live.decorate.service.IDecoratePackageService;
+import com.lm.live.framework.service.ServiceResult;
 import com.lm.live.guard.service.IGuardService;
 import com.lm.live.home.service.IGwFilesService;
 import com.lm.live.room.service.IRoomService;
@@ -21,7 +20,6 @@ import com.lm.live.tools.service.IGiftService;
 import com.lm.live.tools.service.IUserPackageService;
 import com.lm.live.user.service.IUserCacheInfoService;
 import com.lm.live.user.service.IUserInfoService;
-import com.lm.live.user.vo.UserInfo;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -57,6 +55,9 @@ public class ServiceTest {
 	
 	@Resource
 	private IAppStartupPageService appStartupPageService;
+	
+	@Resource
+	private IThirdpartyConfService thirdpartyConfService;
 
 	@Test
 	public void test() {
@@ -75,11 +76,11 @@ public class ServiceTest {
 //			vo.setNickName("渣渣辉");
 //			vo.setRemark("你是个渣渣呀");
 //			vo.setUserId(userId);
-			UserInfo info = new UserInfo();
-			info.setNickName("异次元诸葛亮100");
-			info.setUserId(userId);
-			info.setRemark("暂无愧疚");
-			userInfoService.modifyUserBase(userId, info);
+//			UserInfo info = new UserInfo();
+//			info.setNickName("异次元诸葛亮100");
+//			info.setUserId(userId);
+//			info.setRemark("暂无愧疚");
+//			userInfoService.modifyUserBase(userId, info);
 //			userInfoService.modifyUserBase(vo);
 //			userInfoService.userAttention(userId, "102029", 0);
 //			JSONObject jsonRes = userInfoService.listFans(userId, page);
@@ -126,6 +127,8 @@ public class ServiceTest {
 //				System.err.println("null ....");
 //			}
 //			System.err.println("name =" + name);
+			
+			ServiceResult<ThirdpartyConf> srt = thirdpartyConfService.getThirdpartyConf(0, "com.lm.live", 0);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
