@@ -14,17 +14,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONObject;
+import com.lm.live.account.domain.Level;
 import com.lm.live.account.domain.UserAccount;
 import com.lm.live.account.domain.UserAccountBook;
+import com.lm.live.account.enums.LevelEnum.TypeEnum;
 import com.lm.live.account.service.IUserAccountService;
 import com.lm.live.account.service.IUserLevelService;
 import com.lm.live.base.dao.ShareInfoMapper;
 import com.lm.live.base.domain.UserShareInfo;
-import com.lm.live.base.enums.IMBusinessEnum;
 import com.lm.live.base.enums.IMBusinessEnum.ImCommonEnum;
-import com.lm.live.base.enums.IMBusinessEnum.MsgTypeEnum;
 import com.lm.live.base.enums.IMBusinessEnum.RefreshType;
-import com.lm.live.base.enums.IMBusinessEnum.SeqID;
 import com.lm.live.base.service.ISendMsgService;
 import com.lm.live.cache.constants.CacheKey;
 import com.lm.live.cache.constants.CacheTimeout;
@@ -34,7 +33,6 @@ import com.lm.live.common.utils.DateUntil;
 import com.lm.live.common.utils.HttpUtils;
 import com.lm.live.common.utils.JsonUtil;
 import com.lm.live.common.utils.LogUtil;
-import com.lm.live.common.utils.MemcachedUtil;
 import com.lm.live.common.utils.SensitiveWordUtil;
 import com.lm.live.common.utils.StrUtil;
 import com.lm.live.common.vo.Page;
@@ -214,20 +212,25 @@ public class RoomServiceImpl implements IRoomService {
 			String orderId = StrUtil.getOrderId();
 			int befUserLevel = 0;
 			int befAnchorLevel = 0;
-			UserAccount befUser = userAccountService.getFromCache(userId);
+			UserAccount befUser = userAccountService.getByUserId(userId);
 			if(befUser != null) {
 				befUserLevel = befUser.getUserLevel();
 			}
-			UserAccount befAnchor = userAccountService.getFromCache(anchorId);
+			UserAccount befAnchor = userAccountService.getByUserId(anchorId);
 			if(befAnchor != null) {
 				befAnchorLevel = befAnchor.getAnchorLevel();
 			}
+			// 加完经验之后的总用户经验，
+			long totalPoint = befUser.getUserPoint() + userPoint;
+			// 加完经验之后的总主播经验
+			long anchorTotalPoint = befAnchor.getAnchorPoint() + anchorPoint;
+			
 			// 加用户经验
 			userAccountService.addUserPoint(userId, userPoint);
 			// 加主播经验
-			userAccountService.addAnchorPoint(userId, anchorPoint);
+			userAccountService.addAnchorPoint(anchorId, anchorPoint);
 			// 加主播水晶
-			userAccountService.addCrystal(userId, crystal);
+			userAccountService.addCrystal(anchorId, crystal);
 			
 			// 加送礼记录t_pay_gift_out
 			PayGiftOut pgo = new PayGiftOut();
@@ -243,14 +246,47 @@ public class RoomServiceImpl implements IRoomService {
 			pgo.setRemark(remark);
 			payGiftOutService.insert(pgo);
 			
+			// 处理升级
+			int newUserLevel = 0;
+			Level userLevel = userLevelService.qryLevel(totalPoint, TypeEnum.GENERAL.getType());
+			if(userLevel == null) {
+				LogUtil.log.info("### handle level：已经是最高级，不处理!");
+			} else {
+				newUserLevel = userLevel.getLevel();
+				if(newUserLevel > befUserLevel) {
+					userAccountService.updateUserLevel(userId, newUserLevel);
+					// 升级更新缓存
+					String key = CacheKey.USER_IM_CACHE + userId;
+					UserInfoVo userche = RedisUtil.getJavaBean(key, UserInfoVo.class);
+					if(userche != null) {
+						userche.setUserLevel(newUserLevel);
+						RedisUtil.set(key, userche);
+					}
+				}
+			}
+			int newAnchorLevel = 0;
+			Level anchorLevel = userLevelService.qryLevel(anchorTotalPoint, TypeEnum.ANCHOR.getType());
+			if(anchorLevel == null) {
+				LogUtil.log.info("### handle level：已经是最高级，不处理!");
+			} else {
+				newAnchorLevel = anchorLevel.getLevel();
+				if(newAnchorLevel > befAnchorLevel) {
+					userAccountService.updateAnchorLevel(anchorId, newAnchorLevel);
+					// 升级更新缓存
+					String key = CacheKey.USER_IM_CACHE + anchorId;
+					UserInfoVo userche = RedisUtil.getJavaBean(key, UserInfoVo.class);
+					if(userche != null) {
+						userche.setAnchorLevel(newAnchorLevel);
+						RedisUtil.set(key, userche);
+					}
+				}
+			}
 			// 发送送礼消息
-			// 处理等级，送礼前vs送礼后，等级是否发生变化？这个放在最后
-			
 			// 礼物跑道消息
 			boolean flagOnGiftRunwayCondition = false;
 			JSONObject onGiftRunwayImData = null;  //上礼物跑道的im内容
 			if(isOnGiftRunwayChoice) { 
-				int onGiftRunwayNeedGold = 52000;
+				int onGiftRunwayNeedGold = Constants.GIFT_RUNWAY;
 				if(gold >= onGiftRunwayNeedGold) { 
 					flagOnGiftRunwayCondition = true;
 				}
@@ -332,29 +368,23 @@ public class RoomServiceImpl implements IRoomService {
 			
 			try {
 				//用户等级提升IM消息
-				UserAccount user = userAccountService.getByUserId(userId);
-				if (user != null) {
-					int endLevel = user.getUserLevel();
-					LogUtil.log.info("### sendGift-送礼前用户等级 = " + befUserLevel + ",送礼后登记 = " + endLevel);
-					//用户升级，保存升级记录
-					if(endLevel > befUserLevel) {
-						int sortLevel = userLevelService.saveLevelHis(anchorId, befUserLevel, endLevel, false);
-						// 发送消息
-						sendMsg(userId, roomId, befUserLevel, endLevel, sortLevel, false);
-					}
+				LogUtil.log.info("### sendGift-送礼前用户等级 = " + befUserLevel + ",送礼后等级 = " + newUserLevel);
+				//用户升级，保存升级记录
+				if(newUserLevel > befUserLevel) {
+					int sortLevel = userLevelService.saveLevelHis(anchorId, befUserLevel, newUserLevel, false);
+					// 发送消息
+					sendMsg(userId, roomId, befUserLevel, newUserLevel, sortLevel, false);
+					RedisUtil.del(CacheKey.ACCOUNT_BASE_CACHE + userId);
 				}
 				//主播等级提升IM消息
-				UserAccount anchor = userAccountService.getByUserId(anchorId);
-				if (anchor != null) {
-					int anchorEndLevel = anchor.getAnchorLevel();
-					LogUtil.log.info("### sendGift-送礼前主播等级 = " + befAnchorLevel + ",送礼后登记 = " + anchorEndLevel);
-					//主播守护后等级
-					if(anchorEndLevel > befAnchorLevel) {
-						//主播升级
-						userLevelService.saveLevelHis(anchorId, befAnchorLevel, anchorEndLevel, true);
-						// 升级消息推送
-						sendMsg(userId, roomId, befAnchorLevel, anchorEndLevel, 0, true);
-					}
+				LogUtil.log.info("### sendGift-送礼前主播等级 = " + befAnchorLevel + ",送礼后等级 = " + newAnchorLevel);
+				//主播守护后等级
+				if(newAnchorLevel > befAnchorLevel) {
+					//主播升级
+					userLevelService.saveLevelHis(anchorId, befAnchorLevel, newAnchorLevel, true);
+					// 升级消息推送
+					sendMsg(anchorId, roomId, befAnchorLevel, newAnchorLevel, 0, true);
+					RedisUtil.del(CacheKey.ACCOUNT_BASE_CACHE + anchorId);
 				}
 			} catch(Exception e) {
 				LogUtil.log.error(e.getMessage(),e);

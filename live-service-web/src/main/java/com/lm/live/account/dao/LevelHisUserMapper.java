@@ -6,5 +6,5 @@ import com.lm.live.common.dao.ICommonMapper;
 
 public interface LevelHisUserMapper extends ICommonMapper<LevelHisUser> {
 
-	int getLastLevel(int userLevel);
+	LevelHisUser getLastLevel(int userLevel);
 }

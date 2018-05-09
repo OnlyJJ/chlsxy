@@ -40,4 +40,7 @@ public class Constants extends BaseConstants {
 	
 	/** 发送大喇叭需要的金币 */
 	public static final int HORN_GOLD = 5000;
+	
+	/** 上礼物跑道的金币限制 */
+	public static final int GIFT_RUNWAY = 52000;
 }

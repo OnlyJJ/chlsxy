@@ -144,6 +144,9 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 		if(StringUtils.isEmpty(userId) || StringUtils.isEmpty(toUserId)) {
 			throw new UserBizException(ErrorCode.ERROR_101);
 		}
+		if(userId.equals(toUserId)) {
+			return;
+		}
 		boolean isAnchor = false; // 是否是主播
 		try {
 			UserAnchor vo = userAnchorService.getAnchorByIdChe(toUserId);;

@@ -20,6 +20,17 @@ public interface IUserLevelService {
 	 *@author shao.xiang
 	 *@data 2018年4月16日
 	 */
-	int saveLevelHis(String userId, int befLevel, int endLevel, boolean isAnchor) throws Exception ;
+	int saveLevelHis(String userId, int befLevel, int endLevel, boolean isAnchor) throws Exception;
+	
+	/**
+	 * 查询当前经验所对应的等级信息
+	 *@param point
+	 *@param type
+	 *@return
+	 *@throws Exception
+	 *@author shao.xiang
+	 *@data 2018年5月8日
+	 */
+	Level qryLevel(long point, int type) throws Exception;
 	
 }

@@ -9,40 +9,15 @@
 		<result property="userId" column="userId" />
 		<result property="userLevel" column="userLevel" />
 		<result property="resultTime" column="resultTime" />
-		<result property="remark" column="remark" />
 		<result property="reachOrder" column="reachOrder" />
 	</resultMap>
-
-	<select id="getUserGrowth" resultMap="vo">
-		select t1.userid as userId,userlevelStr as userLevelStr,resulttime as
-		resulTtime,reachorder as reachorder,icon as image,nickName from
-		t_level_his_user t1
-		inner join t_user_info t2
-		on t1.userid = t2.userid
-		<if test="userId != null and userId != ''">
-			where t1.userid = #{userId}
-		</if>
-		<if test="reachorder != null">
-			where t1.reachorder = #{reachorder}
-		</if>
-		order by userlevel desc
-	</select>
-
-	<select id="getUserTopGrowth" resultMap="vo">
-		select t1.userid as userId,userlevelStr as userLevelStr,resulttime as
-		resulTtime,reachorder as reachorder from t_level_his_user t1
-		<if test="reachorder != null">
-			where t1.reachorder = #{reachorder}
-		</if>
-		order by userlevel desc
-	</select>
 
 	<select id="getObjectById" parameterType="int" resultMap="vo">
 		select * from t_level_his_user where id=#{id}
 	</select>
 	
-	<select id="getLastLevel"  resultType="java.lang.Integer">
-		SELECT reachOrder FROM t_level_his_user WHERE userLevel = #{userLevel} ORDER BY reachOrder DESC LIMIT 1
+	<select id="getLastLevel"  resultMap="vo">
+		SELECT * FROM t_level_his_user WHERE userLevel = #{userLevel} ORDER BY reachOrder DESC LIMIT 1
 	</select>
 
 	<delete id="removeById" parameterType="int">
@@ -59,17 +34,13 @@
 			userId,
 			userLevel,
 			resultTime,
-			userLevelStr,
-			reachOrder,
-			remark
+			reachOrder
 			) VALUES (
 			#{id,jdbcType=VARCHAR},
 			#{userId,jdbcType=VARCHAR},
 			#{userLevel,jdbcType=VARCHAR},
 			#{resultTime,jdbcType=VARCHAR},
-			#{userLevelStr,jdbcType=VARCHAR},
-			#{reachOrder,jdbcType=VARCHAR},
-			#{remark,jdbcType=VARCHAR}
+			#{reachOrder,jdbcType=VARCHAR}
 		)	
 		]]>
 	</insert>
@@ -85,9 +56,6 @@
 			</if>
 			<if test="resultTime != null">
 					<![CDATA[resultTime = #{resultTime,jdbcType=VARCHAR},  ]]>
-			</if>
-			<if test="remark != null">
-					<![CDATA[remark = #{remark,jdbcType=VARCHAR}  ]]>
 			</if>
 		</set>
 		<where>

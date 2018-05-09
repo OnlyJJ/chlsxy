@@ -12,73 +12,52 @@ public class Level extends BaseVo {
 	/** 主键自增ID */
 	private int id;
 	/** 用户类型：1-普通用户，2-主播 */
-	private int levelType;
-	/** 主播：歌手等级:新主播。普通用户空值 */
-	private String levelName;
-	/** 主播：子等级:S1。普通用户: V1 */
-	private String level;
-	/** 主播：称号:新生代。普通用户:银翼少侠V1 */
-	private String title;
+	private int type;
+	/** 等级名称 */
+	private String name;
+	/** 等级 */
+	private int level;
 	/** 对应的等级图标 */
 	private String image;
 	/** 对应的等级所需积分 */
-	private String point;
-
-	public void setId(int id){
+	private long point;
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
 		this.id = id;
 	}
-	
-	public int getId() {
-		return this.id;
+	public int getType() {
+		return type;
 	}
-	
-	public void setLevelType(int levelType){
-		this.levelType = levelType;
+	public void setType(int type) {
+		this.type = type;
 	}
-	
-	public int getLevelType() {
-		return this.levelType;
+	public String getName() {
+		return name;
 	}
-	
-	public void setLevelName(String levelName){
-		this.levelName = levelName;
+	public void setName(String name) {
+		this.name = name;
 	}
-	
-	public String getLevelName() {
-		return this.levelName;
+	public int getLevel() {
+		return level;
 	}
-	
-	public void setLevel(String level){
+	public void setLevel(int level) {
 		this.level = level;
 	}
-	
-	public String getLevel() {
-		return this.level;
+	public String getImage() {
+		return image;
 	}
-	
-	public void setTitle(String title){
-		this.title = title;
-	}
-	
-	public String getTitle() {
-		return this.title;
-	}
-	
-	public void setImage(String image){
+	public void setImage(String image) {
 		this.image = image;
 	}
-	
-	public String getImage() {
-		return this.image;
+	public long getPoint() {
+		return point;
 	}
-	
-	public void setPoint(String point){
+	public void setPoint(long point) {
 		this.point = point;
 	}
-	
-	public String getPoint() {
-		return this.point;
-	}
+
 	
 
 }

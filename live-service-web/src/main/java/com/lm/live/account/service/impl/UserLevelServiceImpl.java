@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.lm.live.account.dao.LevelHisAnchorMapper;
 import com.lm.live.account.dao.LevelHisUserMapper;
+import com.lm.live.account.dao.LevelMapper;
+import com.lm.live.account.domain.Level;
 import com.lm.live.account.domain.LevelHisAnchor;
 import com.lm.live.account.domain.LevelHisUser;
 import com.lm.live.account.service.IUserLevelService;
@@ -22,6 +24,9 @@ public class UserLevelServiceImpl implements IUserLevelService {
 
 	@Resource
 	private LevelHisAnchorMapper levelHisAnchorMapper;
+	
+	@Resource
+	private LevelMapper levelMapper;
 
 	@Override
 	public int saveLevelHis(String userId, int befLevel, int endLevel, boolean isAnchor) throws Exception {
@@ -40,7 +45,11 @@ public class UserLevelServiceImpl implements IUserLevelService {
 					levelHistAnchor.setUserId(userId);
 					levelHistAnchor.setAnchorLevel(i);
 					int anchorLevel = i;
-					int reachOrder = levelHisAnchorMapper.getLastLevel(anchorLevel);
+					int reachOrder = 0;
+					LevelHisAnchor anchor = levelHisAnchorMapper.getLastLevel(anchorLevel);
+					if(anchor != null) {
+						reachOrder = anchor.getReachOrder();
+					}
 					levelHistAnchor.setReachOrder(reachOrder+1);
 					levelHistAnchor.setResultTime(nowDate);
 					levelHisAnchorMapper.insert(levelHistAnchor);
@@ -55,7 +64,11 @@ public class UserLevelServiceImpl implements IUserLevelService {
 					levelHistUser.setUserLevel(i);
 					levelHistUser.setResultTime(nowDate);
 					int userLevel = i;
-					int reachOrder = levelHisUserMapper.getLastLevel(userLevel);
+					int reachOrder = 0;
+					LevelHisUser user = levelHisUserMapper.getLastLevel(userLevel);
+					if(user != null) {
+						reachOrder = user.getReachOrder();
+					}
 					// 取当前最高等级的排名ß
 					if (i == endLevel) {
 						maxLevelReachorder = reachOrder + 1;
@@ -68,6 +81,11 @@ public class UserLevelServiceImpl implements IUserLevelService {
 			}
 		}
 		return maxLevelReachorder;
+	}
+
+	@Override
+	public Level qryLevel(long point, int type) throws Exception {
+		return levelMapper.getLevelInfo(type, point);
 	}
 
 }
