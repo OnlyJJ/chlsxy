@@ -138,7 +138,7 @@ public class GuardServiceImpl implements IGuardService {
 		// 从缓存中查询当前用户是否是该房间的守护
 		List<Map> guardList = getUserGuardInfoByRoomCache(userId, roomId);
 		if(guardList == null || guardList.size() == 0) { // 非守护和游客的缓存
-			key = CacheKey.ROOM_GUARD_COMMON_CACHE + roomId ;
+			key = CacheKey.ROOM_GUARD_COMMON_CACHE + roomId;
 		} else { // 守护个人缓存
 			isGuard = true;
 			key = CacheKey.ROOM_GUARD_VIP_CACHE + roomId + userId;
@@ -374,8 +374,6 @@ public class GuardServiceImpl implements IGuardService {
 		}
 		String userKey = CacheKey.ROOM_GUARD_VIP_CACHE + roomId + userId;
 		RedisUtil.del(userKey);
-
-		
 	}
 	
 	@Override

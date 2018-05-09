@@ -50,6 +50,10 @@ public class UserLevelServiceImpl implements IUserLevelService {
 					if(anchor != null) {
 						reachOrder = anchor.getReachOrder();
 					}
+					// 取当前最高等级的排名ß
+					if (i == endLevel) {
+						maxLevelReachorder = reachOrder + 1;
+					}
 					levelHistAnchor.setReachOrder(reachOrder+1);
 					levelHistAnchor.setResultTime(nowDate);
 					levelHisAnchorMapper.insert(levelHistAnchor);

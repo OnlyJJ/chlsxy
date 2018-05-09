@@ -786,9 +786,9 @@ public class RoomServiceImpl implements IRoomService {
 					LogUtil.log.info(String.format("###主播守护前等级%s,购买后等级%s",anchorStrLevel,anchorEndLevel));
 					//主播升级
 					if(anchorEndLevel > anchorStrLevel) {
-						userLevelService.saveLevelHis(anchorUserId, anchorStrLevel, anchorEndLevel, true);
+						int sortLevel = userLevelService.saveLevelHis(anchorUserId, anchorStrLevel, anchorEndLevel, true);
 						// 升级消息推送
-						sendMsg(anchorUserId, roomId, anchorStrLevel, anchorEndLevel, 0, true);
+						sendMsg(anchorUserId, roomId, anchorStrLevel, anchorEndLevel, sortLevel, true);
 					}
 				}
 			} catch(Exception e) {
@@ -1040,10 +1040,7 @@ public class RoomServiceImpl implements IRoomService {
 				}else if (21 <= level) {
 					msg = String.format("恭喜%s荣升%s级！成为超级明星 ，集万千宠爱于一身、聚百般羡艳为一体！", toUser.getNickName(),level);
 				}
-				content.put("msg", msg);
-				content.put("nowlevel", level);//现在等级
 				content.put("isAnchorUpgrade", true);//是否为主播升级
-				content.put("isAllRoomNotify", msgType);//是否全站通知
 			} else {
 				if (level <= 10) {//草民-10富
 					msg = String.format("恭喜%s荣升%s级，可喜可贺！", toUser.getNickName(),level);
@@ -1055,13 +1052,14 @@ public class RoomServiceImpl implements IRoomService {
 				}else if (25 <= level) {//皇帝-创世神
 					msg = String.format("恭喜%s荣升%s级，天神下凡,万民敬仰！！", toUser.getNickName(),level);
 				}
-				content.put("msg", msg);
-				content.put("oldLevel", oldLevel);//旧等级
-				content.put("nowlevel", level);//现在等级
-				content.put("rank", rank);
 				content.put("isAnchorUpgrade", false);//是否为主播升级
-				content.put("isAllRoomNotify", msgType);//是否全站通知
 			}
+			content.put("msg", msg);
+			content.put("oldLevel", oldLevel);//旧等级
+			content.put("nowlevel", level);//现在等级
+			content.put("rank", rank);
+			content.put("isAnchorUpgrade", true);//是否为主播升级
+			content.put("isAllRoomNotify", msgType);//是否全站通知
 			if (msgType) {
 				//发送全站通知
 				roomId = Constants.WHOLE_SITE_NOTICE_ROOMID;

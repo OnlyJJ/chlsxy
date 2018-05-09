@@ -74,9 +74,6 @@ public class SendMsgServiceImpl implements ISendMsgService {
 		if(content == null) {
 			throw new BaseBizException(ErrorCode.ERROR_10005);
 		}
-		if(!StrUtil.isNullOrEmpty(toUserId)) {
-			content.put("to", toUserId);
-		}
 		// 聊天消息 
 		int seqID = IMBusinessEnum.SeqID.SEQ_1.getValue();
 		int funId = IMBusinessEnum.FunID.FUN_11001.getValue();
@@ -85,6 +82,9 @@ public class SendMsgServiceImpl implements ISendMsgService {
 		JSONObject data = new JSONObject();
 		//群聊 
 		int dataMsgType = MsgTypeEnum.GroupChat.getValue();
+		if(!StrUtil.isNullOrEmpty(toUserId)) {
+			data.put("to", toUserId);
+		}
 		// 系统身份
 		data.put("msgtype", dataMsgType);
 		data.put("targetid", targetid);
@@ -125,11 +125,9 @@ public class SendMsgServiceImpl implements ISendMsgService {
 		}
 		if(dataJsonObj.containsKey("to")) { // 把to完整信息放入数据流中
 			String to = dataJsonObj.getString("to");
-			if(StrUtil.isNullOrEmpty(to) && !to.startsWith("{")) {
-				UserInfoVo toUser = userCacheInfoService.getUserFromCache(to, roomId);
-				if(toUser != null) {
-					dataJsonObj.put("to", toUser);
-				}
+			UserInfoVo toUser = userCacheInfoService.getUserFromCache(to, roomId);
+			if(toUser != null) {
+				dataJsonObj.put("to", JsonUtil.toJson(toUser));
 			}
 		}
 		UserInfoVo user = userCacheInfoService.getUserFromCache(senderUserId, roomId);
