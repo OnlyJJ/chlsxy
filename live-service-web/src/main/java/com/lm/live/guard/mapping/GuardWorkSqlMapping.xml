@@ -18,17 +18,6 @@
 		select * from t_guard_work where id=#{id}
 	</select>
 	
-	<select id="getGuardEndTimeByUser" parameterType="int" resultMap="guardWorkVo">
-		select w.* from t_guard_work w, t_guard_conf c 
-		where w.guardId=c.id 
-		AND userId=#{userId} 
-		<if test="roomId != null and roomId != ''">
-			AND roomId=#{roomId}
-		</if>
-		AND c.guardType= #{guardType} 
-		ORDER BY endTime DESC 
-		LIMIT 1
-	</select>
 	
 	<select id="getGuardInfoAllData"  resultMap="guardWorkVo">
 	<![CDATA[
@@ -412,5 +401,13 @@
 		]]>
 	</select>
  	 
+ 	 <select id="getGuardEndTimeByUser" resultMap="guardWorkVo">
+ 		SELECT w.* FROM t_guard_work w, t_guard_conf c 
+		WHERE w.guardId=c.id 
+		AND userId= #{userId}
+		AND c.guardType= #{guardType}
+		ORDER BY endTime DESC 
+		LIMIT 1
+ 	 </select>
 	
 </mapper>

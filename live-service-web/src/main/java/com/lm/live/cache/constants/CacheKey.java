@@ -126,6 +126,10 @@ public class CacheKey {
 	/** 用户背包缓存 */
 	public static final String TOOL_USER_BAG_CACHE = "tool:user:bag:";
 	
+	//游戏模块
+	/** 砸蛋奖品缓存 */
+	public static final String EGG_PRIZE_CACHE = "egg:prize";
+	
 	// others模块
 	public static final String XINGE_PUSH_CACHE = "xinge_token_";
 	

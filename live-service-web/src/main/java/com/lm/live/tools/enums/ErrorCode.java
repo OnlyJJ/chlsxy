@@ -11,6 +11,11 @@ import java.util.Map;
  *
  */
 public enum ErrorCode {
+	/** 此道具已无效 */
+	ERROR_3001(3001, "此道具已无效"),
+	/** 背包余量不足 */
+	ERROR_3000(3000, "背包余量不足"),
+	
 	
 	/** 参数错误 */
 	ERROR_101(101, "参数错误"),

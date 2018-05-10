@@ -14,4 +14,7 @@ public interface UserPackageMapper extends ICommonMapper<UserPackage> {
 	
 	List<UserPackage> listUserPackage(String userId);
 	
+	void addPackage(UserPackage vo);
+	
+	void subPackage(UserPackage vo);
 }

@@ -1,6 +1,7 @@
 package com.lm.live.tools.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -16,11 +17,13 @@ import com.lm.live.common.service.impl.CommonServiceImpl;
 import com.lm.live.common.utils.JsonUtil;
 import com.lm.live.common.utils.StrUtil;
 import com.lm.live.guard.constant.Constants;
+import com.lm.live.room.exception.RoomBizException;
 import com.lm.live.tools.dao.ToolMapper;
 import com.lm.live.tools.dao.UserPackageMapper;
 import com.lm.live.tools.domain.Gift;
 import com.lm.live.tools.domain.Tool;
 import com.lm.live.tools.domain.UserPackage;
+import com.lm.live.tools.domain.UserPackageHis;
 import com.lm.live.tools.enums.ErrorCode;
 import com.lm.live.tools.enums.ToolsEnum.ToolType;
 import com.lm.live.tools.exception.ToolBizException;
@@ -110,6 +113,55 @@ public class UserPackageServiceImpl extends CommonServiceImpl<UserPackageMapper,
 			}
 		}
 		return ret;
+	}
+
+	@Override
+	public void addUserPackage(String userId, int type, int toolId, int number) throws Exception {
+		if(StrUtil.isNullOrEmpty(userId) || number <= 0) {
+			throw new ToolBizException(ErrorCode.ERROR_101);
+		}
+		UserPackage up = dao.getUserPackage(userId, toolId, type);
+		if(up == null) {
+			up = new UserPackage();
+			up.setUserId(userId);
+			up.setAddTime(new Date());
+			up.setToolId(toolId);
+			up.setType(type);
+			up.setNumber(number);
+			up.setStatus(Constants.STATUS_1);
+			up.setValidity(Constants.STATUS_0);
+			dao.insert(up);
+		} else {
+			up.setNumber(number);
+			dao.addPackage(up);
+		}
+	}
+
+	@Override
+	public int subUserPackage(String userId, int type, int toolId, int number) throws Exception {
+		if(StrUtil.isNullOrEmpty(userId) || number <= 0) {
+			throw new ToolBizException(ErrorCode.ERROR_101);
+		}
+		UserPackage up = dao.getUserPackage(userId, toolId, type);
+		if(up == null) {
+			throw new ToolBizException(ErrorCode.ERROR_3000);
+		} else {
+			if(up.getNumber() < number) {
+				throw new ToolBizException(ErrorCode.ERROR_3000);
+			}
+			if(up.getStatus() == Constants.STATUS_0) {
+				throw new ToolBizException(ErrorCode.ERROR_3001);
+			}
+			if(up.getValidity() == Constants.STATUS_1) {
+				if((new Date()).after(up.getEndTime())) {
+					throw new ToolBizException(ErrorCode.ERROR_3001);
+				}
+			}
+			int retnum = up.getNumber() - number;
+			up.setNumber(number);
+			dao.subPackage(up);
+			return retnum;
+		}
 	}
 
 

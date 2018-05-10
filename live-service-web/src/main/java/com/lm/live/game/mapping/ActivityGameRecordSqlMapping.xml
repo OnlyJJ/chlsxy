@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+   
+<mapper namespace="com.lm.live.game.dao.ActivityGameRecordMapper">
+	<resultMap type="com.lm.live.game.domain.ActivityGameRecord" id="vo">
+	    <result property="id" column="id" />
+	    <result property="userId" column="userId" />
+	    <result property="gameId" column="gameId" />
+	    <result property="prizeId" column="prizeId" />
+	    <result property="recordDateTime" column="recordDateTime" />
+	    <result property="remark" column="remark" />
+	</resultMap>
+
+	<select id="getObjectById" parameterType="java.lang.Integer" resultMap="vo">
+		select * from t_activity_game_record where id=#{id}
+	</select>
+	
+	<delete id="removeById" parameterType="java.lang.Integer">
+		delete from t_activity_game_record where id = #{id}
+	</delete>
+	
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+	  <![CDATA[
+	  INSERT INTO t_activity_game_record(
+			userId,
+			gameId,
+			prizeId,
+			recordDateTime,
+			remark
+			) VALUES (
+			#{userId,jdbcType=VARCHAR},
+			#{gameId,jdbcType=VARCHAR},
+			#{prizeId,jdbcType=VARCHAR},
+			#{recordDateTime,jdbcType=VARCHAR},
+			#{remark,jdbcType=VARCHAR}
+		)	
+		]]>
+	  </insert>
+	  
+	  
+</mapper>

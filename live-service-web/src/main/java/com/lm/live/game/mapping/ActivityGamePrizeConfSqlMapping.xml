@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+   
+<mapper namespace="com.lm.live.game.dao.ActivityGamePrizeConfMapper">
+	<resultMap type="com.lm.live.game.domain.ActivityGamePrizeConf" id="vo">
+	    <result property="id" column="id" />
+	    <result property="gameType" column="gameType" />
+	    <result property="rate" column="rate" />
+	    <result property="type" column="type" />
+	    <result property="prizeValue" column="prizeValue" />
+	    <result property="itemTitle" column="itemTitle" />
+	    <result property="itemDesc" column="itemDesc" />
+	    <result property="number" column="number"/>
+	    <result property="isAllRoomNotify" column="isAllRoomNotify" />
+	    <result property="status" column="status" />
+	    <result property="firstPrize" column="firstPrize" />
+	    <result property="addTime" column="addTime" /> 
+	</resultMap>
+
+	<select id="getObjectById" parameterType="java.lang.Integer" resultMap="vo">
+		select * from t_activity_game_prize_conf where id=#{id}
+	</select>
+	
+	<!-- 获取某类型正在使用的奖品配置 -->
+	<select id="listActivityGamePrizeConf"  resultMap="vo">
+		SELECT * FROM t_activity_game_prize_conf 
+		WHERE gameType=#{gameType}
+		AND status = 1
+		ORDER BY rate ASC
+	</select>
+
+	<select id="getObjectByGift" resultType="java.util.Map">
+		SELECT a.*, b.image, b.price, b.info comment FROM t_activity_game_prize_conf a LEFT JOIN
+		t_gift b ON a.prizeValue = b.id
+		<where>
+			AND a.gameType = #{gameType}
+			AND a.type = #{type}
+			AND a.status = #{status}
+		</where>
+	</select>
+	
+	<select id="getObjectByTool" resultType="java.util.Map">
+		SELECT a.*, b.image, b.gold price, b.info comment FROM t_activity_game_prize_conf a LEFT JOIN
+		t_tool b ON a.prizeValue = b.id
+		<where>
+			AND a.gameType = #{gameType}
+			AND a.type = #{type}
+			AND a.status = #{status}
+		</where>
+	</select>
+	
+	<select id="getObjectByDecorate" resultType="java.util.Map">
+		SELECT a.*, b.lightenImg image FROM t_activity_game_prize_conf a LEFT JOIN
+		t_decorate b ON a.prizeValue = b.id
+		<where>
+			AND a.gameType = #{gameType}
+			AND a.type = #{type}
+			AND a.status = #{status}
+		</where>
+	</select>
+	 
+	 <select id="getFirstPrizeByGameId" resultMap="vo">
+	 	SELECT * FROM t_activity_game_prize_conf 
+	 	WHERE gameType = #{gameType}
+		AND status = 1
+		AND firstPrize = 1
+		LIMIT 1
+	 </select>
+	 
+	 <select id="getAllPrizeByGameId" resultMap="vo">
+	 	SELECT * FROM t_activity_game_prize_conf 
+	 	WHERE gameType = #{gameType}
+		AND status = 1
+	 </select>
+	 
+	 <select id="getPirzeConByIdAndInuse" resultMap="vo">
+	 	SELECT * FROM t_activity_game_prize_conf 
+	 	WHERE id = #{id}
+		AND status = #{status}
+		LIMIT 1
+	 </select>
+	 
+</mapper>

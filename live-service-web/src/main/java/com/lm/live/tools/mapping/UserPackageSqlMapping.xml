@@ -68,6 +68,19 @@
 		]]>
 	</insert>
 
+	<!-- 加背包 -->
+	<update id="addPackage">
+		UPDATE t_user_package SET number = number + #{number}
+		WHERE userId = #{userId}
+		AND type = #{type}
+		AND toolId = #{toolId}
+	</update>
 
-
+	<!-- 扣背包 -->
+	<update id="subPackage">
+		UPDATE t_user_package SET number = number - #{number}
+		WHERE userId = #{userId}
+		AND type = #{type}
+		AND toolId = #{toolId}
+	</update>
 </mapper>

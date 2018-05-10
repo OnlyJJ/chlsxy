@@ -4,6 +4,7 @@ package com.lm.live.decorate.service;
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.common.service.ICommonService;
 import com.lm.live.decorate.domain.DecoratePackage;
+import com.lm.live.decorate.vo.DecorateVo;
 
 /**
  * 勋章包裹
@@ -41,5 +42,12 @@ public interface IDecoratePackageService extends ICommonService<DecoratePackage>
 	 */
 	public void updateStatus(String userId, int decorateId, int status) throws Exception;
 	
-			
+	/**
+	 * 发放勋章
+	 *@param vo
+	 *@throws Exception
+	 *@author shao.xiang
+	 *@data 2018年5月9日
+	 */
+	void addDecorate(DecorateVo vo) throws Exception;		
 }

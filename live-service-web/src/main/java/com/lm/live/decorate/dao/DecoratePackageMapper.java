@@ -10,6 +10,9 @@ import com.lm.live.decorate.domain.DecoratePackage;
 import com.lm.live.decorate.vo.DecoratePackageVo;
 
 public interface DecoratePackageMapper extends ICommonMapper<DecoratePackage> {
+	
+	DecoratePackage getDecoratePackage(@Param("userId") String userId, @Param("decorateId") int decorateId);
+	
 	/**
 	 * 查询有效的勋章
 	 *@param userId

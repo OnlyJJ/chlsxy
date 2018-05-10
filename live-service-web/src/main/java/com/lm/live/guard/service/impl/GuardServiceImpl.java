@@ -29,6 +29,8 @@ import com.lm.live.guard.domain.GuardConf;
 import com.lm.live.guard.domain.GuardPayHis;
 import com.lm.live.guard.domain.GuardWork;
 import com.lm.live.guard.domain.GuardWorkConf;
+import com.lm.live.guard.enums.ErrorCode;
+import com.lm.live.guard.exception.GuardBizException;
 import com.lm.live.guard.service.IGuardService;
 import com.lm.live.guard.vo.GuardVo;
 import com.lm.live.user.service.IUserCacheInfoService;
@@ -402,6 +404,14 @@ public class GuardServiceImpl implements IGuardService {
 			}
 		}
 		return list;
+	}
+
+	@Override
+	public GuardWork getGuardEndTimeByUser(String userId, int guardType) {
+		if(StrUtil.isNullOrEmpty(userId)) {
+			throw new GuardBizException(ErrorCode.ERROR_101);
+		}
+		return this.gwMapper.getGuardEndTimeByUser(userId, guardType);
 	}
 
 	

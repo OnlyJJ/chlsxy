@@ -2,17 +2,21 @@ package test;
 
 import javax.annotation.Resource;
 
+
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.alibaba.fastjson.JSONObject;
 import com.lm.live.appclient.service.IAppStartupPageService;
 import com.lm.live.base.domain.ThirdpartyConf;
 import com.lm.live.base.service.IThirdpartyConfService;
 import com.lm.live.base.service.IUserAccusationInfoService;
 import com.lm.live.decorate.service.IDecoratePackageService;
 import com.lm.live.framework.service.ServiceResult;
+import com.lm.live.game.service.IGameService;
 import com.lm.live.guard.service.IGuardService;
 import com.lm.live.home.service.IGwFilesService;
 import com.lm.live.room.service.IRoomService;
@@ -58,6 +62,9 @@ public class ServiceTest {
 	
 	@Resource
 	private IThirdpartyConfService thirdpartyConfService;
+	
+	@Resource
+	private IGameService gameService;
 
 	@Test
 	public void test() {
@@ -127,8 +134,15 @@ public class ServiceTest {
 //				System.err.println("null ....");
 //			}
 //			System.err.println("name =" + name);
-			
-			ServiceResult<ThirdpartyConf> srt = thirdpartyConfService.getThirdpartyConf(0, "com.lm.live", 0);
+//			ServiceResult<ThirdpartyConf> srt = thirdpartyConfService.getThirdpartyConf(0, "com.lm.live", 0);
+			int gameType = 1;
+			int series = 1;
+			JSONObject jsonRes = gameService.openEggs(userId, roomId, gameType, series);
+			if(jsonRes != null) {
+				System.err.println(jsonRes);
+			} else {
+				System.err.println("null ....");
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -20,4 +20,6 @@ public interface GuardWorkMapper extends ICommonMapper<GuardWork> {
 	List<GuardWork> listRoomGuardData(String roomId);
 	
 	List<Map> getUserGuardRoomData(@Param("userId") String userId, @Param("roomId") String roomId);
+	
+	GuardWork getGuardEndTimeByUser(@Param("userId") String userId, @Param("guardType") int guardType);
 }

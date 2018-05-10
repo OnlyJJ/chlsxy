@@ -51,6 +51,15 @@ public interface IGuardService {
 			int validate, Date time,int price,int diamond,String toUserId,String remark) throws Exception;
 	GuardConf getGuardConfData(int guardType, int priceType) throws Exception;
 	
+	/**
+	 * 获取用户某种守护最长的结束时间
+	 *@param userId
+	 *@param guardType
+	 *@return
+	 *@author shao.xiang
+	 *@data 2018年5月9日
+	 */
+	GuardWork getGuardEndTimeByUser(String userId, int guardType);
 	void clean(String userId, String roomId) throws Exception;
 	
 	/**

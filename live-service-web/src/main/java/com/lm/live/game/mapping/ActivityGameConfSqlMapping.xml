@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+   
+<mapper namespace="com.lm.live.game.dao.ActivityGameConfMapper">
+	<resultMap type="com.lm.live.game.domain.ActivityGameConf" id="vo">
+	    <result property="id" column="id" />
+	    <result property="spendGold" column="spendGold" />
+	    <result property="gameType" column="gameType" />
+	    <result property="status" column="status" />
+	    <result property="gameTitle" column="gameTitle" />
+	    <result property="gameComment" column="gameComment" />
+	    <result property="beginTime" column="beginTime" />
+	    <result property="endTime" column="endTime" />
+	</resultMap>
+
+	<select id="getObjectById" parameterType="java.lang.Integer" resultMap="vo">
+		select * from t_activity_game_conf where id=#{id}
+	</select>
+	
+	<select id="countForGetListByPage"  resultType="java.lang.Integer"> 
+          SELECT count(*) FROM t_activity_game_conf a WHERE a.status= 1 
+    </select> 	
+    
+    <select id="getActivityGameConf" resultMap="vo"> 
+          SELECT * FROM t_activity_game_conf a WHERE a.gameType= #{gameType}
+    </select> 
+
+</mapper>

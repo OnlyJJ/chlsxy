@@ -55,4 +55,8 @@ public class CacheTimeout {
 	 */
 	public final static int DEFAULT_TIMEOUT_24H = 60 * 60 * 24;
 	
+	/**
+	 * 默认缓存时间，30天
+	 */
+	public final static int DEFAULT_TIMEOUT_30D = 60 * 60 * 24 * 30;
 }

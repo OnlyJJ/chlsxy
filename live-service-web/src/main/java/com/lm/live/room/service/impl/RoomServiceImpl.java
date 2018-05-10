@@ -36,6 +36,8 @@ import com.lm.live.common.utils.LogUtil;
 import com.lm.live.common.utils.SensitiveWordUtil;
 import com.lm.live.common.utils.StrUtil;
 import com.lm.live.common.vo.Page;
+import com.lm.live.decorate.service.IDecoratePackageService;
+import com.lm.live.decorate.vo.DecorateVo;
 import com.lm.live.guard.domain.GuardConf;
 import com.lm.live.guard.domain.GuardPayHis;
 import com.lm.live.guard.domain.GuardWork;
@@ -120,6 +122,8 @@ public class RoomServiceImpl implements IRoomService {
 	@Resource
 	private IUserRoomMemberService userRoomMemberService;
 	
+	@Resource 
+	private IDecoratePackageService decoratePackageService;
 	
 	@Transactional(rollbackFor=Exception.class)
 	@Override
@@ -168,7 +172,7 @@ public class RoomServiceImpl implements IRoomService {
 			// 扣金币，加流水记录
 			UserAccountBook book = new UserAccountBook();
 			book.setUserId(userId);
-			book.setChangeGold(gold);
+			book.setChangeGold(-gold);
 			book.setSourceDesc(remark);
 			book.setSourceId(sourceId);
 			book.setRecordTime(now);
@@ -177,30 +181,16 @@ public class RoomServiceImpl implements IRoomService {
 		} else if(fromType == ToolsEnum.GiftFormType.BAG.getValue()) {
 			// 扣背包
 			// 查询背包是否存在此礼物，并且数量足够，不足的直接返回
-			UserPackage pck = userPackageService.getUserPackage(userId, giftId, ToolsEnum.ToolType.GIFT.getValue());
-			if(pck == null) {
-				throw new RoomBizException(ErrorCode.ERROR_8004);
-			}
-			if(pck.getNumber() < giftNum) {
-				throw new RoomBizException(ErrorCode.ERROR_8004);
-			}
-			if(pck.getStatus() == Constants.STATUS_0) {
-				throw new RoomBizException(ErrorCode.ERROR_8001);
-			}
-			if(pck.getValidity() == Constants.STATUS_1) {
-				if(now.after(pck.getEndTime())) {
-					throw new RoomBizException(ErrorCode.ERROR_8001);
-				}
-			}
-			int num = pck.getNumber() - giftNum;
-			retVo.setNum(num);
+			int type = ToolsEnum.ToolType.GIFT.getValue();
 			remark = Constants.SENDGIFT_BYBAG_REMARK;
 			// 扣背包，加背包流水记录（此处再设计一个背包流水）
+			int num = userPackageService.subUserPackage(userId, type, giftId, giftNum);
+			retVo.setNum(num);
 			UserPackageHis his = new UserPackageHis();
 			his.setUserId(userId);
 			his.setNum(-giftNum);
 			his.setRecordTime(now);
-			his.setType(ToolType.GIFT.getValue());
+			his.setType(type);
 			his.setToolId(giftId);
 			his.setRefDesc(remark);
 			userPackageHisService.insert(his);
@@ -706,8 +696,21 @@ public class RoomServiceImpl implements IRoomService {
 			userAccountService.addCrystal(anchorUserId, crystal);
 			
 			//7 赠送勋章
-//			decoratePackageService.addPackage(userId, roomId, decorateId, periodFlag, 1, validate, guardType);
-			
+			GuardWork lastGk = guardService.getGuardEndTimeByUser(userId, guardType);
+			Date endTime =DateUntil.addDay(now, validate);
+			if(lastGk != null) {
+				endTime = DateUntil.addDay(lastGk.getEndtime(), validate);
+			}
+			DecorateVo vo = new DecorateVo();
+			vo.setUserId(userId);
+			vo.setRoomId(roomId);
+			vo.setDecorateId(decorateId);
+			vo.setPeriod(periodFlag);
+			vo.setDays(validate);
+			vo.setEndTime(endTime);
+			vo.setDesc(Constants.DECORATE_REMAK);
+			vo.setIsAccumulation(Constants.STATUS_1);
+			decoratePackageService.addDecorate(vo);
 							
 			String orderId = Constants.BUYGUARD_ORDERID + gph.getId();
 			PayGiftOut giftOut = new PayGiftOut();

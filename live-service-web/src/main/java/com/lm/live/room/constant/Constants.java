@@ -36,6 +36,8 @@ public class Constants extends BaseConstants {
 	public static final String REL_REMARK = "续期";
 	public static final String BUYGUARD_REMARK = "购买守护，id:";
 	public static final String BUYGUARD_ORDERID = "t_guard_pay_his_";
+	/** 买守护的勋章 */
+	public static final String DECORATE_REMAK = "购买守护，获得勋章";
 	
 	
 	/** 发送大喇叭需要的金币 */

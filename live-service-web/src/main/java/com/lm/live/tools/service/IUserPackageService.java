@@ -37,4 +37,27 @@ public interface IUserPackageService extends ICommonService<UserPackage> {
 	 * @data 2018年4月1日
 	 */
 	JSONObject listUserBagData(String userId) throws Exception;
+	
+	/**
+	 * 加背包
+	 *@param userId
+	 *@param type
+	 *@param toolId
+	 *@param number
+	 *@author shao.xiang
+	 *@data 2018年5月9日
+	 */
+	void addUserPackage(String userId, int type, int toolId, int number) throws Exception;
+	
+	/**
+	 * 扣背包
+	 *@param userId
+	 *@param type
+	 *@param toolId
+	 *@param number
+	 * @return 返回扣除后的余量
+	 *@author shao.xiang
+	 *@data 2018年5月9日
+	 */
+	int subUserPackage(String userId, int type, int toolId, int number) throws Exception;
 }

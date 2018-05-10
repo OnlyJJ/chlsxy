@@ -13,6 +13,7 @@ public interface DecorateMapper extends ICommonMapper<Decorate> {
 	/**
 	 * 获取用户有效的勋章
 	 *@param userId
+	 *@category 类型，0-普通用户，1-主播
 	 *@return
 	 *@author shao.xiang
 	 *@data 2018年4月8日

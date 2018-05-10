@@ -32,7 +32,13 @@
 		]]>
 		AND d.type=0
 		ORDER BY p.isPeriod ASC ,p.endTime DESC,d.sortWeight DESC
+	</select>
 
+	<select id="getDecoratePackage" resultMap="vo">
+		SELECT * FROM t_decorate_package
+		WHERE decorateId = #{decorateId}
+		AND userId=#{userId}
+		LIMIT 1
 	</select>
 
 </mapper>
