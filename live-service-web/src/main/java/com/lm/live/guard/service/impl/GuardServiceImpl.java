@@ -249,11 +249,11 @@ public class GuardServiceImpl implements IGuardService {
 				array.add(vo.buildJson());
 			}
 			// 放入缓存
-			RedisUtil.set(key, array, CacheTimeout.DEFAULT_TIMEOUT_30M);
 			LogUtil.log.info("### mydebug,从db中查询守护列表,end，key="+key);
 		} 
 		if(array != null && array.size() >0) {
 			ret.put(Constants.DATA_BODY, array);
+			RedisUtil.set(key, ret, CacheTimeout.DEFAULT_TIMEOUT_30M);
 		}
 		return ret;
 	}

@@ -53,7 +53,6 @@ import com.lm.live.login.domain.WechatOauth2TokenRefresh;
 import com.lm.live.login.domain.WechatUser;
 import com.lm.live.login.domain.WeiboUserInfoDo;
 import com.lm.live.login.enums.ErrorCode;
-import com.lm.live.login.enums.LockTarget;
 import com.lm.live.login.enums.LoginType;
 import com.lm.live.login.exceptions.LoginBizException;
 import com.lm.live.login.service.ILoginService;
@@ -1019,7 +1018,7 @@ public class LoginServiceImpl implements ILoginService {
 	@SuppressWarnings("unchecked")
 	private String getUserId() throws Exception{
 		String code = "";
-		String lockname = LockTarget.LOCK_LOGIN_USERCODE.getLockName();
+		String lockname = LockKey.LOCK_LOGIN_USERCODE;
 		try {
 			RdLock.lock(lockname);
 			List<CodeRandom> list = null;

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+    
+    <mapper namespace="com.lm.live.game.dao.SignPrizeHisMapper">
+    	<resultMap type="com.lm.live.game.domain.SignPrizeHis" id="vo">
+    		<result property="id" column="id"/>
+    		<result property="userId" column="userId"/>
+    		<result property="prizeType" column="prizeType"/>
+    		<result property="prizeId" column="prizeId"/>
+    		<result property="number" column="number"/>
+    		<result property="addTime" column="addTime"/>
+    	</resultMap>
+    
+	    <select id="getsignPrizeConfType"  resultMap="vo">
+	    	SELECT * FROM t_sign_prize_his WHERE prizeType = #{prizeType}
+	    </select>
+	    
+	    <select id="getRecivePrizeDatas" resultMap="vo">
+	    	SELECT * FROM t_sign_prize_his WHERE userId=#{userId} ORDER BY addTime DESC LIMIT #{num}
+	    </select>
+	    
+    	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    	<![CDATA[
+    		INSERT INTO t_sign_prize_his(
+    			userId,
+    			prizeType,
+    			prizeId,
+			    number,			
+    			addTime
+    		) VALUES(
+    			#{userId,jdbcType=VARCHAR},
+    			#{prizeType,jdbcType=VARCHAR},
+    			#{prizeId,jdbcType=VARCHAR},
+    			#{number,jdbcType=VARCHAR},
+    			#{addTime,jdbcType=VARCHAR}
+    		)
+    	]]>
+    	</insert>
+    	
+    </mapper>

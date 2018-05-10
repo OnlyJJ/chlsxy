@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.account.domain.UserAccount;
+import com.lm.live.common.constant.LockKey;
 import com.lm.live.common.controller.BaseController;
+import com.lm.live.common.redis.RdLock;
 import com.lm.live.common.utils.LogUtil;
 import com.lm.live.common.utils.RequestUtil;
 import com.lm.live.common.vo.RequestVo;
@@ -21,7 +23,9 @@ import com.lm.live.common.vo.Result;
 import com.lm.live.game.enums.ErrorCode;
 import com.lm.live.game.exception.GameBizException;
 import com.lm.live.game.service.IGameService;
+import com.lm.live.game.service.ISignService;
 import com.lm.live.game.vo.GameVo;
+import com.lm.live.game.vo.SignVo;
 import com.lm.live.web.vo.DataRequest;
 
 /**
@@ -35,6 +39,9 @@ public class GameWeb extends BaseController {
 	
 	@Resource
 	private IGameService gameService;
+	
+	@Resource
+	private ISignService signService;
 	
 	
 	/**
@@ -60,7 +67,18 @@ public class GameWeb extends BaseController {
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
 			String userId = req.getUserId();
-			
+			String lockname = LockKey.LOCK_USER_TOOL;
+			try {
+				RdLock.lock(lockname);
+				SignVo vo = signService.sign(userId);
+				if(vo != null) {
+					jsonRes.put(vo.getShortName(), vo.buildJson());
+				}
+			} catch(Exception e) {
+				throw e;
+			} finally {
+				RdLock.unlock(lockname);
+			}
 		} catch(GameBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());
@@ -105,8 +123,14 @@ public class GameWeb extends BaseController {
 			game.parseJson(data.getData().getJSONObject(game.getShortName()));
 			int gameType = game.getGameType();
 			int series = game.getSeriesConf();
-			synchronized(UserAccount.class) {
+			String lockname = LockKey.LOCK_USER_ACCOUNT;
+			try {
+				RdLock.lock(lockname);
 				jsonRes = gameService.openEggs(userId, roomId, gameType, series);
+			} catch(Exception e) {
+				throw e;
+			} finally {
+				RdLock.unlock(lockname);
 			}
 		} catch(GameBizException e) {
 			LogUtil.log.error(e.getMessage(), e);

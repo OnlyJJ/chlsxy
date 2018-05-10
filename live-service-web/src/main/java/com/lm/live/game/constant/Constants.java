@@ -17,5 +17,9 @@ public class Constants extends BaseConstants {
 	/** 砸蛋得勋章说明 */
 	public static final String DECORATE_RECORD_REMARK = "砸蛋获得勋章";
 	
+	/** 签到时，用户为新用户还是老用户的判断时间点-即注册时间+6 */
+	public static final int NEW_USER_TIME = 7;
 	
+	/** 签到获得奖励 */
+	public static final String SIGN_REMARK = "签到获得奖励";
 }

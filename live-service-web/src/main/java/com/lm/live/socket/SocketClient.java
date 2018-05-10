@@ -54,6 +54,7 @@ public class SocketClient {
 				LogUtil.log.info("### sokcet destory。。。");
 				client.close();
 			}
+			ThreadManager.getInstance().shutdownNow();
 		} catch (IOException e) {
 			LogUtil.log.error(e.getMessage() ,e);
 		}

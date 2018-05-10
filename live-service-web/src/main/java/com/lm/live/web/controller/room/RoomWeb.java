@@ -729,8 +729,8 @@ public class RoomWeb  extends BaseController{
 			String userId = req.getUserId();
 			String roomId = ro.getRoomid();
 			String msg = ro.getMsg();
-			String token = ro.getToken(); // my-todo，这里要传token的，im实现要再改一下
-			roomService.sendHorn(userId, roomId, msg);
+			String anchorId = ro.getAnchorId();
+			roomService.sendHorn(userId, anchorId, roomId, msg);
 		} catch(RoomBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());

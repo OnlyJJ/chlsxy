@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+    
+    <mapper namespace="com.lm.live.game.dao.SignInfoMapper">
+    	<resultMap type="com.lm.live.game.domain.SignInfo" id="info">
+    		<result property="id" column="id"/>
+    		<result property="userId" column="userId"/>
+    		<result property="seriesDay" column="seriesDay"/>
+    		<result property="signTime" column="signTime"/>
+    		<result property="totalDay" column="totalDay"/>
+    	</resultMap>
+    
+    	<select id="getSignInfo" parameterType="java.lang.String" resultMap="info">
+    		SELECT * FROM t_sign_info WHERE userId=#{userId} ORDER BY signTime DESC LIMIT 1;  
+    	</select>
+    
+    	<select id="getSignInfoCondition" resultMap="info">
+    		select * from t_sign_info where signTime=#{signTime} and userId= #{userId}  
+    	</select>
+    	
+    	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		 	<![CDATA[
+		 		INSERT INTO t_sign_info(
+		    			userId,
+		    			seriesDay,
+		    			signTime,
+		    			totalDay
+		    		) VALUES(
+		    			#{userId,jdbcType=VARCHAR},
+		    			#{seriesDay,jdbcType=VARCHAR},
+		    			#{signTime,jdbcType=VARCHAR},
+		    			#{totalDay,jdbcType=VARCHAR}
+		    		)
+		 	]]>
+	 	</insert>
+    	
+    	<!-- 更新用户签到信息 -->
+    	<update id="updateCondition">
+    		UPDATE t_sign_info SET seriesDay = #{seriesDay}, signTime = #{signTime},totalDay=totalDay+1
+    		WHERE userId = #{userId}
+    	</update>
+    	
+    </mapper>

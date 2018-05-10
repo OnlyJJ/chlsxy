@@ -129,6 +129,8 @@ public class CacheKey {
 	//游戏模块
 	/** 砸蛋奖品缓存 */
 	public static final String EGG_PRIZE_CACHE = "egg:prize";
+	/** 每日签到缓存：key + userId + ":" + nowStr */
+	public static final String SIGN_DAY_CACHE = "sign:day:";
 	
 	// others模块
 	public static final String XINGE_PUSH_CACHE = "xinge_token_";

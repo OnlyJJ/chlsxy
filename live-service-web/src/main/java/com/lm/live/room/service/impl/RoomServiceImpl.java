@@ -323,7 +323,7 @@ public class RoomServiceImpl implements IRoomService {
 				try {
 					if(shouhuContent != null) {
 						LogUtil.log.info(String.format("####　begin推送礼物跑道的im消息:发消息begin..,onGiftRunwayImData:%s",JsonUtil.beanToJsonString(onGiftRunwayImData)));
-						sendMsgService.sendMsg(userId, null, ImCommonEnum.IM_HORN.getValue(), Constants.WHOLE_SITE_NOTICE_ROOMID, shouhuContent);
+						sendMsgService.sendMsg(userId, anchorId, ImCommonEnum.IM_HORN.getValue(), Constants.WHOLE_SITE_NOTICE_ROOMID, shouhuContent);
 						LogUtil.log.info(String.format("####　end推送礼物跑道的im消息:发消息end..,onGiftRunwayImData:%s",JsonUtil.beanToJsonString(onGiftRunwayImData)));
 					}
 				} catch(Exception e) {
@@ -1338,7 +1338,7 @@ public class RoomServiceImpl implements IRoomService {
 	}
 
 	@Override
-	public void sendHorn(String userId, String roomId, String msg)
+	public void sendHorn(String userId, String anchorId, String roomId, String msg)
 			throws Exception {
 		if(StrUtil.isNullOrEmpty(userId) || StrUtil.isNullOrEmpty(roomId)){
 			throw new RoomBizException(ErrorCode.ERROR_101);
@@ -1360,6 +1360,6 @@ public class RoomServiceImpl implements IRoomService {
 		content.put("msg", SensitiveWordUtil.replaceSensitiveWord(msg));
 		content.put("roomId", roomId);
 		String targetid = Constants.WHOLE_SITE_NOTICE_ROOMID;
-		sendMsgService.sendMsg(userId, null, ImCommonEnum.IM_HORN.getValue(), targetid, content);
+		sendMsgService.sendMsg(userId, anchorId, ImCommonEnum.IM_HORN.getValue(), targetid, content);
 	}
 }

@@ -70,7 +70,7 @@
 
 	<!-- 加背包 -->
 	<update id="addPackage">
-		UPDATE t_user_package SET number = number + #{number}
+		UPDATE t_user_package SET number = number + #{number},addTime = NOW()
 		WHERE userId = #{userId}
 		AND type = #{type}
 		AND toolId = #{toolId}
@@ -78,7 +78,7 @@
 
 	<!-- 扣背包 -->
 	<update id="subPackage">
-		UPDATE t_user_package SET number = number - #{number}
+		UPDATE t_user_package SET number = number - #{number},addTime = NOW()
 		WHERE userId = #{userId}
 		AND type = #{type}
 		AND toolId = #{toolId}

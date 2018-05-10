@@ -12,7 +12,7 @@ public class UserPackageHis extends BaseVo {
 	private long id;
 	/** 用户userId */
 	private String userId;
-	/** 类型，0-礼物，1-道具 */
+	/** 类型，1-礼物，2-道具 */
 	private int type;
 	/** toolId */
 	private int toolId;

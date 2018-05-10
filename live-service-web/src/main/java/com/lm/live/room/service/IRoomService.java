@@ -114,6 +114,6 @@ public interface IRoomService {
 	 *@author shao.xiang
 	 *@data 2018年5月7日
 	 */
-	void sendHorn(String userId, String roomId, String msg) throws Exception;
+	void sendHorn(String userId, String anchorId, String roomId, String msg) throws Exception;
 	
 }

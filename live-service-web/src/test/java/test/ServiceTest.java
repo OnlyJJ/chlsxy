@@ -1,22 +1,26 @@
 package test;
 
+import java.util.Date;
+
 import javax.annotation.Resource;
-
-
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.alibaba.fastjson.JSONObject;
 import com.lm.live.appclient.service.IAppStartupPageService;
-import com.lm.live.base.domain.ThirdpartyConf;
 import com.lm.live.base.service.IThirdpartyConfService;
 import com.lm.live.base.service.IUserAccusationInfoService;
+import com.lm.live.cache.constants.CacheKey;
+import com.lm.live.common.redis.RedisUtil;
+import com.lm.live.common.utils.DateUntil;
+import com.lm.live.common.utils.JsonUtil;
 import com.lm.live.decorate.service.IDecoratePackageService;
-import com.lm.live.framework.service.ServiceResult;
+import com.lm.live.game.constant.Constants;
 import com.lm.live.game.service.IGameService;
+import com.lm.live.game.service.ISignService;
+import com.lm.live.game.vo.SignVo;
 import com.lm.live.guard.service.IGuardService;
 import com.lm.live.home.service.IGwFilesService;
 import com.lm.live.room.service.IRoomService;
@@ -65,6 +69,9 @@ public class ServiceTest {
 	
 	@Resource
 	private IGameService gameService;
+	
+	@Resource
+	private ISignService signService;
 
 	@Test
 	public void test() {
@@ -137,9 +144,14 @@ public class ServiceTest {
 //			ServiceResult<ThirdpartyConf> srt = thirdpartyConfService.getThirdpartyConf(0, "com.lm.live", 0);
 			int gameType = 1;
 			int series = 1;
-			JSONObject jsonRes = gameService.openEggs(userId, roomId, gameType, series);
+//			JSONObject jsonRes = gameService.openEggs(userId, roomId, gameType, series);
+			Date now = new Date();
+			String nowStr = DateUntil.format2Str(now, Constants.DATEFORMAT_YMD_1);
+			String key = CacheKey.SIGN_DAY_CACHE + userId + Constants.SEPARATOR_COLON + nowStr;
+			RedisUtil.del(key);
+			SignVo jsonRes = signService.sign(userId);
 			if(jsonRes != null) {
-				System.err.println(jsonRes);
+				System.err.println(jsonRes.buildJson());
 			} else {
 				System.err.println("null ....");
 			}
