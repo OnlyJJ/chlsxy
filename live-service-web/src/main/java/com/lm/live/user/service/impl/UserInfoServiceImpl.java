@@ -90,7 +90,6 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 		// 用户粉丝数
 		int fans = userAttentionService.getFansounts(userId);
 		vo.setFans(fans);
-		//  个人勋章
 		return vo;
 	}
 

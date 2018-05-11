@@ -86,6 +86,8 @@ public class GuardVo extends JsonParseInterface implements Serializable {
 	
 	/** 主播昵称 */
 	private String anchorName;
+	/** 主播id */
+	private String anchorId;
 	
 	private String g_name = "a";
 	private String g_level = "b";
@@ -107,6 +109,7 @@ public class GuardVo extends JsonParseInterface implements Serializable {
 	private String g_roomId="r";
 	private String g_sortIndex="s";
 	private String g_anchorName = "t";
+	private String g_anchorId = "u";
 	@Override
 	public JSONObject buildJson() {
 		JSONObject json = new JSONObject();
@@ -131,6 +134,7 @@ public class GuardVo extends JsonParseInterface implements Serializable {
 			setString(json,g_roomId,roomId);
 			setInt(json,g_sortIndex,sortIndex);
 			setString(json, g_anchorName, anchorName);
+			setString(json, g_anchorId, anchorId);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -156,6 +160,7 @@ public class GuardVo extends JsonParseInterface implements Serializable {
 			this.avatar = getString(json,g_avatar);
 			this.timerDown=getString(json,g_timerDown);
 			this.time=getLong(json,g_time);
+			this.g_anchorId = getString(json, g_anchorId);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -327,6 +332,14 @@ public class GuardVo extends JsonParseInterface implements Serializable {
 
 	public void setAnchorName(String anchorName) {
 		this.anchorName = anchorName;
+	}
+
+	public String getAnchorId() {
+		return anchorId;
+	}
+
+	public void setAnchorId(String anchorId) {
+		this.anchorId = anchorId;
 	}
 
 }

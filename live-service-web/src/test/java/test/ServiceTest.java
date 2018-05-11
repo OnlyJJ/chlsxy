@@ -11,6 +11,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.appclient.service.IAppStartupPageService;
+import com.lm.live.base.service.IImagePackageConfigService;
 import com.lm.live.base.service.IThirdpartyConfService;
 import com.lm.live.base.service.IUserAccusationInfoService;
 import com.lm.live.cache.constants.CacheKey;
@@ -33,7 +34,7 @@ import com.lm.live.user.service.IUserInfoService;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({   "classpath*:spring/spring-context.xml"})
+@ContextConfiguration({ "classpath*:spring/spring-context.xml"})
 public class ServiceTest {
 	
 	@Resource
@@ -74,6 +75,9 @@ public class ServiceTest {
 	
 	@Resource
 	private ISignService signService;
+	
+	@Resource
+	private IImagePackageConfigService imagePackageConfigService;
 
 	@Test
 	public void test() {
@@ -122,7 +126,8 @@ public class ServiceTest {
 //			av.setAccusationDesc("不开车，没意思");
 //			userAccusationInfoService.recordAccusationInfo(userId, toUserId, av);
 //			JSONObject jsonRes = roomService.getRoomOnlineData(roomId, page);
-			JSONObject jsonRes = guardService.getRoomGuardData(userId, roomId);
+//			JSONObject jsonRes = guardService.getRoomGuardData(userId, roomId);
+			JSONObject jsonRes = imagePackageConfigService.findNewestUseableList(null);
 //			JSONObject jsonRes = giftService.qryGiftData();
 //			JSONObject jsonRes =  userPackageService.listUserBagData(userId);
 //			if(avo != null) {
