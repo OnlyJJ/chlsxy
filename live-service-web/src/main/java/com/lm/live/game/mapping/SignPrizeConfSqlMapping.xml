@@ -12,21 +12,21 @@
     		<result property="number" column="number"/>
     		<result property="status" column="status"/>
     		<result property="content" column="content"/>
-    		<result property="userFlag" column="userFlag"/>
+    		<result property="prizeStage" column="prizeStage"/>
     		<result property="addTime" column="addTime"/>
     	</resultMap>
     
 	    <select id="getSignPrizeConf"  resultMap="vo">
 	    	SELECT * FROM t_sign_prize_conf 
 	    	WHERE seriesDayType = #{seriesDayType} 
-	    	AND userFlag = #{userFlag} 
+	    	AND prizeStage = #{prizeStage} 
 	    	AND status = 1
 	    	LIMIT 1
 	    </select>
 	    
 	    <select id="listSignPrizeConf"  resultMap="vo">
 	 		SELECT * FROM t_sign_prize_conf 
-	 		WHERE userFlag = #{userFlag}
+	 		WHERE prizeStage = #{prizeStage}
 		    AND status = 1 
 		    ORDER BY seriesDayType ASC
 	    </select>
@@ -40,7 +40,7 @@
     			number,
     			status,
     			content,
-    			userFlag,
+    			prizeStage,
     			addTime
     		) VALUES(
     			#{seriesDayType,jdbcType=VARCHAR},
@@ -49,7 +49,7 @@
     			#{number,jdbcType=VARCHAR},
     			#{status,jdbcType=VARCHAR},
     			#{content,jdbcType=VARCHAR},
-    			#{userFlag,jdbcType=VARCHAR},
+    			#{prizeStage,jdbcType=VARCHAR},
     			#{addTime,jdbcType=VARCHAR}
     		)
     	]]>

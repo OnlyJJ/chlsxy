@@ -23,7 +23,7 @@ public class SignPrizeConf extends BaseVo{
 	
 	private String content;
 	
-	private int userFlag;
+	private int prizeStage;
 	
 	private Date addTime;
 
@@ -91,12 +91,12 @@ public class SignPrizeConf extends BaseVo{
 		this.addTime = addTime;
 	}
 
-	public int getUserFlag() {
-		return userFlag;
+	public int getPrizeStage() {
+		return prizeStage;
 	}
 
-	public void setUserFlag(int userFlag) {
-		this.userFlag = userFlag;
+	public void setUserFlag(int prizeStage) {
+		this.prizeStage = prizeStage;
 	}
 
 	

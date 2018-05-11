@@ -18,9 +18,11 @@ import com.lm.live.game.constant.Constants;
 import com.lm.live.game.dao.SignInfoMapper;
 import com.lm.live.game.dao.SignPrizeConfMapper;
 import com.lm.live.game.dao.SignPrizeHisMapper;
+import com.lm.live.game.dao.SignStageMapper;
 import com.lm.live.game.domain.SignInfo;
 import com.lm.live.game.domain.SignPrizeConf;
 import com.lm.live.game.domain.SignPrizeHis;
+import com.lm.live.game.domain.SignStage;
 import com.lm.live.game.enums.ErrorCode;
 import com.lm.live.game.enums.SignEnum.PrizeType;
 import com.lm.live.game.exception.GameBizException;
@@ -33,7 +35,6 @@ import com.lm.live.tools.service.IGiftService;
 import com.lm.live.tools.service.IUserPackageHisService;
 import com.lm.live.tools.service.IUserPackageService;
 import com.lm.live.tools.service.ItoolService;
-import com.lm.live.userbase.domain.UserInfoDo;
 import com.lm.live.userbase.service.IUserBaseService;
 
 @Service("signService")
@@ -41,6 +42,9 @@ public class SignServiceImpl implements ISignService {
 	
 	@Resource
 	private SignInfoMapper signInfoMapper;
+	
+	@Resource
+	private SignStageMapper signStageMapper;
 	
 	@Resource
 	private SignPrizeConfMapper signPrizeConfMapper;
@@ -86,31 +90,37 @@ public class SignServiceImpl implements ISignService {
 			}
 		}
 		String yesDayStr = DateUntil.addDayByDate(now, -1);
-		// 判断是否是新用户
-		UserInfoDo user = userBaseService.getUserByUserId(userId);
-		Date addTime = user.getAddTime();
-		int userFlag = 1;
-		boolean isNewUser = DateUntil.daysBetween(addTime, now) <= Constants.NEW_USER_TIME ? true : false;
-		if(isNewUser) {
-			userFlag = 0;
-		}
+		int prizeStage = 1; // 当前奖品隶属期，默认第一期
 		// 当前签到的连续情况
 		int seriesDay = 1; // 默认签到为第一天
 		int signPrizeId = 1; // 默认奖励配置id，7天一个循环
+		SignStage stage = signStageMapper.getSignStage();
+		if(stage == null) {
+			throw new GameBizException(ErrorCode.ERROR_13004);
+		}
+		prizeStage = stage.getPrizeStage();
 		SignInfo info = signInfoMapper.getSignInfo(userId);
 		if(info != null) {
 			String signTime = info.getSignTime();
+			int userStage = info.getPrizeStage();
 			if(signTime.equals(nowStr)) { // 当天已签到
 				throw new GameBizException(ErrorCode.ERROR_13003);
 			} 
 			if(signTime.equals(yesDayStr)) { // 连续签到
 				seriesDay = info.getSeriesDay() + 1;
-				if (DateUntil.daysBetween(addTime, now) == 7) { 
-					seriesDay = 1;
-				}
 				signPrizeId = seriesDay % 7;
-				if (signPrizeId == 0) {
+				if (signPrizeId == 0) { // 刚好第七天
 					signPrizeId = 7;
+				}
+				if(userStage != prizeStage) {
+					// 判断是否7天已经连续完成，完成则进入最新的奖品配置期，或者连续签到中断，也进入最新的奖品期
+					if(signPrizeId > 0 && seriesDay >= Constants.SIGN_LOOP_DAY) { // 不是第7天，并且连续签到大于7，说明进入下一个循环
+						info.setPrizeStage(prizeStage);
+					}
+				}
+			} else { // 非连续签到
+				if(userStage != prizeStage) {
+					info.setPrizeStage(prizeStage);
 				}
 			}
 			info.setSeriesDay(seriesDay);
@@ -122,12 +132,13 @@ public class SignServiceImpl implements ISignService {
 			info.setSeriesDay(seriesDay);
 			info.setTotalDay(1);
 			info.setSignTime(nowStr);
+			info.setPrizeStage(prizeStage);
 			signInfoMapper.insert(info);
 		}
 		
 		SignVo sign = new SignVo();
 		// 签到奖励
-		SignPrizeConf spc = signPrizeConfMapper.getSignPrizeConf(seriesDay, userFlag);
+		SignPrizeConf spc = signPrizeConfMapper.getSignPrizeConf(seriesDay, prizeStage);
 		if(spc == null) {
 			throw new GameBizException(ErrorCode.ERROR_13004);
 		}

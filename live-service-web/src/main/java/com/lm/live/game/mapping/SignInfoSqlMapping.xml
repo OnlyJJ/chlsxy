@@ -10,6 +10,7 @@
     		<result property="seriesDay" column="seriesDay"/>
     		<result property="signTime" column="signTime"/>
     		<result property="totalDay" column="totalDay"/>
+    		<result property="prizeStage" column="prizeStage"/>
     	</resultMap>
     
     	<select id="getSignInfo" parameterType="java.lang.String" resultMap="info">
@@ -26,12 +27,14 @@
 		    			userId,
 		    			seriesDay,
 		    			signTime,
-		    			totalDay
+		    			totalDay,
+		    			prizeStage
 		    		) VALUES(
 		    			#{userId,jdbcType=VARCHAR},
 		    			#{seriesDay,jdbcType=VARCHAR},
 		    			#{signTime,jdbcType=VARCHAR},
-		    			#{totalDay,jdbcType=VARCHAR}
+		    			#{totalDay,jdbcType=VARCHAR},
+		    			#{prizeStage,jdbcType=VARCHAR}
 		    		)
 		 	]]>
 	 	</insert>

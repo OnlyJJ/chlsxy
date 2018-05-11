@@ -19,7 +19,7 @@ public interface SignPrizeConfMapper extends ICommonMapper<SignPrizeConf> {
 	 *@author shao.xiang
 	 *@data 2018年5月10日
 	 */
-	SignPrizeConf getSignPrizeConf(@Param("seriesDayType") int seriesDayType, @Param("userFlag") int userFlag);
+	SignPrizeConf getSignPrizeConf(@Param("seriesDayType") int seriesDayType, @Param("prizeStage") int prizeStage);
 	
 	/**
 	 * 获取奖励配置（新、老用户奖励配置不一样）

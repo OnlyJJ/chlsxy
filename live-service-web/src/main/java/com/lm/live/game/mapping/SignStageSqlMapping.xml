@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.lm.live.game.dao.SignStageMapper">
+	<resultMap type="com.lm.live.game.domain.SignStage" id="vo">
+		<result property="id" column="id" />
+		<result property="prizeStage" column="prizeStage" />
+		<result property="status" column="status" />
+		<result property="modifyTime" column="modifyTime" />
+	</resultMap>
+
+	<select id="getSignStage" resultMap="vo">
+		SELECT * FROM t_sign_stage
+		WHERE status = 1
+	</select>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    	<![CDATA[
+    		INSERT INTO t_sign_prize_his(
+    			prizeStage,
+    			status,
+    			modifyTime
+    		) VALUES(
+    			#{prizeStage,jdbcType=VARCHAR},
+    			#{status,jdbcType=VARCHAR},
+    			#{modifyTime,jdbcType=VARCHAR}
+    		)
+    	]]>
+	</insert>
+
+</mapper>

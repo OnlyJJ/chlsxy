@@ -18,6 +18,9 @@ public class SignInfo extends BaseVo{
 	/** 总的签到天数 */
 	private int totalDay;
 	
+	/** 当前签到奖励隶属的期，对应prize_conf的prizeStage */
+	private int prizeStage;
+	
 	public long getId() {
 		return id;
 	}
@@ -47,6 +50,12 @@ public class SignInfo extends BaseVo{
 	}
 	public void setTotalDay(int totalDay) {
 		this.totalDay = totalDay;
+	}
+	public int getPrizeStage() {
+		return prizeStage;
+	}
+	public void setPrizeStage(int prizeStage) {
+		this.prizeStage = prizeStage;
 	}
 	
 }
