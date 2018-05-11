@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSONObject;
 import com.lm.live.account.service.IUserAccountService;
 import com.lm.live.cache.constants.CacheKey;
 import com.lm.live.cache.constants.CacheTimeout;
@@ -250,6 +251,12 @@ public class SignServiceImpl implements ISignService {
 			throw new GameBizException(ErrorCode.ERROR_101);
 		}
 
+	}
+
+	@Override
+	public JSONObject listPrize(String userId) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

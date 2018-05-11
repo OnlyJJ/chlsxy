@@ -17,6 +17,7 @@ import com.lm.live.cache.constants.CacheKey;
 import com.lm.live.cache.constants.CacheTimeout;
 import com.lm.live.common.redis.RedisUtil;
 import com.lm.live.common.utils.DateUntil;
+import com.lm.live.common.utils.JsonUtil;
 import com.lm.live.common.utils.LogUtil;
 import com.lm.live.common.utils.StrUtil;
 import com.lm.live.common.vo.Page;
@@ -34,6 +35,7 @@ import com.lm.live.guard.exception.GuardBizException;
 import com.lm.live.guard.service.IGuardService;
 import com.lm.live.guard.vo.GuardVo;
 import com.lm.live.user.service.IUserCacheInfoService;
+import com.lm.live.user.vo.UserInfo;
 import com.lm.live.userbase.domain.UserInfoDo;
 import com.lm.live.userbase.service.IUserBaseService;
 
@@ -65,67 +67,78 @@ public class GuardServiceImpl implements IGuardService {
 	@Override
 	public JSONObject getGuardData(String userId, Page page) throws Exception {
 		JSONObject json = new JSONObject();
-		List<GuardVo> guardList = null;
 		String key = CacheKey.GUARD_USER_CACHE + userId;
-		List<GuardVo> cache = RedisUtil.getList(key, GuardVo.class);
-		if(cache != null) {
-			guardList = cache;
+		String cache = RedisUtil.get(key);
+		if(!StrUtil.isNullOrEmpty(cache)) {
+			LogUtil.log.info("### 查询个人守护列表：从缓存中获取,userId = " + userId);
+			return JsonUtil.strToJsonObject(cache);
 		}else{
-			guardList = gwMapper.getAllUserGuard(userId);
+			LogUtil.log.info("### 查询个人守护列表：从db中获取,userId = " + userId);
+			List<GuardVo> guardList = gwMapper.getAllUserGuard(userId);
 			if(guardList == null ){
 				guardList = new ArrayList<GuardVo>();
 			}
-			RedisUtil.set(key, guardList, CacheTimeout.DEFAULT_TIMEOUT_10M);
-		}
-		List<JSONObject> jsonArray = new ArrayList<JSONObject>();
-		List<JSONObject> resultArray = new ArrayList<JSONObject>();
-		if(guardList != null && guardList.size()>0){
-			for (GuardVo guardVo : guardList) {
-				jsonArray.add(guardVo.buildJson());
+			List<JSONObject> jsonArray = new ArrayList<JSONObject>();
+			List<JSONObject> resultArray = new ArrayList<JSONObject>();
+			if(guardList != null && guardList.size()>0){
+				for (GuardVo guardVo : guardList) {
+					// 守护的主播昵称
+					UserInfo anchor = userCacheInfoService.getAnchorByRoomId(guardVo.getRoomId());
+					if(anchor == null) {
+						continue;
+					}
+					String anchorName = anchor.getNickName();
+					guardVo.setAnchorName(anchorName);
+					String endTime = guardVo.getEndTime();
+					String timerDown = DateUntil.getTimeRemains2(new Date(), DateUntil.parse2DefaultFormat(endTime));
+					guardVo.setTimerDown(timerDown);
+					jsonArray.add(guardVo.buildJson());
+				}
 			}
-		}
-		if(jsonArray.size()>0){
-			int pageNum = page.getPageNum(); // 页码
-			int pageSize = page.getPagelimit(); // 单页容量
-			// 从哪里开始
-			int index = pageNum >1 ? (pageNum - 1) * pageSize : 0;
-			int currentNum = 0;
-			int maxPageNum = 0;
-			int pageLimit = pageSize;
-			// 判断请求的页码最大值
-			int count = jsonArray.size();
-			page.setCount(count);
-			if(count%pageLimit == 0) {
-				maxPageNum = count/pageLimit;
-			}else{
-				maxPageNum = (count/pageLimit)+1;
-			}
-			// 如果请求的页码大于页码最大值，给空数据返回
-			if(pageNum > maxPageNum) {
-				json.put(Constants.DATA_BODY, resultArray);	
-				return json;
-			}
-			// 遍历取值的范围，防止下标越界
-			if(count >= pageLimit){
-				if(pageNum > (count/pageLimit)){
-					currentNum = index+(count%pageLimit);
+			if(jsonArray.size()>0){
+				int pageNum = page.getPageNum(); // 页码
+				int pageSize = page.getPagelimit(); // 单页容量
+				// 从哪里开始
+				int index = pageNum >1 ? (pageNum - 1) * pageSize : 0;
+				int currentNum = 0;
+				int maxPageNum = 0;
+				int pageLimit = pageSize;
+				// 判断请求的页码最大值
+				int count = jsonArray.size();
+				page.setCount(count);
+				if(count%pageLimit == 0) {
+					maxPageNum = count/pageLimit;
 				}else{
-					currentNum = index+pageLimit;
+					maxPageNum = (count/pageLimit)+1;
 				}
-			}else{
-				currentNum = count;
-			}
-			for(int i=index;i<currentNum;i++) {
-				if(count <= index){
-					break; //防止越界
+				// 如果请求的页码大于页码最大值，给空数据返回
+				if(pageNum > maxPageNum) {
+					json.put(Constants.DATA_BODY, resultArray);	
+					return json;
 				}
-				resultArray.add(jsonArray.get(i));
-				index++;
+				// 遍历取值的范围，防止下标越界
+				if(count >= pageLimit){
+					if(pageNum > (count/pageLimit)){
+						currentNum = index+(count%pageLimit);
+					}else{
+						currentNum = index+pageLimit;
+					}
+				}else{
+					currentNum = count;
+				}
+				for(int i=index;i<currentNum;i++) {
+					if(count <= index){
+						break; //防止越界
+					}
+					resultArray.add(jsonArray.get(i));
+					index++;
+				}
 			}
+			json.put(page.getShortName(), page.buildJson());
+			json.put(Constants.DATA_BODY, resultArray);		
+			RedisUtil.set(key, json, CacheTimeout.DEFAULT_TIMEOUT_10M);
+			return json;
 		}
-		json.put(page.getShortName(), page.buildJson());
-		json.put(Constants.DATA_BODY, resultArray);		
-		return json;
 	}
 
 	@Override
@@ -143,7 +156,7 @@ public class GuardServiceImpl implements IGuardService {
 			key = CacheKey.ROOM_GUARD_COMMON_CACHE + roomId;
 		} else { // 守护个人缓存
 			isGuard = true;
-			key = CacheKey.ROOM_GUARD_VIP_CACHE + roomId + userId;
+			key = CacheKey.ROOM_GUARD_VIP_CACHE + roomId + Constants.SEPARATOR_COLON + userId;
 		}
 		String obj = RedisUtil.get(key);
 		if(!StringUtils.isEmpty(obj)) {
@@ -370,11 +383,11 @@ public class GuardServiceImpl implements IGuardService {
 		if(listWork != null && listWork.size() >0) {
 			for(GuardWork vo : listWork) {
 				String userId2 = vo.getUserid();
-				String userKey = CacheKey.ROOM_GUARD_VIP_CACHE + roomId + userId2;
+				String userKey = CacheKey.ROOM_GUARD_VIP_CACHE + roomId + Constants.SEPARATOR_COLON + userId2;
 				RedisUtil.del(userKey);
 			}
 		}
-		String userKey = CacheKey.ROOM_GUARD_VIP_CACHE + roomId + userId;
+		String userKey = CacheKey.USER_GUARD_VIP_CACHE + userId + Constants.SEPARATOR_COLON  + roomId;
 		RedisUtil.del(userKey);
 	}
 	
@@ -393,7 +406,7 @@ public class GuardServiceImpl implements IGuardService {
 			return null;
 		}
 		List<Map> list = null;
-		String key = CacheKey.ROOM_GUARD_VIP_CACHE + roomId + userId;
+		String key = CacheKey.USER_GUARD_VIP_CACHE + userId + Constants.SEPARATOR_COLON + roomId;
 		List<Map> obj = RedisUtil.getList(key, Map.class);
 		if(obj != null) {
 			list = obj;

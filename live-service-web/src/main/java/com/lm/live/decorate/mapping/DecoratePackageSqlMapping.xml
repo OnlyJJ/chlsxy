@@ -17,6 +17,11 @@
 		<result property="isAccumulation" column="isAccumulation" />
 		<result property="status" column="status" />
 	</resultMap>
+	
+	<select id="getObjectById" resultMap="vo">
+		SELECT * FROM t_decorate_package
+		WHERE id=#{id}
+	</select>
 
 	<insert id="insert">
     	<![CDATA[
@@ -62,9 +67,6 @@
 			<if test="endTime != null">
 					 <![CDATA[ endTime = #{endTime,jdbcType=VARCHAR},  ]]>
 			</if>
-			<if test="isAdornUserDecorate != null">
-					 <![CDATA[ status = #{status,jdbcType=VARCHAR},  ]]>
-			</if>
 		</set>
 		<where>
 			 <![CDATA[ and id = #{id} ]]>
@@ -77,26 +79,38 @@
 		t_decorate_package where id = #{id}
 	</delete>
 
+	<select id="getDecoratePackage" resultMap="vo">
+		SELECT * FROM
+		t_decorate_package
+		WHERE decorateId = #{decorateId}
+		AND userId=#{userId}
+		LIMIT 1
+	</select>
+
 	<!-- 获取有效的勋章 -->
 	<select id="findValidDecorate" resultType="com.lm.live.decorate.vo.DecoratePackageVo">
 		SELECT d.id as decorateId, d.name as name, d.lightenImg as lightenImg,
-			d.grayImg as grayImg, dp.status as inUse,d.remark as remark
-		FROM t_decorate d, t_decorate_package dp
+		d.grayImg as grayImg, dp.status as inUse,d.remark as remark
+		FROM
+		t_decorate d, t_decorate_package dp
 		WHERE dp.decorateId = d.id
-		AND dp.userId=#{userId}
+		AND
+		dp.userId=#{userId}
 		AND d.category=#{category}
 		<![CDATA[
 		AND (isPeriod=0 or (isPeriod=1 and now() >= beginTime and now() <= endTime) )
 		]]>
 		AND d.type=0
-		ORDER BY dp.isPeriod ASC ,dp.endTime DESC ,d.sortWeight DESC
-		
+		ORDER BY dp.isPeriod ASC ,dp.endTime DESC ,d.sortWeight
+		DESC
+
 	</select>
 
 	<update id="updateStatus">
 		UPDATE t_decorate_package
 		SET status = #{status}
-		WHERE userId = #{userId}
+		WHERE
+		userId = #{userId}
 		AND decorateId = #{decorateId}
 	</update>
 

@@ -18,6 +18,7 @@ import com.lm.live.common.utils.LogUtil;
 import com.lm.live.common.utils.RequestUtil;
 import com.lm.live.common.vo.RequestVo;
 import com.lm.live.common.vo.Result;
+import com.lm.live.common.vo.UserBaseInfo;
 import com.lm.live.web.vo.DataRequest;
 
 @Controller("FileWeb")
@@ -43,10 +44,10 @@ public class FileWeb extends BaseController {
 		JSONObject jsonRes = new JSONObject();
 		try {
 			if(data==null  
-					|| !data.getData().containsKey(RequestVo .class.getSimpleName().toLowerCase())) {
+					|| !data.getData().containsKey(UserBaseInfo.class.getSimpleName().toLowerCase())) {
 				throw new BaseBizException(ErrorCode.ERROR_101);
 			}
-			RequestVo req = new RequestVo();
+			UserBaseInfo req = new UserBaseInfo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
 			String userId = req.getUserId();
 			fileUploadService.uploadFile(request, userId);

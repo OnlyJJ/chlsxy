@@ -18,9 +18,12 @@
 		<result property="remark" column="remark" />
 		<result property="sortWeight" column="sortWeight" />
 		<result property="isShow" column="isShow" />
-		<result property="isAdornUserDecorate" column="isAdornUserDecorate" />
 
 	</resultMap>
+	
+	<select id="getObjectById" resultMap="vo">
+		SELECT * FROM t_decorate WHERE id=#{id}
+	</select>
 
 	<select id="findListOfCommonUser" resultMap="vo">
 		SELECT d.* FROM t_decorate d ,t_decorate_package p
@@ -32,13 +35,6 @@
 		]]>
 		AND d.type=0
 		ORDER BY p.isPeriod ASC ,p.endTime DESC,d.sortWeight DESC
-	</select>
-
-	<select id="getDecoratePackage" resultMap="vo">
-		SELECT * FROM t_decorate_package
-		WHERE decorateId = #{decorateId}
-		AND userId=#{userId}
-		LIMIT 1
 	</select>
 
 </mapper>

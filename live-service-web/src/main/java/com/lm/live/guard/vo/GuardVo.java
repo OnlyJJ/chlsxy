@@ -84,6 +84,9 @@ public class GuardVo extends JsonParseInterface implements Serializable {
 	
 	private String userLevel;
 	
+	/** 主播昵称 */
+	private String anchorName;
+	
 	private String g_name = "a";
 	private String g_level = "b";
 	private String g_image = "c";
@@ -103,7 +106,7 @@ public class GuardVo extends JsonParseInterface implements Serializable {
 	private String g_endTime = "q";
 	private String g_roomId="r";
 	private String g_sortIndex="s";
-	
+	private String g_anchorName = "t";
 	@Override
 	public JSONObject buildJson() {
 		JSONObject json = new JSONObject();
@@ -127,6 +130,7 @@ public class GuardVo extends JsonParseInterface implements Serializable {
 			setString(json,g_endTime,endTime);
 			setString(json,g_roomId,roomId);
 			setInt(json,g_sortIndex,sortIndex);
+			setString(json, g_anchorName, anchorName);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -315,6 +319,14 @@ public class GuardVo extends JsonParseInterface implements Serializable {
 
 	public void setUserLevel(String userLevel) {
 		this.userLevel = userLevel;
+	}
+
+	public String getAnchorName() {
+		return anchorName;
+	}
+
+	public void setAnchorName(String anchorName) {
+		this.anchorName = anchorName;
 	}
 
 }

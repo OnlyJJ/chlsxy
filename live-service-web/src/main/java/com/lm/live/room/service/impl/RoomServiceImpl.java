@@ -43,6 +43,7 @@ import com.lm.live.guard.domain.GuardPayHis;
 import com.lm.live.guard.domain.GuardWork;
 import com.lm.live.guard.domain.GuardWorkConf;
 import com.lm.live.guard.enums.GuardTableEnum;
+import com.lm.live.guard.enums.GuardTableEnum.DecorateType;
 import com.lm.live.guard.service.IGuardService;
 import com.lm.live.room.constant.Constants;
 import com.lm.live.room.enums.ErrorCode;
@@ -600,8 +601,10 @@ public class RoomServiceImpl implements IRoomService {
 		String guardName = "";
 		if(guardType == GuardTableEnum.GuardCarType.baiyin.getValue()) {
 			carId = GuardTableEnum.CarId.baiyin.getValue();
+			decorateId = DecorateType.VIP.getValue();
 		} else if(guardType == GuardTableEnum.GuardCarType.huangjin.getValue()) {
 			carId = GuardTableEnum.CarId.huangjin.getValue();
+			decorateId = DecorateType.SVIP.getValue();
 		}
 		
 		// 查询守护配置信息

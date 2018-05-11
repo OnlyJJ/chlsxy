@@ -91,7 +91,6 @@ public class DataRequest extends BaseDataRequest implements Serializable {
 						userBaseInfo.setUserId(userid);
 						data.put(userBaseInfo.getShortName(), userBaseInfo);
 					}
-					//if( null != userid && userid.length() >0 ){
 					if(!StringUtils.isEmpty(sessionid)){
 						Session session = new Session();
 						session.setSessionid(sessionid);

@@ -56,17 +56,21 @@ public class GuardTableEnum {
 	}
 	
 	/**
-	 * carType 用于座驾区别其他的座驾类型
+	 * 勋章
 	 * @author Administrator
 	 *
 	 */
-	public static enum CarType {
+	public static enum DecorateType {
 		
-		/** 守护座驾  */
-		shouhu(7);
+		/** vip  */
+		VIP(3),
+		
+		/** svip */
+		SVIP(4);
+		
 		
 		private final int value;
-		CarType(int value) {
+		DecorateType(int value) {
 			this.value = value;
 		}
 		public int getValue() {

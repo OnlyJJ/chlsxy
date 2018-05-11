@@ -42,9 +42,10 @@ public class CacheKey {
 	public static final String GUARD_USER_CACHE = "guard:user:";
 	/** 房间内普通用户的守护墙缓存，房间守护有更新时，需删除此缓存:key + roomId */
 	public static final String ROOM_GUARD_COMMON_CACHE = "guard:room:general";
-	/** 房间内守护的缓存，以用户区分，当房间守护有更新时，需要删除所有的用户此缓存 : key + roomId + userId*/
+	/** 房间内守护的缓存，以用户区分，当房间守护有更新时，需要删除所有的用户此缓存 : key + roomId + ":" + userId*/
 	public static final String ROOM_GUARD_VIP_CACHE = "guard:room:vip:";
-	
+	/** 用户个人的房间守护缓存，List,key + userId + ":" + roomId*/
+	public static final String USER_GUARD_VIP_CACHE = "guard:user:room:";
 	
 	// 首页
 	/** 首页主播列表，一级缓存 */

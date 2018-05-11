@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+   
+<mapper namespace="com.lm.live.decorate.dao.DecorateHisMapper">
+	<resultMap type="com.lm.live.decorate.domain.DecorateHis" id="vo">
+		<result property="id" column="id" />
+	    <result property="userId" column="userId" />
+	    <result property="decorateId" column="decorateId" />
+	    <result property="addTime" column="addTime"/>
+	    <result property="number" column="number" />
+	    <result property="sourceKey" column="sourceKey" />
+	    <result property="descs" column="descs" />
+	</resultMap>
+	
+	<select id="findLatelyDecorateHis" resultMap="vo">
+		SELECT userId,decorateId,addTime,number
+		FROM t_decorate_his
+		WHERE userId = #{userId} AND decorateId = #{decorateId} 
+		ORDER BY addTime desc limit 1;
+	</select>
+	
+	 	<insert id="insert">
+    	<![CDATA[
+    		INSERT INTO t_decorate_his(
+    			userId,
+    			decorateId,
+    			addTime,
+    			number,
+    			sourceKey,
+    			descs
+    		) VALUES(
+    			#{userId,jdbcType=VARCHAR},
+    			#{decorateId,jdbcType=VARCHAR},
+    			#{addTime,jdbcType=VARCHAR},
+    			#{number,jdbcType=VARCHAR},
+    			#{sourceKey,jdbcType=VARCHAR},
+    			#{descs,jdbcType=VARCHAR}
+    		)
+    	]]>
+    	</insert>
+    	
+    <select id="findByUserAndSourceKey" resultMap="vo">
+		SELECT *
+		FROM t_decorate_his
+		WHERE userId = #{userId} 
+		AND sourceKey = #{sourceKey}
+	</select>	
+	
+	<select id="findByUserAndSourceKeyOrder" resultMap="vo">
+		SELECT *
+		FROM t_decorate_his
+		<where>
+			<if test="userId != null">
+					and userId = #{userId}
+			</if>
+			<if test="sourceKey != null">
+					and sourceKey = #{sourceKey}
+			</if>
+		</where>
+		ORDER BY decorateId DESC
+	</select>	
+	
+	<delete id="removeById" parameterType="int">
+		delete from t_decorate_his where id = #{id}
+	</delete>
+	
+	<select id="getLatelyDecorateHisBySourcekey" resultMap="vo">
+		SELECT *
+		FROM t_decorate_his
+		WHERE userId = #{userId} 
+		AND decorateId = #{decorateId}
+		AND sourceKey = #{sourceKey}
+	</select>
+	
+</mapper>
