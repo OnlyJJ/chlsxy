@@ -33,7 +33,7 @@ public interface IUserInfoService  {
 	 * @author shao.xiang
 	 * @date 2018年3月14日
 	 */
-	UserInfo getUserInfo(String userId) throws Exception;	
+	UserInfo getUserInfo(String userId, String roomId) throws Exception;	
 	
 	/**
 	 * 获取用户关注列表

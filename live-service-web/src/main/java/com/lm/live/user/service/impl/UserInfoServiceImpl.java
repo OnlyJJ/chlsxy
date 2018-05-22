@@ -41,6 +41,7 @@ import com.lm.live.user.vo.UserInfo;
 import com.lm.live.userbase.domain.UserAnchor;
 import com.lm.live.userbase.domain.UserAttentionDo;
 import com.lm.live.userbase.domain.UserInfoDo;
+import com.lm.live.userbase.service.IRoomBannedOperationService;
 import com.lm.live.userbase.service.IUserAnchorService;
 import com.lm.live.userbase.service.IUserAttentionService;
 import com.lm.live.userbase.service.IUserBaseService;
@@ -75,6 +76,9 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 	@Resource
 	private ISendMsgService sendMsgService;
 	
+	@Resource
+	private IRoomBannedOperationService roomBannedOperationService;
+	
 	@Override
 	public UserInfo getUserDetailInfo(String userId) throws Exception {
 		if(StringUtils.isEmpty(userId)) {
@@ -94,7 +98,7 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 	}
 
 	@Override
-	public UserInfo getUserInfo(String userId) throws Exception {
+	public UserInfo getUserInfo(String userId, String roomId) throws Exception {
 		if(StringUtils.isEmpty(userId)) {
 			throw new UserBizException(ErrorCode.ERROR_101);
 		}
@@ -108,6 +112,15 @@ public class UserInfoServiceImpl  implements IUserInfoService {
 		// 获取用户勋章列表
 		List<Decorate> userDecorateList = decorateService.findListOfCommonUser(userId);
 		vo.setDecorate(userDecorateList);
+		// 是否被禁言
+		if(!StrUtil.isNullOrEmpty(roomId)) {
+			boolean shutup = roomBannedOperationService.checkShutUp(userId, roomId);
+			int unSpeak = Constants.STATUS_0;
+			if(shutup) {
+				unSpeak = Constants.STATUS_1;
+			}
+			vo.setUpSpeak(unSpeak);
+		}
 		return vo;
 	}
 	

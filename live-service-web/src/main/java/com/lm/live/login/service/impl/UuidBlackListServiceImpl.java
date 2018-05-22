@@ -29,14 +29,14 @@ public class UuidBlackListServiceImpl extends CommonServiceImpl<UuidBlackListMap
 		if (blackList != null) {
 			if(blackList.getAddTime() == null || blackList.getEndTime() == null){//没配置开始结束时间的，直接抛异常
 				if(blackList.getEndTime() == null){
-					throw new LoginBizException(ErrorCode.ERROR_103);
+					throw new LoginBizException(ErrorCode.ERROR_14001);
 				}
 			}
 			
 			if(blackList.getAddTime() != null && blackList.getEndTime() != null){
 				Date now = new Date();
 				if(now.after(blackList.getAddTime()) && now.before(blackList.getEndTime())){
-					throw new LoginBizException(ErrorCode.ERROR_103);
+					throw new LoginBizException(ErrorCode.ERROR_14001);
 				}
 			}
 		}

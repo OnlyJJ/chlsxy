@@ -1,6 +1,7 @@
 package com.lm.live.login.service.impl;
 
 import java.io.File;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -132,7 +133,7 @@ public class LoginServiceImpl implements ILoginService {
 		String uuid = deviceProperties.getUuid();
 		// 校验参数
 		if (StringUtils.isEmpty(uuid)) {
-			throw new LoginBizException(ErrorCode.ERROR_102);
+			throw new LoginBizException(ErrorCode.ERROR_14001);
 		}
 		filterAppAutoRegist(clientIp);
 
@@ -204,6 +205,7 @@ public class LoginServiceImpl implements ILoginService {
 			userInfo.setChannelId(channelId);
 			userInfo.setAppPackage(appPackage);
 			userInfo.setLoginType(LoginType.AUTO.getType());
+			userInfo.setIsModifyInfo(Constants.STATUS_1);
 			userBaseService.insert(userInfo);
 			
 			retUserInfo.setIsFirttimeLogin(Constants.STATUS_1);
@@ -253,12 +255,12 @@ public class LoginServiceImpl implements ILoginService {
 			userInfo = userBaseService.getUserByUserId(userId);
 
 			if (userInfo == null) {
-				throw new LoginBizException(ErrorCode.ERROR_103);
+				throw new LoginBizException(ErrorCode.ERROR_14001);
 			}
 
 			// 是否被封号
 			if (userInfo.getUserStatus() != 1) {
-				throw new LoginBizException(ErrorCode.ERROR_103);
+				throw new LoginBizException(ErrorCode.ERROR_14001);
 			}
 
 			// 更新user_info信息
@@ -320,7 +322,7 @@ public class LoginServiceImpl implements ILoginService {
 		
 		if(thirdpartyConf.getInUseLogin() != Constants.STATUS_1){
 			LogUtil.log.info(String.format("###查询到相关的第三方配置成停用(inUseLogin!=1),thirdpartyType:%s,packageName:%s,clientTypeInt:%s", thirdpartyType,packageName,clientTypeInt));
-			throw new LoginBizException(ErrorCode.ERROR_104);
+			throw new LoginBizException(ErrorCode.ERROR_14002);
 		}
 		
 		// appId
@@ -416,7 +418,7 @@ public class LoginServiceImpl implements ILoginService {
 			String imgName = null;
 			//下载微信用户的头像
 			if(!StringUtils.isEmpty(wechatHeadImgUrl)){
-				String filepath = Constants.USER_ICON_URL +File.separator+Constants.ICON_IMG_FILE_URI+File.separator;
+				String filepath = Constants.cdnPath +File.separator+Constants.ICON_IMG_FILE_URI+File.separator;
 				
 				String iconDateStr = DateUntil.getFormatDate(Constants.DATEFORMAT_YMD_1, nowDate);
 				
@@ -460,6 +462,7 @@ public class LoginServiceImpl implements ILoginService {
 			dbUserInfo.setUserStatus(1); //'用户状态，1-正常; 0-停用;
 			dbUserInfo.setChannelId(channelId);
 			dbUserInfo.setAppPackage(packageName);
+			dbUserInfo.setIsModifyInfo(Constants.STATUS_1);
 			//增加UUID
 			if(!StringUtils.isEmpty(deviceProperties.getUuid())){
 				dbUserInfo.setUuid(deviceProperties.getUuid());
@@ -467,6 +470,11 @@ public class LoginServiceImpl implements ILoginService {
 			
 			dbUserInfo.setLoginType(LoginType.WECHAT.getType());
 			userBaseService.insert(dbUserInfo);
+			
+			// 插入账户表
+			UserAccount account = new UserAccount();
+			account.setUserId(userId);
+			userAccountService.insert(account);
 			
 			//插表t_wechat_userinfo
 			WechatUser wechatUserDo = new WechatUser();
@@ -492,7 +500,7 @@ public class LoginServiceImpl implements ILoginService {
 			int userStatus = dbUserInfo.getUserStatus();
 			// 用户状态，1-正常; 0-停用; 2-待审核
 			if(userStatus != 1) {
-				throw new LoginBizException(ErrorCode.ERROR_103);
+				throw new LoginBizException(ErrorCode.ERROR_14001);
 			}
 		}
 		
@@ -571,7 +579,7 @@ public class LoginServiceImpl implements ILoginService {
 		
 		if(thirdpartyConf.getInUseLogin() != Constants.STATUS_1){
 			LogUtil.log.info(String.format("###查询到相关的第三方配置成停用(inUseLogin!=1),thirdpartyType:%s,packageName:%s,clientTypeInt:%s", thirdpartyType,packageName,clientTypeInt));
-			throw new LoginBizException(ErrorCode.ERROR_104);
+			throw new LoginBizException(ErrorCode.ERROR_14002);
 		}
 		
 		String serverConfAppid = thirdpartyConf.getAppId();
@@ -590,7 +598,7 @@ public class LoginServiceImpl implements ILoginService {
 			int userStatus = dbUserInfo.getUserStatus();
 			// 用户状态，1-正常; 0-停用;
 			if(userStatus!=1){
-				throw new LoginBizException(ErrorCode.ERROR_103);
+				throw new LoginBizException(ErrorCode.ERROR_14001);
 			}
 			dbUserInfo.setLastTime(DateUntil.getFormatDate(Constants.DATEFORMAT_YMDHMS, new Date())); 
 			retUserinfo.setIsFirttimeLogin(Constants.STATUS_0);
@@ -662,7 +670,7 @@ public class LoginServiceImpl implements ILoginService {
 		}
 		if(thirdpartyConf.getInUseLogin() != Constants.STATUS_1){
 			LogUtil.log.info(String.format("###查询到相关的第三方配置成停用(inUseLogin!=1),thirdpartyType:%s,packageName:%s,clientTypeInt:%s", thirdpartyType,packageName,clientTypeInt));
-			throw new LoginBizException(ErrorCode.ERROR_104);
+			throw new LoginBizException(ErrorCode.ERROR_14002);
 		}
 		
 		String serverConfAppid = thirdpartyConf.getAppId();
@@ -684,7 +692,7 @@ public class LoginServiceImpl implements ILoginService {
 			int userStatus = dbUserInfo.getUserStatus();
 			// 用户状态，1-正常; 0-停用; 2-待审核
 			if(userStatus != Constants.STATUS_1) {
-				throw new LoginBizException(ErrorCode.ERROR_103);
+				throw new LoginBizException(ErrorCode.ERROR_14001);
 			}
 			retUserinfo.setIsFirttimeLogin(Constants.STATUS_0);
 			dbUserInfo.setLastTime(DateUntil.getFormatDate(Constants.DATEFORMAT_YMDHMS, new Date())); //更新最后登录的时间
@@ -757,7 +765,7 @@ public class LoginServiceImpl implements ILoginService {
 		}
 		if(thirdpartyConf.getInUseLogin() != Constants.STATUS_1){
 			LogUtil.log.info(String.format("###查询到相关的第三方配置成停用(inUseLogin!=1),thirdpartyType:%s,packageName:%s,clientTypeInt:%s", thirdpartyType,packageName,clientTypeInt));
-			throw new LoginBizException(ErrorCode.ERROR_104);
+			throw new LoginBizException(ErrorCode.ERROR_14002);
 		}
 		String clientId = thirdpartyConf.getAppId();
 		
@@ -787,7 +795,7 @@ public class LoginServiceImpl implements ILoginService {
 			int userStatus = dbUserInfo.getUserStatus();
 			// 用户状态，1-正常; 0-停用; 2-待审核
 			if(userStatus != Constants.STATUS_1){
-				throw new LoginBizException(ErrorCode.ERROR_103); 
+				throw new LoginBizException(ErrorCode.ERROR_14001); 
 			}
 			retUserinfo.setIsFirttimeLogin(Constants.STATUS_0);
 			dbUserInfo.setLastTime(DateUntil.getFormatDate(Constants.DATEFORMAT_YMDHMS, new Date())); //更新最后登录的时间
@@ -859,7 +867,7 @@ public class LoginServiceImpl implements ILoginService {
 		}
 		if(thirdpartyConf.getInUseLogin() != Constants.STATUS_1){
 			LogUtil.log.info(String.format("###查询到相关的第三方配置成停用(inUseLogin!=1),thirdpartyType:%s,packageName:%s,clientTypeInt:%s", thirdpartyType,packageName,clientTypeInt));
-			throw new LoginBizException(ErrorCode.ERROR_104);
+			throw new LoginBizException(ErrorCode.ERROR_14002);
 		}
 		
 		String clientId = thirdpartyConf.getAppId();
@@ -889,7 +897,7 @@ public class LoginServiceImpl implements ILoginService {
 			int userStatus = dbUserInfo.getUserStatus();
 			// 用户状态，1-正常; 0-停用;
 			if(userStatus != Constants.STATUS_1){
-				throw new LoginBizException(ErrorCode.ERROR_103);
+				throw new LoginBizException(ErrorCode.ERROR_14001);
 			}
 			dbUserInfo.setLastTime(DateUntil.getFormatDate(Constants.DATEFORMAT_YMDHMS, new Date())); 
 			retUserinfo.setIsFirttimeLogin(Constants.STATUS_0);
@@ -1069,6 +1077,7 @@ public class LoginServiceImpl implements ILoginService {
 			realPwds = MD5Util.md5(pwd+userId+time);
 		}else if(obj instanceof Date){
 			String time = DateUntil.getFormatDate(Constants.DATEFORMAT_YMDHMS, (Date)obj);
+			System.err.println("time="+time);
 			realPwds = MD5Util.md5(pwd+userId+time);
 		}
 		return realPwds;
@@ -1235,7 +1244,13 @@ public class LoginServiceImpl implements ILoginService {
 					dbUserInfo.setUuid(deviceProperties.getUuid());
 				}
 			}
+			dbUserInfo.setIsModifyInfo(Constants.STATUS_1);
 			userBaseService.insert(dbUserInfo);
+			
+			// 插入账户表
+			UserAccount account = new UserAccount();
+			account.setUserId(userId);
+			userAccountService.insert(account);
 			
 			//保存qq用户信息
 			QQConnectUserInfoDo qqConnectUserInfoDo = new QQConnectUserInfoDo();
@@ -1245,7 +1260,7 @@ public class LoginServiceImpl implements ILoginService {
 			qqConnectUserInfoDo.setUnionid(unionid);
 			qqAccessService.insert(qqConnectUserInfoDo);
      	} catch (Exception e) {
-			throw new LoginBizException(ErrorCode.ERROR_105);
+			throw new LoginBizException(ErrorCode.ERROR_14004);
 		}
 		return dbUserInfo;
 	}
@@ -1284,7 +1299,7 @@ public class LoginServiceImpl implements ILoginService {
 				|| StringUtils.isEmpty(unionid)) {
 			String errorMsg = "qq互联app端接入，服务器端appid,openid，unionid认证不通过";
 			LogUtil.log.error("###"+errorMsg);
-			throw new LoginBizException(ErrorCode.ERROR_105);
+			throw new LoginBizException(ErrorCode.ERROR_14004);
 		}
 		return oauthMeJson;
 	}
@@ -1399,7 +1414,13 @@ public class LoginServiceImpl implements ILoginService {
 					dbUserInfo.setUuid(deviceProperties.getImei());
 				}
 			}
+			dbUserInfo.setIsModifyInfo(Constants.STATUS_1);
 			userBaseService.insert(dbUserInfo);
+			
+			// 插入账户表
+			UserAccount account = new UserAccount();
+			account.setUserId(userId);
+			userAccountService.insert(account);
 			
 			WeiboUserInfoDo weiboUserInfoDo = new WeiboUserInfoDo();
 			BeanUtils.copyProperties(weiboUserInfoDo, weiboUserInfo);
@@ -1433,4 +1454,63 @@ public class LoginServiceImpl implements ILoginService {
 		return null;
 	}
 
+	@Override
+	public JSONObject register(String nickName, String pwd) throws Exception {
+		if(StrUtil.isNullOrEmpty(nickName) || StrUtil.isNullOrEmpty(pwd)) {
+			throw new LoginBizException(ErrorCode.ERROR_101);
+		}
+		UserInfoDo dbuser = userBaseService.getUserByNickname(nickName);
+		if(dbuser != null) {
+			throw new LoginBizException(ErrorCode.ERROR_14004);
+		}
+		JSONObject ret = new JSONObject();
+		Date addTime = new Date();
+		String userId = getUserId();
+		dbuser = new UserInfoDo();
+		dbuser.setUserId(userId);
+		dbuser.setNickName(nickName);
+		dbuser.setPwd(getPwd(addTime, userId, pwd));
+		dbuser.setUserStatus(Constants.STATUS_1);
+		dbuser.setIcon(Constants.USER_DEFAULT_ICON);
+		dbuser.setAddTime(addTime);
+		dbuser.setIsAnchor(Constants.STATUS_0);
+		userBaseService.insert(dbuser);
+		UserBaseInfo vo = new UserBaseInfo();
+//		BeanUtils.copyProperties(dbuser, vo);
+		vo.setUserId(userId);
+		ret.put(vo.getShortName(), vo.buildJson());
+		return ret;
+	}
+
+	@Override
+	public JSONObject verifyLogin(String userId, String pwd) throws Exception {
+		if(StrUtil.isNullOrEmpty(userId) || StrUtil.isNullOrEmpty(pwd)) {
+			throw new LoginBizException(ErrorCode.ERROR_101);
+		}
+		JSONObject ret = new JSONObject();
+		Session session = new Session();
+		UserBaseInfo retUserinfo = new UserBaseInfo();
+		UserInfoDo dbuser = userBaseService.getUserByUserId(userId);
+		if(dbuser == null) {
+			throw new LoginBizException(ErrorCode.ERROR_14001);
+		}
+		int userStatus = dbuser.getUserStatus();
+		if(userStatus == Constants.STATUS_0) {
+			throw new LoginBizException(ErrorCode.ERROR_14001);
+		}
+		Date addTime = dbuser.getAddTime();
+		String signPwd = getPwd(addTime, userId, pwd);
+		if(!dbuser.getPwd().equals(signPwd)) {
+			throw new LoginBizException(ErrorCode.ERROR_14005);	
+		}
+		setMemcacheToSessionId(session, userId);
+		retUserinfo.setUserId(userId);
+		retUserinfo.setNickName(dbuser.getNickName());
+		retUserinfo.setIcon(dbuser.getIcon());
+		session.setFrom(1);
+		
+		ret.put(session.getShortName(), session.buildJson());
+		ret.put(retUserinfo.getShortName(), retUserinfo.buildJson());
+		return ret;
+	}
 }

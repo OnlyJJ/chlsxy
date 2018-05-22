@@ -57,6 +57,9 @@ public class UserInfo extends UserBaseInfo implements Serializable {
 	private int anchorLevel;
 	/** 房间身份：0-普通用户，1-主播，2-房管 */
 	private int roomIdentity;
+	
+	/** 是否被禁言，0-没有，1-已禁言 */
+	private int upSpeak;
 
 	// 字段key
 	private static final String u_gold = "a";
@@ -77,6 +80,7 @@ public class UserInfo extends UserBaseInfo implements Serializable {
 	private static final String u_roomIdentity = "p";
 	private static final String u_userLevel = "q";
 	private static final String u_anchorLevel = "r";
+	private static final String u_upSpeak = "s";
 	
 	@Override
 	public JSONObject buildJson() {
@@ -114,6 +118,7 @@ public class UserInfo extends UserBaseInfo implements Serializable {
 			setInt(json, u_roomIdentity, roomIdentity);
 			setInt(json, u_userLevel, userLevel);
 			setInt(json, u_anchorLevel, anchorLevel);
+			setInt(json ,u_upSpeak, upSpeak);
 			return json;
 		} catch (Exception e) {
 			LogUtil.log.error(e.getMessage(), e);
@@ -283,6 +288,14 @@ public class UserInfo extends UserBaseInfo implements Serializable {
 
 	public void setRoomIdentity(int roomIdentity) {
 		this.roomIdentity = roomIdentity;
+	}
+
+	public int getUpSpeak() {
+		return upSpeak;
+	}
+
+	public void setUpSpeak(int upSpeak) {
+		this.upSpeak = upSpeak;
 	}
 
 }

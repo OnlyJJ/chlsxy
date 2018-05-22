@@ -89,12 +89,12 @@ public class DataRequest extends BaseDataRequest implements Serializable {
 					if(!StringUtils.isEmpty(userid)){
 						UserBaseInfo userBaseInfo = new UserBaseInfo();
 						userBaseInfo.setUserId(userid);
-						data.put(userBaseInfo.getShortName(), userBaseInfo);
+						data.put(userBaseInfo.getShortName(), userBaseInfo.buildJson());
 					}
 					if(!StringUtils.isEmpty(sessionid)){
 						Session session = new Session();
 						session.setSessionid(sessionid);
-						data.put(session.getShortName(), session);
+						data.put(session.getShortName(), session.buildJson());
 					}
 				}
 			}

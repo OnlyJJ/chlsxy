@@ -73,20 +73,23 @@ public class AccessCheckAdvice {
 	 */
 	@Before("aspectRoomAction() && args(fromUserId,roomOperationVo)")
 	public void beforeAspectRoomAction(String fromUserId,
-			RoomOperationVo roomBannedOperationVo) throws Exception {
-		LogUtil.log.info(String.format("#######begin-beforeAspectRoomAction,fromUserId:%s,roomOperationVo:%s ", fromUserId,JsonUtil.beanToJsonString(roomBannedOperationVo)));
-		if(org.apache.commons.lang.StringUtils.isEmpty(fromUserId) || roomBannedOperationVo==null){
+			RoomOperationVo roomOperationVo) throws Exception {
+		LogUtil.log.info(String.format("#######begin-beforeAspectRoomAction,fromUserId:%s,roomOperationVo:%s ", fromUserId,JsonUtil.beanToJsonString(roomOperationVo)));
+		if(org.apache.commons.lang.StringUtils.isEmpty(fromUserId) || roomOperationVo==null){
 			throw new AccessBizException(ErrorCode.ERROR_101);
 		}
 		
-		String toUserId = roomBannedOperationVo.getUserId();
-		String roomId = roomBannedOperationVo.getRoomid();
+		String toUserId = roomOperationVo.getUserId();
+		String roomId = roomOperationVo.getRoomid();
 		
 		if(StrUtil.isNullOrEmpty(toUserId) || StrUtil.isNullOrEmpty(roomId)){
 			throw new AccessBizException(ErrorCode.ERROR_101);
 		}
 		
-		int toDoActionType = roomBannedOperationVo.getType(); // 操作类型，0:禁言;1:踢出;2:解除禁言;
+		if(fromUserId.equals(toUserId)) {
+			throw new AccessBizException(ErrorCode.ERROR_12004);
+		}
+		int toDoActionType = roomOperationVo.getType(); // 操作类型，0:禁言;1:踢出;2:解除禁言;
 		
 		switch (toDoActionType) {
 			case 0: // 禁言
@@ -108,7 +111,7 @@ public class AccessCheckAdvice {
 				throw new AccessBizException(ErrorCode.ERROR_101);
 		}
 		
-		LogUtil.log.info(String.format("#######end-beforeAspectRoomAction,fromUserId:%s,roomOperationVo:%s ", fromUserId,JsonUtil.beanToJsonString(roomBannedOperationVo)));
+		LogUtil.log.info(String.format("#######end-beforeAspectRoomAction,fromUserId:%s,roomOperationVo:%s ", fromUserId,JsonUtil.beanToJsonString(roomOperationVo)));
 	}
 
 
@@ -544,13 +547,13 @@ public class AccessCheckAdvice {
 	 * @throws Exception
 	 */
 	@Before("mgrUserRoomMembers() && args(userBaseInfo,roomOperationVo)")
-	public void beforeMgrUserRoomMembers(String fromUserId,RoomOperationVo roomBannedOperationVo) throws Exception {
+	public void beforeMgrUserRoomMembers(String fromUserId,RoomOperationVo roomOperationVo) throws Exception {
 		LogUtil.log.info("#######AccessCheckAdvice-beforeMgrUserRoomMembers 权限校验开始。。。 ");
-		if(StrUtil.isNullOrEmpty(fromUserId) || roomBannedOperationVo==null){
+		if(StrUtil.isNullOrEmpty(fromUserId) || roomOperationVo==null){
 			throw new AccessBizException(ErrorCode.ERROR_100);
 		}
 		
-		String roomId = roomBannedOperationVo.getRoomid();
+		String roomId = roomOperationVo.getRoomid();
 		LogUtil.log.info(String.format("#######设置、取消权限校验,fromUserId:%s,roomId:%s",fromUserId,roomId));
 		// 当前禁言、踢人等操作者
 		UserCache userInfoVo = userCacheInfoService.getUserInRoomChe(fromUserId, roomId);

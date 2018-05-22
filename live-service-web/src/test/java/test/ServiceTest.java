@@ -1,7 +1,5 @@
 package test;
 
-import java.util.Date;
-
 import javax.annotation.Resource;
 
 import org.junit.Test;
@@ -14,18 +12,13 @@ import com.lm.live.appclient.service.IAppStartupPageService;
 import com.lm.live.base.service.IImagePackageConfigService;
 import com.lm.live.base.service.IThirdpartyConfService;
 import com.lm.live.base.service.IUserAccusationInfoService;
-import com.lm.live.cache.constants.CacheKey;
-import com.lm.live.common.redis.RedisUtil;
-import com.lm.live.common.utils.DateUntil;
-import com.lm.live.common.utils.JsonUtil;
 import com.lm.live.common.vo.Page;
 import com.lm.live.decorate.service.IDecoratePackageService;
-import com.lm.live.game.constant.Constants;
 import com.lm.live.game.service.IGameService;
 import com.lm.live.game.service.ISignService;
-import com.lm.live.game.vo.SignVo;
 import com.lm.live.guard.service.IGuardService;
 import com.lm.live.home.service.IGwFilesService;
+import com.lm.live.login.service.ILoginService;
 import com.lm.live.room.service.IRoomService;
 import com.lm.live.tools.service.IGiftService;
 import com.lm.live.tools.service.IUserPackageService;
@@ -78,6 +71,9 @@ public class ServiceTest {
 	
 	@Resource
 	private IImagePackageConfigService imagePackageConfigService;
+	
+	@Resource
+	private ILoginService loginService;
 
 	@Test
 	public void test() {
@@ -127,7 +123,7 @@ public class ServiceTest {
 //			userAccusationInfoService.recordAccusationInfo(userId, toUserId, av);
 //			JSONObject jsonRes = roomService.getRoomOnlineData(roomId, page);
 //			JSONObject jsonRes = guardService.getRoomGuardData(userId, roomId);
-			JSONObject jsonRes = imagePackageConfigService.findNewestUseableList(null);
+//			JSONObject jsonRes = imagePackageConfigService.findNewestUseableList(null);
 //			JSONObject jsonRes = giftService.qryGiftData();
 //			JSONObject jsonRes =  userPackageService.listUserBagData(userId);
 //			if(avo != null) {
@@ -158,11 +154,13 @@ public class ServiceTest {
 //			String key = CacheKey.SIGN_DAY_CACHE + userId + Constants.SEPARATOR_COLON + nowStr;
 //			RedisUtil.del(key);
 //			SignVo jsonRes = signService.sign(userId);
-			if(jsonRes != null) {
-				System.err.println(jsonRes);
-			} else {
-				System.err.println("null ....");
-			}
+//			JSONObject jsonRes = loginService.register("牛逼ddd人", "123456");
+//			JSONObject jsonRes = loginService.verifyLogin("100546", "123456");
+//			if(jsonRes != null) {
+//				System.err.println(jsonRes);
+//			} else {
+//				System.err.println("null ....");
+//			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

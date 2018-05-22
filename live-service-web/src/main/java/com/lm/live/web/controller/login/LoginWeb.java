@@ -28,6 +28,7 @@ import com.lm.live.common.utils.MemcachedUtil;
 import com.lm.live.common.utils.StrUtil;
 import com.lm.live.common.vo.Code;
 import com.lm.live.common.vo.DeviceProperties;
+import com.lm.live.common.vo.RequestVo;
 import com.lm.live.common.vo.Result;
 import com.lm.live.common.vo.Session;
 import com.lm.live.common.vo.UserBaseInfo;
@@ -337,6 +338,88 @@ public class LoginWeb extends BaseController {
 				ip = IpUtils.getClientIp(data.getRequest());
 			}
 			jsonRes = loginService.pseudoLogin(sessionId, uid, ip, time);
+		} catch(LoginBizException e) {
+			LogUtil.log.error(e.getMessage(), e);
+			result.setResultCode(e.getErrorCode().getResultCode());
+			result.setResultDescr(e.getErrorCode().getResultDescr());
+		}catch (Exception e) {
+			LogUtil.log.error(e.getMessage(), e);
+			result.setResultCode(ErrorCode.ERROR_100.getResultCode());
+			result.setResultDescr(ErrorCode.ERROR_100.getResultDescr());
+		}
+		jsonRes.put(result.getShortName(),result.buildJson());
+		long time2 = System.currentTimeMillis();
+		long spendTimes = time2 - time1;
+		handleInfo(LogUtil.log, request, data.getRequestStr(), spendTimes, jsonRes.toString(), true);
+		out(jsonRes, request, response, q);
+	}
+	
+	/**
+	 * L6
+	 * 账户注册
+	 *@param request
+	 *@param response
+	 *@param q
+	 *@author shao.xiang
+	 *@data 2018年5月22日
+	 */
+	@RequestMapping(value = {"L6/{q}"} , method= {RequestMethod.POST})
+	public void register(HttpServletRequest request,HttpServletResponse response, @PathVariable String q){
+		long time1 = System.currentTimeMillis();
+		DataRequest data = (DataRequest) RequestUtil.getDataRequest(request, response);
+		Result result = new Result(ErrorCode.SUCCESS_0.getResultCode(), ErrorCode.SUCCESS_0.getResultDescr());
+		JSONObject jsonRes = new JSONObject();
+		try {
+			if(data == null
+					|| !data.getData().containsKey(Code.class.getSimpleName().toLowerCase())) {
+				throw new LoginBizException(ErrorCode.ERROR_101);
+			}
+			Code code = new Code();
+			code.parseJson(data.getData().getJSONObject(code.getShortName()));
+			String nickName = code.getCode();
+			String pwd = code.getUuid();
+			jsonRes = loginService.register(nickName, pwd);
+		} catch(LoginBizException e) {
+			LogUtil.log.error(e.getMessage(), e);
+			result.setResultCode(e.getErrorCode().getResultCode());
+			result.setResultDescr(e.getErrorCode().getResultDescr());
+		}catch (Exception e) {
+			LogUtil.log.error(e.getMessage(), e);
+			result.setResultCode(ErrorCode.ERROR_100.getResultCode());
+			result.setResultDescr(ErrorCode.ERROR_100.getResultDescr());
+		}
+		jsonRes.put(result.getShortName(),result.buildJson());
+		long time2 = System.currentTimeMillis();
+		long spendTimes = time2 - time1;
+		handleInfo(LogUtil.log, request, data.getRequestStr(), spendTimes, jsonRes.toString(), true);
+		out(jsonRes, request, response, q);
+	}
+	
+	/**
+	 * L7
+	 * 账号登录
+	 *@param request
+	 *@param response
+	 *@param q
+	 *@author shao.xiang
+	 *@data 2018年5月22日
+	 */
+	@RequestMapping(value = {"L7/{q}"} , method= {RequestMethod.POST})
+	public void verifyLogin(HttpServletRequest request,HttpServletResponse response, @PathVariable String q){
+		long time1 = System.currentTimeMillis();
+		DataRequest data = (DataRequest) RequestUtil.getDataRequest(request, response);
+		Result result = new Result(ErrorCode.SUCCESS_0.getResultCode(), ErrorCode.SUCCESS_0.getResultDescr());
+		JSONObject jsonRes = new JSONObject();
+		try {
+			if(data == null
+					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
+				throw new LoginBizException(ErrorCode.ERROR_101);
+			}
+			Code code = new Code();
+			code.parseJson(data.getData().getJSONObject(code.getShortName()));
+			String userId = code.getCode();
+			String pwd = code.getUuid();
+			jsonRes = loginService.verifyLogin(userId, pwd);
 		} catch(LoginBizException e) {
 			LogUtil.log.error(e.getMessage(), e);
 			result.setResultCode(e.getErrorCode().getResultCode());

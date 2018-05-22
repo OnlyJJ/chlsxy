@@ -101,4 +101,26 @@ public interface ILoginService {
 	 */
 	public void setMemcacheToSessionId(Session session,String userId);
 	
+	/**
+	 * 用户注册（精简版，暂时只提供给web端调试使用，后期线上如果需要，则要重构此流程）
+	 *@param nickName
+	 *@param pwd
+	 *@return
+	 *@throws Exception
+	 *@author shao.xiang
+	 *@data 2018年5月22日
+	 */
+	public JSONObject register(String nickName, String pwd) throws Exception;
+	
+	/**
+	 * 账号登录
+	 *@param nickName
+	 *@param pwd
+	 *@return
+	 *@throws Exception
+	 *@author shao.xiang
+	 *@data 2018年5月22日
+	 */
+	public JSONObject verifyLogin(String userId, String pwd) throws Exception;
+	
 }

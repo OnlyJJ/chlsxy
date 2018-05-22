@@ -84,7 +84,7 @@ public class FileWeb extends BaseController {
 		JSONObject jsonRes = new JSONObject();
 		try {
 			if(data==null  
-					|| !data.getData().containsKey(RequestVo .class.getSimpleName().toLowerCase())) {
+					|| !data.getData().containsKey(UserBaseInfo.class.getSimpleName().toLowerCase())) {
 				throw new BaseBizException(ErrorCode.ERROR_101);
 			}
 			RequestVo req = new RequestVo();

@@ -45,13 +45,16 @@ public class FileUploadServiceImpl implements IFileUploadService {
 
 	@Override
 	public void uploadFile(HttpServletRequest request, String userId) throws Exception{
+		LogUtil.log.info("### F1-userId :" + userId);
 		if(!StringUtils.isEmpty(userId)) {
 			// my-todo 这里的路径要修改：应该上传至cdn的路径，调试时使用本地路径
-			String filepath = SpringContextListener.getContextProValue("cdnUpload", "/data/apps/xxwan_cdn/advert/")+Constants.ICON_IMG_FILE_URI+File.separator;
+//			String filepath = Constants.cdnPath + Constants.ICON_IMG_FILE_URI+File.separator;
+			String filepath = "http://192.168.1.70:8616/home/lm/data/uploadfiles/" + Constants.ICON_IMG_FILE_URI+File.separator;
 	        File files = new File(filepath);
 	        if(!files.exists()){
 	        	files.mkdirs();
 	        }
+	        LogUtil.log.info("### F1-mkdirs :" + filepath);
 	        //创建一个通用的多部分解析器  
 			CommonsMultipartResolver cmr = new CommonsMultipartResolver(request.getSession().getServletContext());
 			if(cmr.isMultipart(request)){
@@ -78,20 +81,24 @@ public class FileUploadServiceImpl implements IFileUploadService {
 			        }
 					// 头像地址按目录分类
 					fName = iconDateStr+File.separator+fName;
+					LogUtil.log.info("### F1-file :" + fName + ",file= " + file.getName() +
+							"," + file.getOriginalFilename() + "," + file.getSize());
 	                if(type != null && (type.equals("jpg") || type.equals("png") || type.equals("gif") || type.equals("JPEG"))){
 	                	File fileP = new File(filepath+fName);
 						file.transferTo(fileP);
 						UserInfoDo dbUserInfo = userBaseService.getUserByUserId(userId);
 						int isModifyInfo = dbUserInfo.getIsModifyInfo();
-						if (isModifyInfo == 1) { // 检测是否可以修改头像
+						if (isModifyInfo == 0) { // 检测是否可以修改头像
 							throw new BaseBizException(ErrorCode.ERROR_10003);
 						} 
+						LogUtil.log.info("### F1-updata..."+ fName);
 						userBaseService.updateIcon(userId, fName);
 	                } else {
 	                	throw new BaseBizException(ErrorCode.ERROR_10002);
 	                }
 	            }
 			}
+			LogUtil.log.info("### F1-updata...cmr is error");
 		}
 	}
 
@@ -99,7 +106,7 @@ public class FileUploadServiceImpl implements IFileUploadService {
 	public JSONObject uploadImgs(HttpServletRequest request, String userId) throws Exception {
 		JSONObject json = new JSONObject();
 		if(!StringUtils.isEmpty(userId)){
-			String filepath = SpringContextListener.getContextProValue("cdnUpload", Constants.UPLOAD_FILE_PATH) + Constants.ACCUSATION_IMG_FILE_URL + File.separator;
+			String filepath = Constants.cdnPath + Constants.ACCUSATION_IMG_FILE_URL + File.separator;
 			File files = new File(filepath);
 			if(!files.exists()){
 				files.mkdirs();

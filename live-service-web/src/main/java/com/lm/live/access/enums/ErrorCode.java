@@ -10,6 +10,8 @@ import java.util.Map;
  *
  */
 public enum ErrorCode {
+	/** 不能操作自己 */
+	ERROR_12004(12004,"不能操作自己"),
 	/** 主播不能被禁言 */
 	ERROR_12003(12003,"主播不能被禁言"),
 	/** 房间内没有此成员 */

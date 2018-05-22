@@ -69,7 +69,7 @@ public class QQAccessServiceImpl extends CommonServiceImpl<QQConnectUserInfoDoMa
 			o = JsonUtil.strToJsonObject(responseJsonString);
 		} catch (Exception e) {
 			LogUtil.log.error("###qq登录通过token获取数据出错:"+responseJsonString);
-			throw new LoginBizException(ErrorCode.ERROR_105);
+			throw new LoginBizException(ErrorCode.ERROR_14003);
 		}
 		return o;
 	}

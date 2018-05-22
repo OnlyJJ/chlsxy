@@ -123,7 +123,8 @@ public class UserWeb extends BaseController {
 			RequestVo req = new RequestVo();
 			req.parseJson(data.getData().getJSONObject(req.getShortName()));
 			String userId = req.getUserId();
-			UserInfo vo = userInfoService.getUserInfo(userId);
+			String roomId = req.getRoomId();
+			UserInfo vo = userInfoService.getUserInfo(userId, roomId);
 			if(vo != null) {
 				jsonRes.put(vo.getShortName(), vo.buildJson());
 			}
