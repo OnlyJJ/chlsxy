@@ -412,7 +412,7 @@ public class LoginWeb extends BaseController {
 		JSONObject jsonRes = new JSONObject();
 		try {
 			if(data == null
-					|| !data.getData().containsKey(RequestVo.class.getSimpleName().toLowerCase())) {
+					|| !data.getData().containsKey(Code.class.getSimpleName().toLowerCase())) {
 				throw new LoginBizException(ErrorCode.ERROR_101);
 			}
 			Code code = new Code();

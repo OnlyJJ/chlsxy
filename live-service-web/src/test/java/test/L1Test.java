@@ -27,16 +27,17 @@ public class L1Test {
 	@Test
 	public void test() {
 		 String url=  "";
-		 url=  "http://192.168.1.70:8616/L1/0/";
+		 url=  "http://192.168.1.70:8616/L7/0/";
 		 JSONObject  json = new JSONObject();
 		 JSONObject  code = new JSONObject();
 		 JSONObject  deviceproperties = new JSONObject();
-		 code.put("c", "293509968026258edc05db6c4596ebe9");
+		 code.put("a", "100138");
+		 code.put("c", "123456");
 		 deviceproperties.put("a", "M5 Note");
 		 deviceproperties.put("b", "F18A7B3C-7756-4E4B-B072-C6F3ABC0F034"); 
 		 deviceproperties.put("i", 1);
 		 json.put("code", code);
-		 json.put("deviceproperties", deviceproperties);
+//		 json.put("deviceproperties", deviceproperties);
 		  
 		  System.out.println("#####str:"+json.toString());
 		 try {
