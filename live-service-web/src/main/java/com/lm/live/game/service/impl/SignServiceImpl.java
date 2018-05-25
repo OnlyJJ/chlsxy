@@ -255,6 +255,10 @@ public class SignServiceImpl implements ISignService {
 			} 
 		}
 		List<JSONObject> data = listData(seriesDay, prizeStage);
+		if(seriesDay == 0) {
+			seriesDay = 1; // 返回给客户端为1
+		}
+		vo.setSeriesDay(seriesDay);
 		ret.put(vo.getShortName(), vo.buildJson());
 		ret.put(Constants.DATA_BODY, data);
 		return ret;
