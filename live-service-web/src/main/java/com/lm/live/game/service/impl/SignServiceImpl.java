@@ -1,12 +1,15 @@
 package com.lm.live.game.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.account.service.IUserAccountService;
 import com.lm.live.cache.constants.CacheKey;
@@ -136,7 +139,6 @@ public class SignServiceImpl implements ISignService {
 			signInfoMapper.insert(info);
 		}
 		
-		SignVo sign = new SignVo();
 		// 签到奖励
 		SignPrizeConf spc = signPrizeConfMapper.getSignPrizeConf(seriesDay, prizeStage);
 		if(spc == null) {
@@ -156,57 +158,13 @@ public class SignServiceImpl implements ISignService {
 		signPrizeHisMapper.insert(his);
 		
 		String signPrizeHisId = String.valueOf(his.getId());
+		
 		// 返回客户端数据
-		sign.setSeriesDay(seriesDay);
-		sign.setSignFlag(Constants.STATUS_1);
-		sign.setPrizeId(prizeId);
-		sign.setPrizeType(prizeType);
-		sign.setNumber(num);
-
-		boolean issendPrize = true; // 是否发放奖励
-		boolean isPeriod = false; // 是否有时间限制
-		int validate = 1;
-
-		String imgUrl = "";
-		String msg = ""; // 文字奖励
-		String name = "";
-		if (prizeType == PrizeType.text.getValue()) { // 文字奖励
-			issendPrize = false;
-		} else if (prizeType == PrizeType.gift.getValue()) { // 礼物
-			Gift gift = giftService.getObjectById(prizeId);
-			if (gift.getImage() == null) {
-				throw new GameBizException(ErrorCode.ERROR_13002);
-			}
-			imgUrl = Constants.cdnPath + Constants.GIFT_IMG_FILE_URI + "/" + gift.getImage();
-			name = gift.getName();
-		} else if (prizeType == PrizeType.car.getValue()) { // 宠物
-			
-		} else if (prizeType == PrizeType.decorate.getValue()) { // 勋章
-			
-		} else if (prizeType == PrizeType.gongju.getValue()) { // 工具
-			Tool tool = toolService.getObjectById(prizeId);
-			if (tool.getImage() == null) {
-				throw new GameBizException(ErrorCode.ERROR_13002);
-			}
-			imgUrl = Constants.cdnPath + Constants.TOOL_IMG_FILE_URI + "/" + tool.getImage();
-			name = tool.getName();
-		} else if (prizeType == PrizeType.gold.getValue()) {
-			imgUrl = Constants.cdnPath + Constants.GIFT_IMG_FILE_URI + "/" + "jinbi.png";
-			name = "金币";
-		} else if (prizeType == PrizeType.experience.getValue()) {
-			imgUrl = Constants.cdnPath + Constants.GIFT_IMG_FILE_URI + "/" + "jingyan.png";
-			name = "经验";
-		}
-
-		sign.setImgUrl(imgUrl);
-		sign.setPrizeName(name);
-		if (spc.getContent() != null) {
-			msg = spc.getContent();
-		}
-		sign.setDescribe(msg);
+		String content = spc.getContent();
+		SignVo sign = handleData(prizeType, seriesDay, prizeId, num, content);
 		// 赠送奖励
-		if (issendPrize) {
-			recivePrize(userId, prizeType, prizeId, isPeriod, num, validate, signPrizeHisId);
+		if (StrUtil.isNullOrEmpty(content)) {
+			recivePrize(userId, prizeType, prizeId, false, num, 30, signPrizeHisId);
 		}
 		// 签到成功，写入缓存
 		RedisUtil.set(key, 1, CacheTimeout.DEFAULT_TIMEOUT_24H);
@@ -266,9 +224,110 @@ public class SignServiceImpl implements ISignService {
 
 	@Override
 	public JSONObject listPrize(String userId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		if(StrUtil.isNullOrEmpty(userId)) {
+			throw new GameBizException(ErrorCode.ERROR_101);
+		}
+		Date now = new Date();
+		String nowStr = DateUntil.format2Str(now, Constants.DATEFORMAT_YMD_1);
+		JSONObject ret = null;
+		String key = CacheKey.USER_SIGN_PRIZE_CACHE + userId + Constants.SEPARATOR_COLON + nowStr;
+		String cache = RedisUtil.get(key);
+		if(!StrUtil.isNullOrEmpty(cache)) {
+			return JSON.parseObject(cache);
+		}
+		ret = new JSONObject();
+		// 1、查询当前签到
+		SignInfo info = signInfoMapper.getSignInfoCondition(userId, nowStr);
+		int seriesDay = 0; // 连续签到天数
+		int prizeStage = 1; // 当前签到奖励隶属的期，默认第一期，（数据库默认配置为1）
+		SignVo vo = new SignVo();
+		if(info != null) {
+			seriesDay = info.getSeriesDay(); 
+			prizeStage = info.getPrizeStage();
+			vo.setSignFlag(Constants.STATUS_1);
+		} else { // 当天没有签到记录，则再查询前一天是否签到
+			vo.setSignFlag(Constants.STATUS_0);
+			String yesterDay =  DateUntil.format2Str(DateUntil.addDay(now, -1), Constants.DATEFORMAT_YMD_1);
+			info = signInfoMapper.getSignInfoCondition(userId, yesterDay);
+			if(info != null) {
+				seriesDay = info.getSeriesDay(); 
+				prizeStage = info.getPrizeStage();
+			} 
+		}
+		List<JSONObject> data = listData(seriesDay, prizeStage);
+		ret.put(vo.getShortName(), vo.buildJson());
+		ret.put(Constants.DATA_BODY, data);
+		return ret;
 	}
 
 
+	private SignVo handleData(int prizeType, int seriesDay, int prizeId, int num, String content) {
+		SignVo sign = new SignVo();
+		sign.setSeriesDay(seriesDay);
+		sign.setSignFlag(Constants.STATUS_1);
+		sign.setPrizeId(prizeId);
+		sign.setPrizeType(prizeType);
+		sign.setNumber(num);
+
+		boolean issendPrize = true; // 是否发放奖励
+		boolean isPeriod = false; // 是否有时间限制
+
+		String imgUrl = "";
+		String msg = ""; // 文字奖励
+		String name = "";
+		if (prizeType == PrizeType.text.getValue()) { // 文字奖励
+			issendPrize = false;
+		} else if (prizeType == PrizeType.gift.getValue()) { // 礼物
+			Gift gift = giftService.getObjectById(prizeId);
+			if (gift.getImage() == null) {
+				throw new GameBizException(ErrorCode.ERROR_13002);
+			}
+			imgUrl = Constants.cdnPath + Constants.GIFT_IMG_FILE_URI + "/" + gift.getImage();
+			name = gift.getName();
+		} else if (prizeType == PrizeType.car.getValue()) { // 宠物
+			
+		} else if (prizeType == PrizeType.decorate.getValue()) { // 勋章
+			
+		} else if (prizeType == PrizeType.tool.getValue()) { // 工具
+			Tool tool = toolService.getObjectById(prizeId);
+			if (tool.getImage() == null) {
+				throw new GameBizException(ErrorCode.ERROR_13002);
+			}
+			imgUrl = Constants.cdnPath + Constants.TOOL_IMG_FILE_URI + "/" + tool.getImage();
+			name = tool.getName();
+		} else if (prizeType == PrizeType.gold.getValue()) {
+			imgUrl = Constants.cdnPath + Constants.GIFT_IMG_FILE_URI + "/" + "jinbi.png";
+			name = "金币";
+		} else if (prizeType == PrizeType.experience.getValue()) {
+			imgUrl = Constants.cdnPath + Constants.GIFT_IMG_FILE_URI + "/" + "jingyan.png";
+			name = "经验";
+		}
+
+		sign.setImgUrl(imgUrl);
+		sign.setPrizeName(name);
+		if (!StrUtil.isNullOrEmpty(content)) {
+			sign.setDescribe(content);
+		}
+		return sign;
+	}
+	
+	private List<JSONObject> listData(int seriesDay, int prizeStage) {
+		List<JSONObject> data = new ArrayList<JSONObject>();
+		List<SignPrizeConf> list = signPrizeConfMapper.listSignPrizeConf(prizeStage);
+		if(list != null && list.size() >0) {
+			for(int i=0; i<list.size();i++) {
+				SignPrizeConf prize = list.get(i);
+				int prizeType = prize.getPrizeType();
+				int prizeId = prize.getPrizeId();
+				int num = prize.getNumber();
+				String content = prize.getContent();
+				SignVo vo = handleData(prizeType, seriesDay, prizeId, num, content);
+				if(i >= seriesDay) {
+					vo.setSignFlag(Constants.STATUS_0);
+				}
+				data.add(vo.buildJson());
+			}
+		}
+		return data;
+	}
 }

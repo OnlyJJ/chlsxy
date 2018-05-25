@@ -1,7 +1,6 @@
 package com.lm.live.login.service.impl;
 
 import java.io.File;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -22,7 +21,6 @@ import com.lm.live.appclient.service.IAppInstallChannelService;
 import com.lm.live.base.dao.ServiceLogMapper;
 import com.lm.live.base.domain.ServiceLog;
 import com.lm.live.base.domain.ThirdpartyConf;
-import com.lm.live.base.enums.ThirdpartyTypeEnum;
 import com.lm.live.base.enums.ThirdpartyTypeEnum.ThirdpartyType;
 import com.lm.live.base.service.IProvinceService;
 import com.lm.live.base.service.IThirdpartyConfService;
@@ -45,6 +43,7 @@ import com.lm.live.common.vo.Session;
 import com.lm.live.common.vo.UserBaseInfo;
 import com.lm.live.framework.service.ServiceResult;
 import com.lm.live.login.constant.Constants;
+import com.lm.live.login.dao.QQConnectUserInfoDoMapper;
 import com.lm.live.login.dao.UserRegistAutoMapper;
 import com.lm.live.login.dao.WechatOauth2TokenRefreshMapper;
 import com.lm.live.login.dao.WechatUserMapper;
@@ -585,11 +584,13 @@ public class LoginServiceImpl implements ILoginService {
 		String serverConfAppid = thirdpartyConf.getAppId();
 		JSONObject qqData = getQQdata(accessToken, openid, serverConfAppid);
 		String clentid = qqData.getString("client_id");
-		String unionid = qqData.getString("unionid");
-		
-		UserInfoDo  dbUserInfo = userBaseService.getByQQConnectUnionid(unionid);
+		// 这里是单个账户多个包登录，生成不同账户的解决方式（需要申请打通）
+//		String unionid = qqData.getString("unionid");
+//		UserInfoDo  dbUserInfo = userBaseService.getByQQConnectUnionid(unionid);
+		UserInfoDo  dbUserInfo = userBaseService.getByQQConnectOpenid(openid);
 		if(dbUserInfo==null){//数据库中没有此openid,表示是第一次登录,则插入一条新纪录
-			dbUserInfo  = saveQQInfoAndUserInfo(qqConnectUserInfoVo,channelId,deviceProperties,clentid,unionid);
+			// 当有unionid时，需要修改这里，加入到db中
+			dbUserInfo  = saveQQInfoAndUserInfo(qqConnectUserInfoVo,channelId,deviceProperties,clentid,null);
 			retUserinfo.setIsFirttimeLogin(Constants.STATUS_1);
 			// 注册后处理的业务，预留扩展
 			doRegistCommonBusiness(dbUserInfo.getUserId(), clientType);
@@ -1295,8 +1296,7 @@ public class LoginServiceImpl implements ILoginService {
 		LogUtil.log.info(String.format("###qq登录,校验appId,openid:%s,serverConfAppid:%s,oauthMeJson:%s",openid ,serverConfAppid,JsonUtil.beanToJsonString(oauthMeJson))) ;
 		if(StringUtils.isEmpty(openid) || StringUtils.isEmpty(oauthMeAppid) 
 				|| StringUtils.isEmpty(oauthMeOpenid) 
-				|| !serverConfAppid.equals(oauthMeAppid)
-				|| StringUtils.isEmpty(unionid)) {
+				|| !serverConfAppid.equals(oauthMeAppid)) {
 			String errorMsg = "qq互联app端接入，服务器端appid,openid，unionid认证不通过";
 			LogUtil.log.error("###"+errorMsg);
 			throw new LoginBizException(ErrorCode.ERROR_14004);

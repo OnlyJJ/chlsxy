@@ -37,6 +37,15 @@ public class StrUtil {
 		return result;
 	}
 	
+	public static boolean isNotNullOrEmpty(Object obj){
+		boolean result = true;
+		if(null == obj || "".equals(obj)) {
+			result = false;
+		}
+		return result;
+	}
+	
+	
 	public static String getOrderId(){
 		String orderId = DateUntil.getFormatDate("yyyyMMddHHmmssSSS",new Date());
 		for(int i=0 ; i<4 ; i++ ){

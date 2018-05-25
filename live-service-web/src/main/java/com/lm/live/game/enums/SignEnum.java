@@ -20,7 +20,7 @@ public class SignEnum {
 		decorate(3),
 		
 		/** 工具 */
-		gongju(4),
+		tool(4),
 		
 		/** 金币 */
 		gold(5),

@@ -57,6 +57,14 @@ public class UserBaseServiceImpl extends CommonServiceImpl<UserBaseMapper, UserI
 		}
 		return dao.getByQQConnectUnionid(unionid);
 	}
+	
+	@Override
+	public UserInfoDo getByQQConnectOpenid(String openid) {
+		if(StringUtils.isEmpty(openid)) {
+			throw new UserBaseBizException(ErrorCode.ERROR_101);
+		}
+		return dao.getByQQConnectOpenid(openid);
+	}
 
 	@Override
 	public UserInfoDo getByWeiboUid(String uid) {

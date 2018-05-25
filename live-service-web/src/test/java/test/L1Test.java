@@ -19,7 +19,7 @@ import com.lm.live.login.dao.UuidBlackListMapper;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath*:spring/spring-context.xml"})
+@ContextConfiguration({ "classpath*:spring/spring-context.xml"})
 public class L1Test {
 	@Resource
 	private UuidBlackListMapper uuidBlackListMapper;
@@ -105,12 +105,12 @@ public class L1Test {
 	@Test
 	public void test2() {
 		 String url=  "";
-		 url=  "http://127.0.0.1:8088/service_8616/U11/0/";
+		 url=  "http://127.0.0.1:8088/service_8616/G2/0/";
 		 JSONObject  json = new JSONObject();
 		 JSONObject  userinfo = new JSONObject();
 		 JSONObject  requestvo = new JSONObject();
 		 JSONObject  deviceproperties = new JSONObject();
-		 requestvo.put("a", "100357");
+		 requestvo.put("a", "100482");
 		 userinfo.put("b3", "cococ2");
 		 userinfo.put("b6", "w");
 		 userinfo.put("g", "甘霖娘aaaaaa");
@@ -118,8 +118,8 @@ public class L1Test {
 		 deviceproperties.put("a", "M5 Note");
 		 deviceproperties.put("b", "F18A7B3C-7756-4E4B-B072-C6F3ABC0F034"); 
 		 deviceproperties.put("i", 1);
-		 json.put("deviceproperties", deviceproperties);
-		 json.put("userinfo", userinfo);
+//		 json.put("deviceproperties", deviceproperties);
+//		 json.put("userinfo", userinfo);
 		 json.put("requestvo", requestvo);
 		  System.out.println("#####str:"+json.toString());
 		 try {

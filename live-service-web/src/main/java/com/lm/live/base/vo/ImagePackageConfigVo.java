@@ -74,7 +74,7 @@ public class ImagePackageConfigVo extends JsonParseInterface implements Serializ
 	private Integer playType;//播放类型：1、视频区域  2、屏幕中心 3、全屏播放
 	private Integer carPlayType;//座驾播放类型：1、弹簧效果  2、上浮效果
 	private Integer showType;//展示类型 1.全部 2.私有
-	private Integer fileType; // zip的内容，0-png，1-webp或gif
+	private int fileType; // zip的内容，0-png，1-webp或gif
 	
 	@Override
 	public JSONObject buildJson() {
@@ -238,10 +238,10 @@ public class ImagePackageConfigVo extends JsonParseInterface implements Serializ
 	public void setShowType(Integer showType) {
 		this.showType = showType;
 	}
-	public Integer getFileType() {
+	public int getFileType() {
 		return fileType;
 	}
-	public void setFileType(Integer fileType) {
+	public void setFileType(int fileType) {
 		this.fileType = fileType;
 	}
 	

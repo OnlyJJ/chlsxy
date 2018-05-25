@@ -37,6 +37,15 @@ public interface UserBaseMapper extends ICommonMapper<UserInfoDo> {
 	UserInfoDo getByQQConnectUnionid(@Param("unionid") String unionid);
 	
 	/**
+	 * 通过openId获取用户信息
+	 *@param openId
+	 *@return
+	 *@author shao.xiang
+	 *@data 2018年5月24日
+	 */
+	UserInfoDo getByQQConnectOpenid(@Param("openid") String openid);
+	
+	/**
 	 * 根据昵称查询用户
 	 * @param nickName
 	 * @return

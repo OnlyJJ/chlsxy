@@ -59,7 +59,9 @@ public class QQAccessServiceImpl extends CommonServiceImpl<QQConnectUserInfoDoMa
 			String reqUrl = SpringContextListener.getContextProValue("url_QQConnect_getOpenid", "https://graph.qq.com/oauth2.0/me");
 			StringBuffer sbfUrl = new StringBuffer();
 			sbfUrl.append(reqUrl).append("?")
-			.append("access_token=").append(accessToken).append("&").append("unionid=1");
+			// 这里是为了处理同一个qq号在app和web登录时生成不同账户（需要申请打通）
+//			.append("access_token=").append(accessToken).append("&").append("unionid=1"); 
+			.append("access_token=").append(accessToken);
 			String url = sbfUrl.toString();
 			//请求微信服务器，获取到json字符串
 			responseJsonString = HttpUtils.get(url);

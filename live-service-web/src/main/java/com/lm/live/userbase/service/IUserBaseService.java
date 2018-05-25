@@ -49,6 +49,15 @@ public interface IUserBaseService  extends ICommonService<UserInfoDo>{
 	UserInfoDo getByQQConnectUnionid(String unionid);
 	
 	/**
+	 * 通过openid获取用户信息
+	 *@param openid
+	 *@return
+	 *@author shao.xiang
+	 *@data 2018年5月24日
+	 */
+	UserInfoDo getByQQConnectOpenid(String openid);
+	
+	/**
 	 * 根据微博uid获取用户信息
 	 * @param uid
 	 * @return

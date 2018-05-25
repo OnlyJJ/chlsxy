@@ -110,7 +110,8 @@ public class CacheKey {
 	public static final String ANCHOR_FANSCOUNT_CACHE = "anchor:fans:t:";
 	/** 游客昵称缓存 */
 	public static final String USER_PESUDONAME_CACHE = "pesudo:name:";
-	
+	/** 用户签到奖励列表换成 */
+	public static final String USER_SIGN_PRIZE_CACHE = "user:sign:prizes:";
 	
 	// 宠物模块
 	/** 用户正在使用的宠物缓存 */

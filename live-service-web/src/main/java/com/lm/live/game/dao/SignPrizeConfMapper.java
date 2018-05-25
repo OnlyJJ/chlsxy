@@ -23,10 +23,11 @@ public interface SignPrizeConfMapper extends ICommonMapper<SignPrizeConf> {
 	
 	/**
 	 * 获取奖励配置（新、老用户奖励配置不一样）
-	 *@param userFlag 0-新用户，1-老用户
+	 *@param prizeStage 期数
 	 *@return
 	 *@author shao.xiang
 	 *@data 2018年5月10日
 	 */
-	List<SignPrizeConf> listSignPrizeConf(@Param("userFlag") int userFlag);
+	List<SignPrizeConf> listSignPrizeConf(@Param("prizeStage") int prizeStage);
+	
 }

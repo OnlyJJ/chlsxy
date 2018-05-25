@@ -156,11 +156,12 @@ public class ServiceTest {
 //			SignVo jsonRes = signService.sign(userId);
 //			JSONObject jsonRes = loginService.register("牛逼ddd人", "123456");
 //			JSONObject jsonRes = loginService.verifyLogin("100546", "123456");
-//			if(jsonRes != null) {
-//				System.err.println(jsonRes);
-//			} else {
-//				System.err.println("null ....");
-//			}
+			JSONObject jsonRes = signService.listPrize(userId);
+			if(jsonRes != null) {
+				System.err.println(jsonRes);
+			} else {
+				System.err.println("null ....");
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
