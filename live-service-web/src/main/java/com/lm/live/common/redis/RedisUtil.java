@@ -246,4 +246,23 @@ public class RedisUtil {
 		return jedisCluster.hdel(hkey, key);
 	}
 
+	// list的使用，用于榜单，缓存中不做排序
+	public static long lpush(String lkey, String... args) {
+		return jedisCluster.lpush(lkey, args);
+	}
+	
+	/**
+	 * 获取list
+	 * 如果start=0，end=-1，则获取全部list元素
+	 *@param lkey
+	 *@param start 开始的下标
+	 *@param end 结束的下标
+	 *@return
+	 *@author shao.xiang
+	 *@data 2018年5月25日
+	 */
+	public static List<?> lget(String lkey, int start, int end) {
+		return jedisCluster.lrange(lkey, start, end);
+	}
+	
 }

@@ -164,7 +164,7 @@ public class LoginServiceImpl implements ILoginService {
 			// 密码: 先取Md5(uuid)
 			String imeiMd5Str = Md5CommonUtils.getMD5String(uuid);
 			// 密码加密
-			String encryptDbPwd = getPwd(nowDate, userId, imeiMd5Str);
+			String encryptDbPwd = getPwd(userId, imeiMd5Str);
 
 			// 根据ip获取省份
 			String clientProvince = provinceService.getProviceBy(clientIp);
@@ -1063,25 +1063,14 @@ public class LoginServiceImpl implements ILoginService {
 	
 	/**
 	 * 生成密码
-	 * @param obj
 	 * @param userId
 	 * @param pwd
 	 * @return
 	 * @author shao.xiang
 	 * @date 2018年3月10日
 	 */
-	private String getPwd(Object obj,String userId,String pwd){
-		String realPwds="";
-		if(obj instanceof String){
-			Date addTime = DateUntil.getDateByFormat(Constants.DATEFORMAT_YMDHMS_1, (String)obj);
-			String time = DateUntil.getFormatDate(Constants.DATEFORMAT_YMDHMS, addTime);
-			realPwds = MD5Util.md5(pwd+userId+time);
-		}else if(obj instanceof Date){
-			String time = DateUntil.getFormatDate(Constants.DATEFORMAT_YMDHMS, (Date)obj);
-			System.err.println("time="+time);
-			realPwds = MD5Util.md5(pwd+userId+time);
-		}
-		return realPwds;
+	private String getPwd(String userId,String pwd){
+		return MD5Util.md5(userId + MD5Util.md5(StrUtil.replaceBlank(pwd)));
 	}
 	
 	/**
@@ -1469,7 +1458,7 @@ public class LoginServiceImpl implements ILoginService {
 		dbuser = new UserInfoDo();
 		dbuser.setUserId(userId);
 		dbuser.setNickName(nickName);
-		dbuser.setPwd(getPwd(addTime, userId, pwd));
+		dbuser.setPwd(getPwd(userId, pwd));
 		dbuser.setUserStatus(Constants.STATUS_1);
 		dbuser.setIcon(Constants.USER_DEFAULT_ICON);
 		dbuser.setAddTime(addTime);
@@ -1499,8 +1488,8 @@ public class LoginServiceImpl implements ILoginService {
 			throw new LoginBizException(ErrorCode.ERROR_14001);
 		}
 		Date addTime = dbuser.getAddTime();
-		String signPwd = getPwd(addTime, userId, pwd);
-		if(!dbuser.getPwd().equals(signPwd)) {
+//		String signPwd = getPwd(userId, pwd);
+		if(!dbuser.getPwd().equals(pwd)) {
 			throw new LoginBizException(ErrorCode.ERROR_14005);	
 		}
 		setMemcacheToSessionId(session, userId);
@@ -1513,4 +1502,5 @@ public class LoginServiceImpl implements ILoginService {
 		ret.put(retUserinfo.getShortName(), retUserinfo.buildJson());
 		return ret;
 	}
+	
 }

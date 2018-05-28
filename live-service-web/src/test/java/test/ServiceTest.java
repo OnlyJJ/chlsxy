@@ -1,5 +1,7 @@
 package test;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.junit.Test;
@@ -7,11 +9,15 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.appclient.service.IAppStartupPageService;
 import com.lm.live.base.service.IImagePackageConfigService;
 import com.lm.live.base.service.IThirdpartyConfService;
 import com.lm.live.base.service.IUserAccusationInfoService;
+import com.lm.live.common.redis.RedisUtil;
+import com.lm.live.common.utils.MD5Util;
+import com.lm.live.common.utils.StrUtil;
 import com.lm.live.common.vo.Page;
 import com.lm.live.decorate.service.IDecoratePackageService;
 import com.lm.live.game.service.IGameService;
@@ -154,14 +160,29 @@ public class ServiceTest {
 //			String key = CacheKey.SIGN_DAY_CACHE + userId + Constants.SEPARATOR_COLON + nowStr;
 //			RedisUtil.del(key);
 //			SignVo jsonRes = signService.sign(userId);
-//			JSONObject jsonRes = loginService.register("牛逼ddd人", "123456");
-//			JSONObject jsonRes = loginService.verifyLogin("100546", "123456");
-			JSONObject jsonRes = signService.listPrize(userId);
+//			JSONObject jsonRes = loginService.register("牛逼ddd人2223", "123456");
+			String pwd =  MD5Util.md5("100282" + MD5Util.md5(StrUtil.replaceBlank("123456")));
+			System.err.println(pwd);
+			JSONObject jsonRes = loginService.verifyLogin("100282", pwd);
+//			JSONObject jsonRes = signService.listPrize(userId);
 			if(jsonRes != null) {
 				System.err.println(jsonRes);
 			} else {
 				System.err.println("null ....");
 			}
+//			JSONObject data = new JSONObject();
+//			data.put("userId", "100655");
+//			data.put("icon", "http://192.168.1.70/upload/default.png");
+//			data.put("userLevel", 2);
+//			data.put("sort", 100000);
+//			RedisUtil.lpush("list2", data.toString());
+//			List list = RedisUtil.lget("list2", 0, -1);
+//			if(list != null && list.size() >0) {
+//				for(int i=0;i<list.size(); i++) {
+//					Object obj = list.get(i);
+//					System.err.println("obj=" + JSON.toJSON(obj));
+//				}
+//			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
