@@ -2,9 +2,10 @@ package com.lm.live.common.redis;
 
 import java.util.List;
 import java.util.Map;
-
+import java.util.Set;
 
 import redis.clients.jedis.JedisCluster;
+import redis.clients.jedis.params.sortedset.ZAddParams;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
@@ -265,4 +266,89 @@ public class RedisUtil {
 		return jedisCluster.lrange(lkey, start, end);
 	}
 	
+	/**
+	 * 有序set（添加成员）
+	 *@param key 有序的set的key
+	 *@param score 排序值（默认从小到大排序）
+	 *@param member 成员（使用userId）
+	 *@return
+	 *@author shao.xiang
+	 *@data 2018年5月29日
+	 */
+	public static long zadd(String key, double score, String member) {
+		return jedisCluster.zadd(key, score, member);
+	}
+	
+	/**
+	 * 有序set（获取成员排名，按分数从小到大排名）
+	 *@param key
+	 *@param member
+	 *@return
+	 *@author shao.xiang
+	 *@data 2018年5月29日
+	 */
+	public static long zrank(String key, String member) {
+		return jedisCluster.zrank(key, member);
+	}
+	
+	/**
+	 * 有序set（获取成员排名，按分数从大到小排名）
+	 *@param key
+	 *@param member
+	 *@return
+	 *@author shao.xiang
+	 *@data 2018年5月29日
+	 */
+	public static long zrevrank(String key, String member) {
+		return jedisCluster.zrevrank(key, member);
+	}
+	
+	/**
+	 * 有序set（获取成员分数，不存在返回null）
+	 *@param key
+	 *@param member
+	 *@return
+	 *@author shao.xiang
+	 *@data 2018年5月29日
+	 */
+	public static Double zscore(String key, String member) {
+		return jedisCluster.zscore(key, member);
+	}
+	
+	/**
+	 * 有序set（返回集合中元素个数，时间复杂度O(1)）
+	 *@param key
+	 *@return
+	 *@author shao.xiang
+	 *@data 2018年5月29日
+	 */
+	public static long zcard(String key) {
+		return jedisCluster.zcard(key);
+	}
+	
+	/**
+	 * 有序set（返回指定下标区间的集合）
+	 *@param key
+	 *@param start
+	 *@param end
+	 *@return
+	 *@author shao.xiang
+	 *@data 2018年5月29日
+	 */
+	public static Set<String> zrange(String key, long start, long end) {
+		return jedisCluster.zrange(key, start, end);
+	}
+	
+	/**
+	 * 有序set（为成员增加score，并返回新的score值，若key不存在，则会先插入再执行，score不能为负，因为指定了double，如果要为负，则score须为float）
+	 *@param key
+	 *@param score
+	 *@param member
+	 *@return
+	 *@author shao.xiang
+	 *@data 2018年5月29日
+	 */
+	public static Double zincrby(String key, double score, String member) {
+		return jedisCluster.zincrby(key, score, member);
+	}
 }

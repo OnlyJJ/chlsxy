@@ -13,8 +13,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.lm.live.common.utils.HttpUtils;
+import com.lm.live.common.utils.MD5Util;
 import com.lm.live.common.utils.Md5CommonUtils;
 import com.lm.live.common.utils.RegexUtil;
+import com.lm.live.common.utils.StrUtil;
 import com.lm.live.login.dao.UuidBlackListMapper;
 
 
@@ -27,17 +29,16 @@ public class L1Test {
 	@Test
 	public void test() {
 		 String url=  "";
-		 url=  "http://192.168.1.70:8616/L7/0/";
+		 url=  "http://192.168.1.70:8616/R2/0/";
 		 JSONObject  json = new JSONObject();
-		 JSONObject  code = new JSONObject();
+		 JSONObject  requestvo = new JSONObject();
 		 JSONObject  deviceproperties = new JSONObject();
-		 code.put("a", "100138");
-		 code.put("c", "123456");
+		 requestvo.put("c", "102692");
 		 deviceproperties.put("a", "M5 Note");
 		 deviceproperties.put("b", "F18A7B3C-7756-4E4B-B072-C6F3ABC0F034"); 
 		 deviceproperties.put("i", 1);
-		 json.put("code", code);
-//		 json.put("deviceproperties", deviceproperties);
+		 json.put("requestvo", requestvo);
+		 json.put("deviceproperties", deviceproperties);
 		  
 		  System.out.println("#####str:"+json.toString());
 		 try {

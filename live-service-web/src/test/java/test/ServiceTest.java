@@ -1,5 +1,6 @@
 package test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -30,6 +31,7 @@ import com.lm.live.tools.service.IGiftService;
 import com.lm.live.tools.service.IUserPackageService;
 import com.lm.live.user.service.IUserCacheInfoService;
 import com.lm.live.user.service.IUserInfoService;
+import com.lm.live.user.vo.UserInfo;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -163,13 +165,13 @@ public class ServiceTest {
 //			JSONObject jsonRes = loginService.register("牛逼ddd人2223", "123456");
 			String pwd =  MD5Util.md5("100282" + MD5Util.md5(StrUtil.replaceBlank("123456")));
 			System.err.println(pwd);
-			JSONObject jsonRes = loginService.verifyLogin("100282", pwd);
+//			JSONObject jsonRes = loginService.verifyLogin("100282", pwd);
 //			JSONObject jsonRes = signService.listPrize(userId);
-			if(jsonRes != null) {
-				System.err.println(jsonRes);
-			} else {
-				System.err.println("null ....");
-			}
+//			if(jsonRes != null) {
+//				System.err.println(jsonRes);
+//			} else {
+//				System.err.println("null ....");
+//			}
 //			JSONObject data = new JSONObject();
 //			data.put("userId", "100655");
 //			data.put("icon", "http://192.168.1.70/upload/default.png");
@@ -183,6 +185,40 @@ public class ServiceTest {
 //					System.err.println("obj=" + JSON.toJSON(obj));
 //				}
 //			}
+			// 加1000个userId
+			for(int i=0; i< 1000;i++) {
+				String key = "test_set";
+				double score = 1.0+i;
+				String member = "1000" + i;
+				RedisUtil.zadd(key, score, member);
+				
+				// 插入每个用户的信息
+				UserInfo vo = new UserInfo();
+				vo.setSex("m");
+				vo.setNickName("渣渣辉:" + i);
+				vo.setRemark("你是个渣渣呀~" + i);
+				vo.setUserId(member);
+				RedisUtil.set(member, JSON.toJSONString(vo));
+			}
+			int num = 1;
+			int limit = 36;
+			int index = num > 1? (num -1) * limit : 0;
+			List<UserInfo> list = new ArrayList<UserInfo>();
+			for(int i=0;i<limit;i++) {
+				if(list.size() > index) {
+					break;
+				}
+				String member = "1000" + i;
+				UserInfo info = RedisUtil.getJavaBean(member, UserInfo.class);
+				list.add(info);
+				index++;
+			}
+			if(list.size() >0) {
+				System.err.println("list=" + list.size());
+				for(UserInfo v : list) {
+					System.err.println("userId = " + v.getUserId());
+				}
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
